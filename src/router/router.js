@@ -21,6 +21,11 @@ export const routes = [
     component: () => import('../views/basic/Register.vue'),
     meta: { title: '注册元素', description: '将元素纳入 jsPlumb 管理' },
   },
+  {
+    path: '/basic/connector',
+    component: () => import('../views/basic/Connector.vue'),
+    meta: { title: '连接元素', description: '连接两个元素' },
+  },
 ];
 
 export const router = createRouter({

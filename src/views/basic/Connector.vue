@@ -26,7 +26,15 @@
   </div>
 </template>
 <script>
-import { newInstance, ready } from '@jsplumb/browser-ui';
+import {
+  newInstance,
+  ready,
+  StraightConnector,
+  BezierConnector,
+  FlowchartConnector,
+  AnchorLocations,
+  BlankEndpoint,
+} from '@jsplumb/browser-ui';
 
 export default {
   mounted() {
@@ -51,9 +59,36 @@ export default {
       const node2 = document.querySelector('#node_id_2');
       const node3 = document.querySelector('#node_id_3');
 
-      this.jsPlumbIns.manage(node1/* , 'node_id_1' */);
-      this.jsPlumbIns.manage(node2/* , 'node_id_2' */);
-      this.jsPlumbIns.manage(node3/* , 'node_id_3' */);
+      this.jsPlumbIns.connect({
+        source: node1,
+        target: node2,
+
+        /**
+         * Whether or not the connection is detachable.
+         * Defaults to true.
+         */
+        detachable: false,
+
+        /**
+         * StraightConnector
+         * BezierConnector
+         * FlowchartConnector
+         */
+        connector: {
+          type: FlowchartConnector.type,
+          options: {
+            cornerRadius: 3,
+          },
+        },
+
+        // 连线两端的样式
+        endpoint: {
+          type: BlankEndpoint.type,
+        },
+
+        // 连线与元素 连接点的样式
+        anchor: AnchorLocations.AutoDefault,
+      });
     },
   },
 };
