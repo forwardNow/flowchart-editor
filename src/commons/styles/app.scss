@@ -1,8 +1,11 @@
-$fc-width: 1200px;
-$fc-height: 800px;
-$fc-toolbox: 240px;
+$color-primary: #026dff;
+
+$fc-width: 800px;
+$fc-height: 400px;
+
 $fc-node-base-width: 128px;
 $fc-node-base-height: 44px;
+$fc-node-base-border-width: 2px;
 
 .flow-chart {
   position: relative;
@@ -10,92 +13,83 @@ $fc-node-base-height: 44px;
   height: $fc-height;
   border: solid 1px #ddd;
 
+  line-height: 1.2;
+  font-size: 13px;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+
   &,
   * {
     box-sizing: border-box;
   }
 
-  .fc-toolbox {
-    position: absolute;
-    left: 0;
-    top: 0;
-
-    width: $fc-toolbox;
-    height: 100%;
-
-    border-right: solid 1px #ddd;
-
-    .node {
-      margin: 24px auto;
-    }
-
-  }
-
   .fc-stage {
     position: relative;
-  }
-
-  .node {
-    width: $fc-node-base-width;
-    //height: 44px;
-
-    line-height: 1.2;
-    font-size: 13px;
-    color: #666;
-
-    background-color: #cce5ff;
-    border: solid 1px #99ccff;
-
-    border-radius: 4px;
-  }
-
-  .node-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0 2px;
-    min-height: $fc-node-base-height;
 
     width: 100%;
     height: 100%;
   }
 
-  .node-text {
+  .fc-node {
+    position: absolute;
+
+    width: $fc-node-base-width;
+
+    color: #666;
+    background-color: #cce5ff;
+
+    border: solid $fc-node-base-border-width #99ccff;
+    border-radius: 4px;
+
+    cursor: default;
+  }
+
+  .fc-node-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 2px;
+
+    width: 100%;
+    height: 100%;
+    min-height: $fc-node-base-height;
+  }
+
+  .fc-node-text {
     text-align: center;
     word-break: break-all;
   }
 
-  .node-circle {
+  .fc-node-circle {
     width: 84px;
     border-color: #ffe6cc;
     background-color: #ffffcc;
     border-radius: 24px;
   }
 
-  .node-rectangle {}
+  .fc-node-rectangle {}
 
-  .node-diamond {
-    width: 64px;
-    height: 64px;
+  .fc-node-diamond {
+    width: 88px;
+    height: 88px;
 
-    border-color: transparent;
+    border: none 0;
     background-color: transparent;
 
 
-    .node-inner {
+    .fc-node-inner {
       padding: 0;
-      width: 100%;
-      height: 100%;
+      width: 64px;
+      height: 64px;
 
-      border-color: #ffcc99;
+      border: solid $fc-node-base-border-width #ffcc99;
       background-color: #ffe6cc;
 
       border-radius: 4px;
-      transform: rotate(45deg);
+      transform: translate(11px, 11px) rotate(45deg);
     }
 
-    .node-text {
+    .fc-node-text {
       transform: rotate(-45deg);
     }
   }

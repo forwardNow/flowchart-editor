@@ -1,38 +1,53 @@
 <template>
-  <div class="view-list">
+  <div class="card-list">
     <router-link
-      class="view-item"
-      v-for="(item, i) in routes"
+      class="card"
+      v-for="(item, i) in cards"
       :key="i"
       :to="item.path"
     >
-      {{ item.path }}
+      <span class="card-title">{{ item.title }}</span>
+      <span class="card-desc">{{ item.description }}</span>
     </router-link>
   </div>
 </template>
 <script>
-import { routes } from '../../router/router.js';
+import { routes } from '../../router/router';
+
 export default {
   data() {
     return {
-      routes
+      routes,
     };
   },
-}
+
+  computed: {
+    cards() {
+      return this.routes
+        .map((route) => {
+          const { path, meta: { title, description, display } } = route;
+          return {
+            path, title, description, display: display !== false,
+          };
+        }).filter((item) => Boolean(item.display));
+    },
+  },
+};
 </script>
 <style lang="scss">
-@import "../../commons/styles/vars";
-
-.view-list {
+.card-list {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
 
-  .view-item {
+  font-size: 14px;
+  line-height: 1.2;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+
+  .card {
+    display: block;
+
     margin: 16px 0 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
     width: 200px;
     height: 120px;
@@ -40,7 +55,22 @@ export default {
     border: solid 1px #ddd;
     border-radius: 6px;
 
-    color: $color-primary;
+    text-decoration: none;
+  }
+
+  .card-title {
+    display: block;
+    margin-top: 16px;
+
+    text-align: center;
+    color: #333;
+    font-size: 18px;
+  }
+
+  .card-desc {
+    display: block;
+    margin: 8px 16px;
+    color: #666;
   }
 }
 </style>

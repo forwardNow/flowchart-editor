@@ -9,13 +9,13 @@
   },
   "dependencies": {
     "vue": "^3.3.8",
+    "@jsplumb/browser-ui": "^6.2.10",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
     "sass": "^1.69.5",
     "vite": "^5.0.0",
-    "@jsplumb/browser-ui": "^6.2.10",
     "@rushstack/eslint-patch": "^1.6.0",
     "@vue/eslint-config-airbnb": "^7.0.0"
   }
