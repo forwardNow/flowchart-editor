@@ -26,6 +26,11 @@ export const routes = [
     component: () => import('../views/basic/Connector.vue'),
     meta: { title: '连接元素', description: '连接两个元素' },
   },
+  {
+    path: '/editor',
+    component: () => import('../views/editor/Editor.vue'),
+    meta: { title: '编辑器', description: '通过拖拽完成界面' },
+  },
 ];
 
 export const router = createRouter({

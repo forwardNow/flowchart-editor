@@ -1,3 +1,4 @@
+$fc-border-color: #ddd;
 $fc-node-base-width: 128px;
 $fc-node-base-height: 44px;
 $fc-node-base-border-width: 2px;
@@ -6,7 +7,7 @@ $fc-node-base-border-width: 2px;
   position: relative;
   width: 100%;
   height: 100%;
-  border: solid 1px #ddd;
+  border: solid 1px $fc-border-color;
 
   line-height: 1.2;
   font-size: 13px;
@@ -18,71 +19,102 @@ $fc-node-base-border-width: 2px;
     box-sizing: border-box;
   }
 
-  .fc-node {
-    position: absolute;
+}
 
-    width: $fc-node-base-width;
+.fc-node {
+  position: absolute;
 
-    color: #666;
-    background-color: #cce5ff;
+  width: $fc-node-base-width;
 
-    border: solid $fc-node-base-border-width #99ccff;
-    border-radius: 4px;
+  color: #666;
+  background-color: #cce5ff;
 
-    cursor: default;
-  }
+  border: solid $fc-node-base-border-width #99ccff;
+  border-radius: 4px;
+
+  cursor: default;
+}
+
+.fc-node-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 2px;
+
+  width: 100%;
+  height: 100%;
+  min-height: $fc-node-base-height;
+}
+
+.fc-node-text {
+  text-align: center;
+  word-break: break-all;
+}
+
+.fc-node-circle {
+  width: 84px;
+  border-color: #ffe6cc;
+  background-color: #ffffcc;
+  border-radius: 24px;
+}
+
+.fc-node-rectangle {}
+
+.fc-node-diamond {
+  width: 88px;
+  height: 88px;
+
+  border: none 0;
+  background-color:  transparent; // rgba(0,0,0,0.2);
+
 
   .fc-node-inner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 0;
+    width: 64px;
+    height: 64px;
 
-    padding: 0 2px;
+    border: solid $fc-node-base-border-width #ffcc99;
+    background-color: #ffe6cc;
 
-    width: 100%;
-    height: 100%;
-    min-height: $fc-node-base-height;
+    border-radius: 4px;
+    transform: translate(12px, 12px) rotate(45deg);
   }
 
   .fc-node-text {
-    text-align: center;
-    word-break: break-all;
+    transform: rotate(-45deg);
   }
-
-  .fc-node-circle {
-    width: 84px;
-    border-color: #ffe6cc;
-    background-color: #ffffcc;
-    border-radius: 24px;
-  }
-
-  .fc-node-rectangle {}
-
-  .fc-node-diamond {
-    width: 88px;
-    height: 88px;
-
-    border: none 0;
-    background-color:  transparent; // rgba(0,0,0,0.2);
-
-
-    .fc-node-inner {
-      padding: 0;
-      width: 64px;
-      height: 64px;
-
-      border: solid $fc-node-base-border-width #ffcc99;
-      background-color: #ffe6cc;
-
-      border-radius: 4px;
-      transform: translate(12px, 12px) rotate(45deg);
-    }
-
-    .fc-node-text {
-      transform: rotate(-45deg);
-    }
-  }
-
 }
 
 
+.fc-editor {
+  display: flex;
+  align-items: stretch;
+
+  position: relative;
+  width: 1000px;
+  height: 600px;
+
+  line-height: 1.2;
+  font-size: 13px;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  user-select: none;
+
+  &,
+  * {
+    box-sizing: border-box;
+  }
+
+  .fc-editor-toolbox {
+    position: relative;
+    width: 200px;
+    height: 100%;
+    border: solid 1px $fc-border-color;
+    border-right-width: 0;
+  }
+  .fc-editor-stage {
+    z-index: 10;
+    width: 800px;
+    height: 100%;
+  }
+}
