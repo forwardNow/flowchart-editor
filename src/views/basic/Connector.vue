@@ -33,7 +33,7 @@ import {
   BezierConnector,
   FlowchartConnector,
   AnchorLocations,
-  BlankEndpoint,
+  BlankEndpoint, ArrowOverlay,
 } from '@jsplumb/browser-ui';
 
 export default {
@@ -55,20 +55,8 @@ export default {
         elementsDraggable: true,
       });
 
-      const node1 = document.querySelector('#node_id_1');
-      const node2 = document.querySelector('#node_id_2');
-      const node3 = document.querySelector('#node_id_3');
-
-      this.jsPlumbIns.connect({
-        source: node1,
-        target: node2,
-
-        /**
-         * Whether or not the connection is detachable.
-         * Defaults to true.
-         */
-        detachable: false,
-
+      // 修改默认样式
+      this.jsPlumbIns.importDefaults({
         /**
          * StraightConnector
          * BezierConnector
@@ -88,6 +76,54 @@ export default {
 
         // 连线与元素 连接点的样式
         anchor: AnchorLocations.AutoDefault,
+      });
+
+      const node1 = document.querySelector('#node_id_1');
+      const node2 = document.querySelector('#node_id_2');
+      const node3 = document.querySelector('#node_id_3');
+
+      this.jsPlumbIns.connect({
+        source: node1,
+        target: node2,
+
+        /**
+         * Whether or not the connection is detachable.
+         * Defaults to true.
+         */
+        detachable: false,
+
+        overlays: [
+          {
+            type: ArrowOverlay.type,
+            options: {
+              location: 1,
+              width: 10,
+              length: 10,
+            },
+          },
+        ],
+      });
+
+      this.jsPlumbIns.connect({
+        source: node2,
+        target: node3,
+
+        /**
+         * Whether or not the connection is detachable.
+         * Defaults to true.
+         */
+        detachable: false,
+
+        overlays: [
+          {
+            type: ArrowOverlay.type,
+            options: {
+              location: 1,
+              width: 10,
+              length: 10,
+            },
+          },
+        ],
       });
     },
   },

@@ -75,7 +75,7 @@ $fc-node-base-border-width: 2px;
     height: 88px;
 
     border: none 0;
-    background-color: transparent;
+    background-color:  transparent; // rgba(0,0,0,0.2);
 
 
     .fc-node-inner {
@@ -87,7 +87,7 @@ $fc-node-base-border-width: 2px;
       background-color: #ffe6cc;
 
       border-radius: 4px;
-      transform: translate(11px, 11px) rotate(45deg);
+      transform: translate(12px, 12px) rotate(45deg);
     }
 
     .fc-node-text {
