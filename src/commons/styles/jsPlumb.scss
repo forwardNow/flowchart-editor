@@ -1,16 +1,11 @@
-$color-primary: #026dff;
-
-$fc-width: 800px;
-$fc-height: 400px;
-
 $fc-node-base-width: 128px;
 $fc-node-base-height: 44px;
 $fc-node-base-border-width: 2px;
 
 .flow-chart {
   position: relative;
-  width: $fc-width;
-  height: $fc-height;
+  width: 100%;
+  height: 100%;
   border: solid 1px #ddd;
 
   line-height: 1.2;
@@ -21,13 +16,6 @@ $fc-node-base-border-width: 2px;
   &,
   * {
     box-sizing: border-box;
-  }
-
-  .fc-stage {
-    position: relative;
-
-    width: 100%;
-    height: 100%;
   }
 
   .fc-node {

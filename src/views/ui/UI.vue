@@ -1,5 +1,5 @@
 <template>
-  <div class="flow-chart">
+  <div class="flow-chart box">
     <div class="fc-node fc-node-circle">
       <div class="fc-node-inner">
         <div class="fc-node-text">起止符号</div>

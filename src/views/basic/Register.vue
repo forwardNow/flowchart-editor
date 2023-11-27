@@ -1,26 +1,22 @@
 <template>
-  <div class="flow-chart">
+  <div class="flow-chart box">
 
-    <div class="fc-stage">
-
-      <div class="fc-node fc-node-circle" id="node_id_1" style="left: 0; top: 100px;">
-        <div class="fc-node-inner">
-          <div class="fc-node-text">起止符号</div>
-        </div>
+    <div class="fc-node fc-node-circle" id="node_id_1" style="left: 0; top: 100px;">
+      <div class="fc-node-inner">
+        <div class="fc-node-text">起止符号</div>
       </div>
+    </div>
 
-      <div class="fc-node fc-node-rectangle" id="node_id_2" style="left: 200px; top: 100px;">
-        <div class="fc-node-inner">
-          <div class="fc-node-text">任务内容（状态：已经完成）</div>
-        </div>
+    <div class="fc-node fc-node-rectangle" id="node_id_2" style="left: 200px; top: 100px;">
+      <div class="fc-node-inner">
+        <div class="fc-node-text">任务内容（状态：已经完成）</div>
       </div>
+    </div>
 
-      <div class="fc-node fc-node-diamond" id="node_id_3" style="left: 400px; top: 100px;">
-        <div class="fc-node-inner">
-          <span class="fc-node-text">决策判断</span>
-        </div>
+    <div class="fc-node fc-node-diamond" id="node_id_3" style="left: 400px; top: 100px;">
+      <div class="fc-node-inner">
+        <span class="fc-node-text">决策判断</span>
       </div>
-
     </div>
 
   </div>
@@ -35,10 +31,10 @@ export default {
 
   methods: {
     init() {
-      const fcStageElement = document.querySelector('.fc-stage');
+      const fcContainerElement = document.querySelector('.flow-chart');
 
       this.jsPlumbIns = newInstance({
-        container: fcStageElement,
+        container: fcContainerElement,
 
         /**
          * Whether or not elements should be draggable.
