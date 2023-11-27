@@ -17,6 +17,11 @@ export const routes = [
     meta: { title: 'UI设计', description: '界面样式，包括舞台样式、节点样式' },
   },
   {
+    path: '/dnd/basic',
+    component: () => import('../views/dnd/Basic.vue'),
+    meta: { title: 'DND-基础', description: '使用 interactjs 完成拖拽组件到画布上' },
+  },
+  {
     path: '/basic/register',
     component: () => import('../views/basic/Register.vue'),
     meta: { title: '注册元素', description: '将元素纳入 jsPlumb 管理' },
