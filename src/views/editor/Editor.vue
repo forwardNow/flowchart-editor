@@ -38,7 +38,7 @@ import {
   BezierConnector,
   FlowchartConnector,
   AnchorLocations,
-  BlankEndpoint, ArrowOverlay,
+  BlankEndpoint, ArrowOverlay, EVENT_CONNECTION, DotEndpoint, DEFAULT_KEY_ENDPOINTS,
 } from '@jsplumb/browser-ui';
 
 export default {
@@ -54,6 +54,46 @@ export default {
 
     initJsPlumb() {
       const fcContainerElement = document.querySelector('.flow-chart');
+
+      this.jsPlumbIns = newInstance({
+        container: fcContainerElement,
+        elementsDraggable: true,
+      });
+
+      this.jsPlumbIns.importDefaults({
+        connector: {
+          type: FlowchartConnector.type,
+          options: {
+            cornerRadius: 3,
+          },
+        },
+
+        endpoint: {
+          type: DotEndpoint.type,
+          options: {
+            radius: 4,
+          },
+        },
+
+        endpointStyle: {
+          fill: '#067bef',
+        },
+
+        paintStyle: { strokeWidth: 2, stroke: '#5c5c5c' },
+
+        anchor: AnchorLocations.AutoDefault,
+
+        connectionOverlays: [
+          {
+            type: ArrowOverlay.type,
+            options: {
+              location: 1,
+              width: 10,
+              length: 10,
+            },
+          },
+        ],
+      });
     },
 
     initDnd() {
@@ -115,10 +155,59 @@ export default {
               mirror.el.style.top = `${mirror.y}px`;
             },
 
-            end() {
+            end: () => {
               if (mirror.x < 0) {
                 stageElement.removeChild(mirror.el);
+                return;
               }
+
+              this.jsPlumbIns.manage(mirror.el);
+
+              this.jsPlumbIns.addEndpoints(mirror.el, [
+                {
+                  source: true,
+                  target: true,
+                  anchor: 'Top',
+                  maxConnections: -1,
+                },
+                {
+                  source: true,
+                  target: true,
+                  anchor: 'Right',
+                  maxConnections: -1,
+                },
+                {
+                  source: true,
+                  target: true,
+                  anchor: 'Bottom',
+                  maxConnections: -1,
+                },
+                {
+                  source: true,
+                  target: true,
+                  anchor: 'Left',
+                  maxConnections: -1,
+                },
+              ]);
+
+              mirror.el.addEventListener('mouseenter', (event) => {
+                console.log('mouseenter');
+                const endPoints = this.jsPlumbIns.getEndpoints(event.target);
+
+                endPoints.forEach((item) => {
+                  item.addClass('hover');
+                });
+              });
+
+              mirror.el.addEventListener('mouseleave', (event) => {
+                console.log('mouseleave');
+
+                const endPoints = this.jsPlumbIns.getEndpoints(event.target);
+
+                endPoints.forEach((item) => {
+                  // item.setVisible(false);
+                });
+              });
             },
           },
         });
@@ -127,8 +216,3 @@ export default {
   },
 };
 </script>
-<style scoped>
-.fc-editor {
-  margin: 100px;
-}
-</style>

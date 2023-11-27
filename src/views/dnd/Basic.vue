@@ -1,5 +1,5 @@
 <template>
-  <div class="fc-editor">
+  <div class="fc-editor dnd-basic">
     <div class="fc-editor-toolbox">
 
       <div class="fc-node fc-node-circle" style="top: 100px;">
@@ -106,8 +106,8 @@ export default {
   },
 };
 </script>
-<style scoped>
-.fc-editor {
+<style>
+.dnd-basic {
   margin: 100px;
 }
 </style>
