@@ -2,19 +2,19 @@
   <div class="fc-editor">
     <div class="fc-editor-toolbox">
 
-      <div class="fc-node fc-node-circle" style="top: 100px;">
+      <div class="fc-node fc-node-circle">
         <div class="fc-node-inner">
           <div class="fc-node-text">起止符号</div>
         </div>
       </div>
 
-      <div class="fc-node fc-node-rectangle" style="top: 200px;">
+      <div class="fc-node fc-node-rectangle">
         <div class="fc-node-inner">
           <div class="fc-node-text">任务内容（状态：已经完成）</div>
         </div>
       </div>
 
-      <div class="fc-node fc-node-diamond" style="top: 300px;">
+      <div class="fc-node fc-node-diamond">
         <div class="fc-node-inner">
           <span class="fc-node-text">决策判断</span>
         </div>
@@ -22,9 +22,7 @@
 
     </div>
     <div class="fc-editor-stage">
-      <div class="flow-chart">
-        <div>text</div>
-      </div>
+      <div class="flow-chart" />
     </div>
   </div>
 </template>
@@ -59,6 +57,8 @@ export default {
         container: fcContainerElement,
         elementsDraggable: true,
       });
+
+      window.jsPlumbIns = this.jsPlumbIns;
 
       this.jsPlumbIns.importDefaults({
         connector: {
@@ -126,6 +126,8 @@ export default {
         .draggable({
           autoScroll: true,
 
+          cursorChecker() {},
+
           listeners: {
             start(event) {
               const { currentTarget } = event;
@@ -189,25 +191,6 @@ export default {
                   maxConnections: -1,
                 },
               ]);
-
-              mirror.el.addEventListener('mouseenter', (event) => {
-                console.log('mouseenter');
-                const endPoints = this.jsPlumbIns.getEndpoints(event.target);
-
-                endPoints.forEach((item) => {
-                  item.addClass('hover');
-                });
-              });
-
-              mirror.el.addEventListener('mouseleave', (event) => {
-                console.log('mouseleave');
-
-                const endPoints = this.jsPlumbIns.getEndpoints(event.target);
-
-                endPoints.forEach((item) => {
-                  // item.setVisible(false);
-                });
-              });
             },
           },
         });
