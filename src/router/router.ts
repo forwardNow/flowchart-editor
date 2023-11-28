@@ -35,6 +35,11 @@ export const routes: Array<RouteConfig> = [
     meta: { title: '连接元素', description: '连接两个元素' },
   },
   {
+    path: '/basic/select',
+    component: () => import('../views/basic/Select.vue'),
+    meta: { title: '查询元素', description: '查询所有元素，并生成配置文件' },
+  },
+  {
     path: '/editor/simple',
     component: () => import('../views/editor/SimpleEditor.vue'),
     meta: { title: '简单编辑器', description: '通过拖拽完成界面。无法保存数据' },
@@ -42,7 +47,7 @@ export const routes: Array<RouteConfig> = [
   {
     path: '/editor/store',
     component: () => import('../views/editor/StoreEditor.vue'),
-    meta: { title: '可保存数据的编辑器', description: '通过拖拽完成界面。可保存数据' },
+    meta: { title: '编辑器', description: '通过拖拽完成界面。可保存数据' },
   },
 ];
 

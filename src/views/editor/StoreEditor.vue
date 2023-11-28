@@ -59,7 +59,9 @@ export default {
         elementsDraggable: true,
       });
 
-      window.jsPlumbIns = this.jsPlumbIns;
+      if (process.env.NODE_ENV === 'development') {
+        window.jsPlumbIns = this.jsPlumbIns;
+      }
 
       this.jsPlumbIns.importDefaults({
         connector: {
