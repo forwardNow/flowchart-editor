@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import type { Connection as JsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
 import lodashGet from 'lodash.get';
+import type { Connection as JsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
 
 export type IFcNodeType = 'Circle' | 'Rectangle' | 'Diamond';
 

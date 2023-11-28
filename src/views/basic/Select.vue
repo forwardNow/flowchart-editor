@@ -30,18 +30,14 @@
   </div>
 </template>
 <script>
-import lodashGet from 'lodash.get';
 
 import {
   newInstance,
   ready,
-  StraightConnector,
-  BezierConnector,
   FlowchartConnector,
-  AnchorLocations,
   BlankEndpoint, ArrowOverlay,
 } from '@jsplumb/browser-ui';
-import { FlowChartConfig, IFcAnchor } from '@/commons/config/FlowChartConfig';
+import { FlowChartConfig } from '@/commons/config/FlowChartConfig';
 
 export default {
   mounted() {
