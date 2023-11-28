@@ -1,9 +1,24 @@
 # jsplumb-guide
 
-## 介绍
+## Project setup
+```
+npm install
+```
 
-jsplumb 相关文档
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-## 参考
+### Compiles and minifies for production
+```
+npm run build
+```
 
-* [流程图 - antV G6 流程图 UI 设计](https://antv-g6.gitee.io/zh/docs/design/template#%E6%B5%81%E7%A8%8B%E5%9B%BE)
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
