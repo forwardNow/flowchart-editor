@@ -3,11 +3,9 @@ $fc-node-base-width: 128px;
 $fc-node-base-height: 44px;
 $fc-node-base-border-width: 2px;
 
-.flow-chart {
-  position: relative;
+.flow-chart-box {
   width: 100%;
   height: 100%;
-  border: solid 1px $fc-border-color;
 
   line-height: 1.2;
   font-size: 13px;
@@ -18,6 +16,16 @@ $fc-node-base-border-width: 2px;
   * {
     box-sizing: border-box;
   }
+}
+
+.flow-chart {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+
+  border: solid 1px $fc-border-color;
+
+  overflow: auto;
 
 }
 
@@ -86,49 +94,35 @@ $fc-node-base-border-width: 2px;
   }
 }
 
+.fc-toolbox {
+  z-index: 10;
+  position: absolute;
+  left: 20px;
+  top: 20px;
 
-.fc-editor {
-  display: flex;
-  align-items: stretch;
+  width: 160px;
 
-  position: relative;
-  width: 1000px;
-  height: 600px;
+  border: solid 1px $fc-border-color;
 
-  line-height: 1.2;
-  font-size: 13px;
-  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-  user-select: none;
+  .fc-toolbox-head {
+    padding: 0 12px;
+    height: 40px;
+    line-height: 40px;
 
-  &,
-  * {
-    box-sizing: border-box;
+    border-bottom: solid 1px $fc-border-color;
+    background-color: #f6f7f8;
   }
 
-  .fc-editor-toolbox {
-    position: relative;
-
+  .fc-toolbox-body {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 24px;
 
-    padding: 24px;
-    width: 200px;
-    height: 100%;
-
-    border: solid 1px $fc-border-color;
-    border-right-width: 0;
-    background-color: #f6f7f8;
-
-    .fc-node {
-      position: static;
-    }
+    padding: 12px 0;
   }
 
-  .fc-editor-stage {
-    z-index: 10;
-    width: 800px;
-    height: 100%;
+  .fc-node {
+    position: static;
   }
 }

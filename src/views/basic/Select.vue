@@ -30,14 +30,13 @@
   </div>
 </template>
 <script>
-
 import {
   newInstance,
   ready,
   FlowchartConnector,
   BlankEndpoint, ArrowOverlay,
 } from '@jsplumb/browser-ui';
-import { FlowChartConfig } from '@/commons/config/FlowChartConfig';
+import { FlowChart } from '@/flow-chart/FlowChart';
 
 export default {
   mounted() {
@@ -110,7 +109,7 @@ export default {
     },
 
     select() {
-      const fcConfig = new FlowChartConfig();
+      const fcConfig = new FlowChart();
 
       const connections = this.jsPlumbIns.getConnections();
 

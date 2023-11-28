@@ -1,9 +1,19 @@
 //@import "reset";
-@import "jsPlumb";
+@import "../../flow-chart/flow-chart";
+
+body {
+  padding: 0;
+  margin: 0;
+}
 
 .box {
   width: 800px;
   height: 400px;
+
+  &,
+  * {
+    box-sizing: border-box;
+  }
 }
 
 .container {
@@ -33,4 +43,51 @@
   -ms-user-select: none;
   font-size: 14px;
   border-radius: 2px;
+}
+
+
+.fc-editor {
+  display: flex;
+  align-items: stretch;
+
+  position: relative;
+  width: 1000px;
+  height: 600px;
+
+  line-height: 1.2;
+  font-size: 13px;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  user-select: none;
+
+  &,
+  * {
+    box-sizing: border-box;
+  }
+
+  .fc-editor-toolbox {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+
+    padding: 24px;
+    width: 200px;
+    height: 100%;
+
+    border: solid 1px $fc-border-color;
+    border-right-width: 0;
+    background-color: #f6f7f8;
+
+    .fc-node {
+      position: static;
+    }
+  }
+
+  .fc-editor-stage {
+    z-index: 10;
+    width: 800px;
+    height: 100%;
+  }
 }
