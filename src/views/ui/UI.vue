@@ -1,5 +1,5 @@
 <template>
-  <div class="flow-chart box">
+  <div class="flow-chart fc-ui">
     <div class="fc-node fc-node-circle">
       <div class="fc-node-inner">
         <div class="fc-node-text">起止符号</div>
@@ -19,9 +19,20 @@
     </div>
   </div>
 </template>
-<style lang="scss" scoped>
-.fc-node {
-  position: static;
-  margin: 24px;
+<style lang="scss">
+.fc-ui {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 24px;
+
+  padding: 24px;
+  width: 600px;
+  min-height: 300px;
+
+  .fc-node {
+    position: static;
+  }
 }
 </style>
