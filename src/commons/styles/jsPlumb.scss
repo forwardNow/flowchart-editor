@@ -107,11 +107,25 @@ $fc-node-base-border-width: 2px;
 
   .fc-editor-toolbox {
     position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+
+    padding: 24px;
     width: 200px;
     height: 100%;
+
     border: solid 1px $fc-border-color;
     border-right-width: 0;
+    background-color: #f6f7f8;
+
+    .fc-node {
+      position: static;
+    }
   }
+
   .fc-editor-stage {
     z-index: 10;
     width: 800px;

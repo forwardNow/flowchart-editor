@@ -2,19 +2,19 @@
   <div class="fc-editor dnd-basic">
     <div class="fc-editor-toolbox">
 
-      <div class="fc-node fc-node-circle" style="top: 100px;">
+      <div class="fc-node fc-node-circle">
         <div class="fc-node-inner">
           <div class="fc-node-text">起止符号</div>
         </div>
       </div>
 
-      <div class="fc-node fc-node-rectangle" style="top: 200px;">
+      <div class="fc-node fc-node-rectangle">
         <div class="fc-node-inner">
-          <div class="fc-node-text">任务内容（状态：已经完成）</div>
+          <div class="fc-node-text">任务内容</div>
         </div>
       </div>
 
-      <div class="fc-node fc-node-diamond" style="top: 300px;">
+      <div class="fc-node fc-node-diamond">
         <div class="fc-node-inner">
           <span class="fc-node-text">决策判断</span>
         </div>
@@ -64,6 +64,9 @@ export default {
       interact('.fc-editor-toolbox .fc-node')
         .draggable({
           autoScroll: true,
+
+          // 不改变光标样式
+          cursorChecker() {},
 
           listeners: {
             start(event) {
