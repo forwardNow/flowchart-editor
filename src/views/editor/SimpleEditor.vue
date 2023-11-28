@@ -10,7 +10,7 @@
 
       <div class="fc-node fc-node-rectangle">
         <div class="fc-node-inner">
-          <div class="fc-node-text">任务内容（状态：已经完成）</div>
+          <div class="fc-node-text">任务内容</div>
         </div>
       </div>
 

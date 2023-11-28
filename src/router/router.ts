@@ -21,7 +21,7 @@ export const routes: Array<RouteConfig> = [
   },
   {
     path: '/dnd/basic',
-    component: () => import('../views/dnd/Basic.vue'),
+    component: () => import('../views/dnd/DndBasic.vue'),
     meta: { title: 'DND-基础', description: '使用 interactjs 完成拖拽组件到画布上' },
   },
   {
@@ -35,9 +35,14 @@ export const routes: Array<RouteConfig> = [
     meta: { title: '连接元素', description: '连接两个元素' },
   },
   {
-    path: '/editor',
-    component: () => import('../views/editor/Editor.vue'),
-    meta: { title: '编辑器', description: '通过拖拽完成界面' },
+    path: '/editor/simple',
+    component: () => import('../views/editor/SimpleEditor.vue'),
+    meta: { title: '简单编辑器', description: '通过拖拽完成界面。无法保存数据' },
+  },
+  {
+    path: '/editor/store',
+    component: () => import('../views/editor/StoreEditor.vue'),
+    meta: { title: '可保存数据的编辑器', description: '通过拖拽完成界面。可保存数据' },
   },
 ];
 
