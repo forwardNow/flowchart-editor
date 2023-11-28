@@ -27,6 +27,7 @@
   </div>
 </template>
 <script>
+/* eslint-disable object-curly-newline */
 import interact from 'interactjs';
 
 import {
@@ -97,22 +98,19 @@ export default {
     },
 
     initDnd() {
-      const toolboxElement = document.querySelector('.fc-editor-toolbox');
-      const stageElement = document.querySelector('.flow-chart');
-
       const toolbox = {
-        el: toolboxElement,
+        el: document.querySelector('.fc-editor-toolbox'),
         x: 0,
         y: 0,
       };
       const stage = {
-        el: stageElement,
+        el: document.querySelector('.flow-chart'),
         x: 0,
         y: 0,
       };
 
-      ({ x: toolbox.x, y: toolbox.y } = toolboxElement.getBoundingClientRect());
-      ({ x: stage.x, y: stage.y } = stageElement.getBoundingClientRect());
+      ({ x: toolbox.x, y: toolbox.y } = toolbox.el.getBoundingClientRect());
+      ({ x: stage.x, y: stage.y } = stage.el.getBoundingClientRect());
 
       const mirror = {
         el: null,
@@ -126,7 +124,9 @@ export default {
         .draggable({
           autoScroll: true,
 
-          cursorChecker() {},
+          cursorChecker() {
+            /* do nothing */
+          },
 
           listeners: {
             start(event) {
@@ -144,7 +144,7 @@ export default {
               mirror.el.style.left = `${mirror.x}px`;
               mirror.el.style.top = `${mirror.y}px`;
 
-              stageElement.appendChild(mirror.el);
+              stage.el.appendChild(mirror.el);
             },
 
             move(event) {
@@ -159,37 +159,17 @@ export default {
 
             end: () => {
               if (mirror.x < 0) {
-                stageElement.removeChild(mirror.el);
+                stage.el.removeChild(mirror.el);
                 return;
               }
 
               this.jsPlumbIns.manage(mirror.el);
 
               this.jsPlumbIns.addEndpoints(mirror.el, [
-                {
-                  source: true,
-                  target: true,
-                  anchor: 'Top',
-                  maxConnections: -1,
-                },
-                {
-                  source: true,
-                  target: true,
-                  anchor: 'Right',
-                  maxConnections: -1,
-                },
-                {
-                  source: true,
-                  target: true,
-                  anchor: 'Bottom',
-                  maxConnections: -1,
-                },
-                {
-                  source: true,
-                  target: true,
-                  anchor: 'Left',
-                  maxConnections: -1,
-                },
+                { source: true, target: true, anchor: 'Top', maxConnections: -1 },
+                { source: true, target: true, anchor: 'Right', maxConnections: -1 },
+                { source: true, target: true, anchor: 'Bottom', maxConnections: -1 },
+                { source: true, target: true, anchor: 'Left', maxConnections: -1 },
               ]);
             },
           },
