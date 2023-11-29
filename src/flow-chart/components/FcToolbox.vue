@@ -1,7 +1,7 @@
 <template>
   <div class="fc-toolbox">
     <div class="fc-toolbox-head">
-      工具栏
+      工具箱
     </div>
     <div class="fc-toolbox-body">
       <div class="fc-node fc-node-circle">

@@ -79,10 +79,12 @@ export class FlowChart {
       },
 
       endpointStyle: {
-        fill: '#067bef',
+        fill: '#fff',
+        strokeWidth: 1,
+        stroke: '#067bef',
       },
 
-      paintStyle: { strokeWidth: 2, stroke: '#5c5c5c' },
+      paintStyle: { strokeWidth: 2, stroke: '#AAB7C4' },
 
       anchor: AnchorLocations.AutoDefault,
 

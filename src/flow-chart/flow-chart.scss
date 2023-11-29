@@ -1,7 +1,8 @@
+$color-primary: #026dff;
 $fc-border-color: #ddd;
 $fc-node-base-width: 128px;
 $fc-node-base-height: 44px;
-$fc-node-base-border-width: 2px;
+$fc-node-base-border-width: 1px;
 
 .flow-chart-box {
   width: 100%;
@@ -100,14 +101,12 @@ $fc-node-base-border-width: 2px;
   left: 20px;
   top: 20px;
 
-  width: 160px;
-
   border: solid 1px $fc-border-color;
 
   .fc-toolbox-head {
-    padding: 0 12px;
-    height: 40px;
-    line-height: 40px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
 
     border-bottom: solid 1px $fc-border-color;
     background-color: #f6f7f8;
@@ -117,12 +116,47 @@ $fc-node-base-border-width: 2px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
-
-    padding: 12px 0;
+    gap: 16px;
+    padding: 8px 16px;
   }
 
   .fc-node {
     position: static;
   }
+}
+
+
+// 线
+.jtk-connector {
+
+  // hover 样式
+  &.jtk-hover {
+    path {
+      stroke: $color-primary;
+    }
+  }
+}
+
+// 端点
+.jtk-endpoint {
+  &:hover {
+    circle {
+      fill: $color-primary;
+    }
+  }
+
+  // 开始端点
+  &.jtk-dragging {
+    circle {
+      fill: $color-primary;
+    }
+  }
+
+  // 目标端点
+  &.jtk-endpoint-drop-allowed {
+    circle {
+      fill: $color-primary;
+    }
+  }
+
 }
