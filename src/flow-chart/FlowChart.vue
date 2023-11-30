@@ -8,6 +8,10 @@
 import { FlowChart } from './FlowChart';
 import FcToolbox from './components/FcToolbox.vue';
 
+const EVENTS = {
+  READY: 'ready',
+};
+
 export default {
   name: 'FlowChart',
   components: { FcToolbox },
@@ -18,6 +22,8 @@ export default {
     this.fc = new FlowChart(stageEl);
 
     this.$refs.toolbox.init(stageEl);
+
+    this.$emit(EVENTS.READY, this.fc);
   },
 
   methods: {

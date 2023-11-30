@@ -1,6 +1,8 @@
 /* eslint-disable class-methods-use-this */
-import lodashGet from 'lodash.get';
 import type { Connection as JsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
+import lodashGet from 'lodash.get';
+import jQuery from 'jquery';
+
 import {
   AnchorLocations, ArrowOverlay,
   BrowserJsPlumbInstance,
@@ -49,6 +51,10 @@ export interface IOptions {
 
 export class FlowChart {
   private readonly el: HTMLElement;
+
+  private readonly cssSelectors = {
+    node: '.fc-node',
+  };
 
   private readonly jsPlumbInstance: BrowserJsPlumbInstance;
 
@@ -110,6 +116,14 @@ export class FlowChart {
   getConfig() {
     const config: IFcConfig = { nodes: [], connections: [] };
 
+    this.getConfigByJsPlumbConnections(config);
+
+    this.addUnconnectedNodesToConfig(config);
+
+    return config;
+  }
+
+  private getConfigByJsPlumbConnections(config: IFcConfig) {
     const jsPlumbConnections = this.jsPlumbInstance.getConnections() as JsPlumbConnection[];
 
     for (let i = 0, len = jsPlumbConnections.length; i < len; i += 1) {
@@ -123,8 +137,6 @@ export class FlowChart {
 
       this.addConfigNodes(nodes, config);
     }
-
-    return config;
   }
 
   private getConfigConnection(jsPlumbConnection: JsPlumbConnection) {
@@ -166,7 +178,7 @@ export class FlowChart {
 
   private getConfigNode(id: string, el: HTMLElement) {
     const type: IFcNodeType = this.getNodeTypeByElement(el);
-    const text: string = el.textContent || '';
+    const text: string = this.getNodeContentByElement(el);
     const position: { x: number, y: number } = this.getNodePositionByElement(el);
 
     return {
@@ -175,6 +187,27 @@ export class FlowChart {
       text,
       position,
     };
+  }
+
+  private addUnconnectedNodesToConfig(config: IFcConfig) {
+    const { jsPlumbInstance } = this;
+
+    const $nodes = jQuery(this.el).find(this.cssSelectors.node);
+
+    const nodes: IFcNode[] = [];
+
+    $nodes.each((index: number, el: HTMLElement) => {
+      const id = jsPlumbInstance.getId(el);
+      const type = this.getNodeTypeByElement(el);
+      const text = this.getNodeContentByElement(el);
+      const position = this.getNodePositionByElement(el);
+
+      nodes.push({
+        id, type, text, position,
+      });
+    });
+
+    this.addConfigNodes(nodes, config);
   }
 
   toString() {
@@ -210,5 +243,9 @@ export class FlowChart {
     const y = parseFloat(el.style.top);
 
     return { x, y };
+  }
+
+  private getNodeContentByElement(el: HTMLElement) {
+    return el.textContent || '';
   }
 }

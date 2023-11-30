@@ -1,34 +1,46 @@
 <template>
   <div class="fc-toolbox">
-    <div class="fc-toolbox-head">
-      工具箱
+    <div class="feature-list">
+      <div class="feature-item">
+        <IconSave title="保存" />
+      </div>
     </div>
-    <div class="fc-toolbox-body">
-      <div class="fc-node fc-node-circle">
-        <div class="fc-node-inner">
-          <div class="fc-node-text">起止符号</div>
+    <div class="shape-list">
+
+      <div class="shape-item" title="">
+        <div class="fc-node fc-node-circle">
+          <div class="fc-node-inner">
+            <div class="fc-node-text"></div>
+          </div>
         </div>
       </div>
 
-      <div class="fc-node fc-node-rectangle">
-        <div class="fc-node-inner">
-          <div class="fc-node-text">任务内容</div>
+      <div class="shape-item" title="">
+        <div class="fc-node fc-node-rectangle">
+          <div class="fc-node-inner">
+            <div class="fc-node-text"></div>
+          </div>
         </div>
       </div>
 
-      <div class="fc-node fc-node-diamond">
-        <div class="fc-node-inner">
-          <span class="fc-node-text">决策判断</span>
+      <div class="shape-item" title="">
+        <div class="fc-node fc-node-diamond">
+          <div class="fc-node-inner">
+            <span class="fc-node-text"></span>
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 </template>
 <script>
 import interact from 'interactjs';
+import IconSave from '@/flow-chart/components/IconSave.vue';
 
 export default {
   name: 'FcToolbox',
+  components: { IconSave },
 
   methods: {
     init(stageEl) {
@@ -46,21 +58,6 @@ export default {
         y: 0,
       };
 
-      interact('.fc-toolbox .fc-toolbox-head')
-        .draggable({
-          listeners: {
-            move: (event) => {
-              const { dx, dy } = event;
-
-              toolbox.x += dx;
-              toolbox.y += dy;
-
-              toolbox.el.style.left = `${toolbox.x}px`;
-              toolbox.el.style.top = `${toolbox.y}px`;
-            },
-          },
-        });
-
       interact('.fc-toolbox .fc-node')
         .draggable({
           autoScroll: true,
@@ -73,19 +70,21 @@ export default {
             start: (event) => {
               const { currentTarget } = event;
 
-              const { offsetLeft, offsetTop } = currentTarget;
-
               const mirrorNode = currentTarget.cloneNode(true);
 
-              mirror.x = offsetLeft + toolbox.x;
-              mirror.y = offsetTop + toolbox.y;
+              const { offsetLeft, offsetTop } = currentTarget;
+
+              mirror.x = offsetLeft;
+              mirror.y = offsetTop;
 
               mirror.el = mirrorNode;
 
               mirror.el.style.left = `${mirror.x}px`;
               mirror.el.style.top = `${mirror.y}px`;
 
-              stageEl.appendChild(mirror.el);
+              mirror.el.style.position = 'absolute';
+
+              toolbox.el.appendChild(mirror.el);
             },
 
             move: (event) => {
@@ -100,9 +99,17 @@ export default {
 
             end: () => {
               if (mirror.x < 0) {
-                stageEl.removeChild(mirror.el);
+                toolbox.el.removeChild(mirror.el);
                 return;
               }
+
+              stageEl.appendChild(mirror.el);
+
+              mirror.x += toolbox.x;
+              mirror.y += toolbox.y;
+
+              mirror.el.style.left = `${mirror.x}px`;
+              mirror.el.style.top = `${mirror.y}px`;
 
               this.$emit('add-node', mirror.el);
             },
