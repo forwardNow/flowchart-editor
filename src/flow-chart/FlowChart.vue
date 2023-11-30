@@ -5,8 +5,9 @@
   </div>
 </template>
 <script>
+import FcToolbox from '@/flow-chart/commons/components/FcToolbox.vue';
 import { FlowChart } from './FlowChart';
-import FcToolbox from './components/FcToolbox.vue';
+import { STORE_KEY_CONFIG } from '@/flow-chart/commons/configs/constants';
 
 const EVENTS = {
   READY: 'ready',
@@ -25,10 +26,23 @@ export default {
   mounted() {
     this.fc = new FlowChart(this.$refs.stage);
 
+    this.restore();
+
     this.$emit(EVENTS.READY, this.fc);
   },
 
   methods: {
+    restore() {
+      const configStr = localStorage.getItem(STORE_KEY_CONFIG)
+
+      if (!configStr) {
+        return;
+      }
+
+      const config = JSON.parse(configStr);
+
+      console.log('config in localStorage: ', config);
+    },
   },
 };
 </script>

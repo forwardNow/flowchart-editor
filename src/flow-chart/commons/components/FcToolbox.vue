@@ -39,10 +39,8 @@
 </template>
 <script>
 import interact from 'interactjs';
-import IconSave from '@/flow-chart/components/IconSave.vue';
-
-const EVENTS = {
-};
+import IconSave from '@/flow-chart/commons/components/IconSave.vue';
+import { STORE_KEY_CONFIG } from '@/flow-chart/commons/configs/constants';
 
 export default {
   name: 'FcToolbox',
@@ -56,6 +54,10 @@ export default {
 
   methods: {
     init() {
+      this.initDnd();
+    },
+
+    initDnd() {
       const toolbox = {
         el: this.$el,
         x: 0,
@@ -63,7 +65,11 @@ export default {
         height: 0,
       };
 
-      ({ x: toolbox.x, y: toolbox.y, height: toolbox.height } = toolbox.el.getBoundingClientRect());
+      ({
+        x: toolbox.x,
+        y: toolbox.y,
+        height: toolbox.height,
+      } = toolbox.el.getBoundingClientRect());
 
       const mirror = {
         el: null,
@@ -94,7 +100,10 @@ export default {
       };
 
       const onMove = (event) => {
-        const { dx, dy } = event;
+        const {
+          dx,
+          dy,
+        } = event;
 
         mirror.x += dx;
         mirror.y += dy;
@@ -116,21 +125,25 @@ export default {
         this.flowChartRef.fc.insertNode(mirror.el);
       };
 
-      interact('.fc-toolbox .fc-node').draggable({
-        autoScroll: true,
-        cursorChecker() { /* do nothing */ },
-        listeners: {
-          start: onStart,
-          move: onMove,
-          end: onEnd,
-        },
-      });
+      interact('.fc-toolbox .fc-node')
+        .draggable({
+          autoScroll: true,
+          cursorChecker() { /* do nothing */
+          },
+          listeners: {
+            start: onStart,
+            move: onMove,
+            end: onEnd,
+          },
+        });
     },
 
     save() {
       const config = this.flowChartRef.fc.getConfig();
 
       console.log(config);
+
+      localStorage.setItem(STORE_KEY_CONFIG, JSON.stringify(config));
     },
 
   },
