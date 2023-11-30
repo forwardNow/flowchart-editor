@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import type { Connection as JsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
 import lodashGet from 'lodash.get';
+import lodashTemplate from 'lodash.template';
 import jQuery from 'jquery';
 
 import {
@@ -11,50 +12,39 @@ import {
   newInstance,
 } from '@jsplumb/browser-ui';
 
-export type IFcNodeType = 'Circle' | 'Rectangle' | 'Diamond';
+const FC_NODE_CLASS_NAMES = {
+  Node: 'fc-node',
 
-export const FcNodeClassSelectors = {
   Circle: 'fc-node-circle',
   Rectangle: 'fc-node-rectangle',
   Diamond: 'fc-node-diamond',
 };
 
-export type IFcAnchor = 'Top' | 'Right' | 'Bottom' | 'Left';
+const NODE_HTML_TEMPLATE = `
+  <div class="fc-node fc-node-<%= type %>" style="left: <%= position.x %>px; top: <%= position.y %>px;">
+    <div class="fc-node-inner">
+      <div class="fc-node-text"><%= text %></div>
+    </div>
+  </div>
+`;
 
-export interface IFcNode {
-  id: string, // managedId
-  type: IFcNodeType,
-  text: string,
-  position: { x: number, y: number },
-}
+const NODE_HTML_RENDER = lodashTemplate(NODE_HTML_TEMPLATE);
 
-export interface IFcConnection {
-  type: string, // 'Flowchart'
+const FC_NODE_TYPES = {
+  Circle: 'Circle',
+  Rectangle: 'Rectangle',
+  Diamond: 'Diamond',
+};
 
-  sourceId: string,
-  sourceAnchor: IFcAnchor,
-
-  targetId: string,
-  targetAnchor: IFcAnchor,
-
-  label?: string,
-}
-
-export interface IFcConfig {
-  nodes: IFcNode[],
-  connections: IFcConnection[],
-}
-
-export interface IOptions {
-  toolboxEl: HTMLElement,
-}
+const FC_NODE_ANCHORS = {
+  Top: 'Top',
+  Right: 'Right',
+  Bottom: 'Bottom',
+  Left: 'Left',
+};
 
 export class FlowChart {
   private readonly el: HTMLElement;
-
-  private readonly cssSelectors = {
-    node: '.fc-node',
-  };
 
   private readonly jsPlumbInstance: BrowserJsPlumbInstance;
 
@@ -123,14 +113,16 @@ export class FlowChart {
     return config;
   }
 
-  insertNode(el: HTMLElement) {
-    const { jsPlumbInstance } = this;
-
+  appendElement(el: HTMLElement, managedId?: string) {
     this.el.appendChild(el);
 
-    jsPlumbInstance.manage(el);
+    this.jsPlumbInstance.manage(el, managedId);
 
-    jsPlumbInstance.addEndpoints(el, [
+    this.createNodeEndpoints(el);
+  }
+
+  createNodeEndpoints(el: HTMLElement) {
+    this.jsPlumbInstance.addEndpoints(el, [
       {
         source: true, target: true, anchor: 'Top', maxConnections: -1,
       },
@@ -146,19 +138,30 @@ export class FlowChart {
     ]);
   }
 
-  private getConfigByJsPlumbConnections(config: IFcConfig) {
+  updateStageByConfig(fcConfig: IFcConfig) {
+    const {
+      nodes,
+      connections,
+    } = fcConfig;
+
+    this.createNodesByConfig(nodes);
+
+    this.createConnectionsByConfig(connections);
+  }
+
+  private getConfigByJsPlumbConnections(fcConfig: IFcConfig) {
     const jsPlumbConnections = this.jsPlumbInstance.getConnections() as JsPlumbConnection[];
 
     for (let i = 0, len = jsPlumbConnections.length; i < len; i += 1) {
       const jsPlumbConnection = jsPlumbConnections[i];
 
-      const connection = this.getConfigConnection(jsPlumbConnection);
+      const fcConnection = this.getConfigConnection(jsPlumbConnection);
 
-      const nodes = this.getConfigNodes(jsPlumbConnection);
+      const fcNodes = this.getConfigNodes(jsPlumbConnection);
 
-      config.connections.push(connection);
+      fcConfig.connections.push(fcConnection);
 
-      this.addConfigNodes(nodes, config);
+      this.addConfigNodes(fcNodes, fcConfig);
     }
   }
 
@@ -212,12 +215,12 @@ export class FlowChart {
     };
   }
 
-  private addUnconnectedNodesToConfig(config: IFcConfig) {
+  private addUnconnectedNodesToConfig(fcConfig: IFcConfig) {
     const { jsPlumbInstance } = this;
 
-    const $nodes = jQuery(this.el).find(this.cssSelectors.node);
+    const $nodes = jQuery(this.el).find(`.${FC_NODE_CLASS_NAMES.Node}`);
 
-    const nodes: IFcNode[] = [];
+    const fcNodes: IFcNode[] = [];
 
     $nodes.each((index: number, el: HTMLElement) => {
       const id = jsPlumbInstance.getId(el);
@@ -225,12 +228,12 @@ export class FlowChart {
       const text = this.getNodeContentByElement(el);
       const position = this.getNodePositionByElement(el);
 
-      nodes.push({
+      fcNodes.push({
         id, type, text, position,
       });
     });
 
-    this.addConfigNodes(nodes, config);
+    this.addConfigNodes(fcNodes, fcConfig);
   }
 
   toString() {
@@ -250,11 +253,11 @@ export class FlowChart {
   }
 
   private getNodeTypeByElement(el: HTMLElement): IFcNodeType {
-    if (el.classList.contains(FcNodeClassSelectors.Circle)) {
+    if (el.classList.contains(FC_NODE_CLASS_NAMES.Circle)) {
       return 'Circle';
     }
 
-    if (el.classList.contains(FcNodeClassSelectors.Diamond)) {
+    if (el.classList.contains(FC_NODE_CLASS_NAMES.Diamond)) {
       return 'Diamond';
     }
 
@@ -271,4 +274,84 @@ export class FlowChart {
   private getNodeContentByElement(el: HTMLElement) {
     return el.textContent || '';
   }
+
+  private createNodesByConfig(fcNodes: IFcNode[]) {
+    for (let i = 0, len = fcNodes.length; i < len; i += 1) {
+      this.createNode(fcNodes[i]);
+    }
+  }
+
+  private createConnectionsByConfig(fcConnections: IFcConnection[]) {
+    for (let i = 0, len = fcConnections.length; i < len; i += 1) {
+      this.createConnection(fcConnections[i]);
+    }
+  }
+
+  private createNode(fcNode: IFcNode) {
+    const { id, type } = fcNode;
+
+    const html = NODE_HTML_RENDER({
+      ...fcNode,
+      type: type.toLowerCase(),
+    });
+
+    const $el = jQuery(html);
+
+    const el = $el.get(0) as HTMLElement;
+
+    this.appendElement(el, id);
+  }
+
+  private createConnection(fcConnection: IFcConnection) {
+    const {
+      sourceId,
+      sourceAnchor,
+      targetId,
+      targetAnchor,
+    } = fcConnection;
+
+    this.jsPlumbInstance.connect({
+      source: this.getElementByManagedId(sourceId),
+      target: this.getElementByManagedId(targetId),
+      anchors: [sourceAnchor, targetAnchor],
+    });
+  }
+
+  private getElementByManagedId(id: string) {
+    return this.jsPlumbInstance.getManagedElement(id);
+  }
+}
+
+// --
+
+type IFcNodeType = keyof typeof FC_NODE_TYPES;
+
+type IFcAnchor = keyof typeof FC_NODE_ANCHORS;
+
+interface IFcNode {
+  id: string, // managedId
+  type: IFcNodeType,
+  text: string,
+  position: { x: number, y: number },
+}
+
+interface IFcConnection {
+  type: string, // 'Flowchart'
+
+  sourceId: string,
+  sourceAnchor: IFcAnchor,
+
+  targetId: string,
+  targetAnchor: IFcAnchor,
+
+  label?: string,
+}
+
+interface IFcConfig {
+  nodes: IFcNode[],
+  connections: IFcConnection[],
+}
+
+interface IOptions {
+  toolboxEl: HTMLElement,
 }

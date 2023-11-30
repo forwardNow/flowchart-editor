@@ -13,12 +13,14 @@
     "interactjs": "^1.10.23",
     "jquery": "^3.7.1",
     "lodash.get": "^4.4.2",
+    "lodash.template": "^4.5.0",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.29",
     "@types/lodash.get": "^4.4.9",
+    "@types/lodash.template": "^4.5.3",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-babel": "~5.0.0",

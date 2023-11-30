@@ -122,7 +122,7 @@ export default {
 
         mirror.updatePosition();
 
-        this.flowChartRef.fc.insertNode(mirror.el);
+        this.flowChartRef.fc.appendElement(mirror.el);
       };
 
       interact('.fc-toolbox .fc-node')
