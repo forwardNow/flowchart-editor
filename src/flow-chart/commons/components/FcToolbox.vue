@@ -41,6 +41,7 @@
 import interact from 'interactjs';
 import IconSave from '@/flow-chart/commons/components/IconSave.vue';
 import { STORE_KEY_CONFIG } from '@/flow-chart/commons/configs/constants';
+import { showSuccessToast } from '@/flow-chart/commons/utils/popup';
 
 export default {
   name: 'FcToolbox',
@@ -144,6 +145,8 @@ export default {
       console.log(config);
 
       localStorage.setItem(STORE_KEY_CONFIG, JSON.stringify(config));
+
+      showSuccessToast('保存成功!');
     },
 
   },

@@ -14,21 +14,23 @@ import {
 
 const FC_NODE_CLASS_NAMES = {
   Node: 'fc-node',
+  Skeleton: 'fc-node-skeleton',
+  NodeSelected: 'fc-node-selected',
 
   Circle: 'fc-node-circle',
   Rectangle: 'fc-node-rectangle',
   Diamond: 'fc-node-diamond',
 };
 
-const NODE_HTML_TEMPLATE = `
+const NODE_HTML_RENDER = lodashTemplate(`
   <div class="fc-node fc-node-<%= type %>" style="left: <%= position.x %>px; top: <%= position.y %>px;">
     <div class="fc-node-inner">
       <div class="fc-node-text"><%= text %></div>
     </div>
   </div>
-`;
+`);
 
-const NODE_HTML_RENDER = lodashTemplate(NODE_HTML_TEMPLATE);
+const NODE_SKELETON_HTML_TEMPLATE = '<div class="fc-node-skeleton"></div>';
 
 const FC_NODE_TYPES = {
   Circle: 'Circle',
@@ -52,6 +54,8 @@ export class FlowChart {
     this.el = el;
 
     this.jsPlumbInstance = this.createJsPlumbInstance();
+
+    this.bindListeners();
   }
 
   private createJsPlumbInstance() {
@@ -319,6 +323,39 @@ export class FlowChart {
 
   private getElementByManagedId(id: string) {
     return this.jsPlumbInstance.getManagedElement(id);
+  }
+
+  private bindListeners() {
+    const $stage = jQuery(this.el);
+
+    $stage
+      .bind('click.fc', (event) => {
+        console.log('click');
+        const $target = jQuery(event.target);
+
+        const $fcNode = $target.closest(`.${FC_NODE_CLASS_NAMES.Node}`);
+
+        const isFcNode = $fcNode.length > 0;
+
+        if (isFcNode) {
+          this.onClickNode($fcNode);
+        }
+      });
+  }
+
+  private onClickNode($fcNode: JQuery<HTMLElement>) {
+    // 1. add active class
+    $fcNode.siblings(`.${FC_NODE_CLASS_NAMES.Node}`).removeClass(FC_NODE_CLASS_NAMES.NodeSelected);
+    $fcNode.addClass(FC_NODE_CLASS_NAMES.NodeSelected);
+
+    // 2. add skeleton element
+    const hasSkeleton = $fcNode.find(`.${FC_NODE_CLASS_NAMES.Skeleton}`).length > 0;
+
+    if (hasSkeleton) {
+      return;
+    }
+
+    $fcNode.append(NODE_SKELETON_HTML_TEMPLATE);
   }
 }
 

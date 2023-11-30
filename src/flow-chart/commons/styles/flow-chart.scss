@@ -5,6 +5,8 @@ $fc-node-base-width: 128px;
 $fc-node-base-height: 44px;
 $fc-node-base-border-width: 1px;
 
+$fc-node-skeleton-padding: 4px;
+
 .flow-chart-box {
   position: relative;
   width: 100%;
@@ -90,6 +92,25 @@ $fc-node-base-border-width: 1px;
 
     .fc-node-text {
       transform: rotate(-45deg);
+    }
+  }
+
+  .fc-node-skeleton {
+    display: none;
+
+    position: absolute;
+    left: -$fc-node-skeleton-padding;
+    right: -$fc-node-skeleton-padding;
+    top: -$fc-node-skeleton-padding;
+    bottom: -$fc-node-skeleton-padding;
+
+    outline: dashed 1px $color-primary;
+    opacity: 0.8;
+  }
+
+  .fc-node-selected {
+    .fc-node-skeleton {
+      display: block;
     }
   }
 }
