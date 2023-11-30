@@ -3,6 +3,7 @@ import type { Connection as JsPlumbConnection } from '@jsplumb/browser-ui/types/
 import lodashGet from 'lodash.get';
 import lodashTemplate from 'lodash.template';
 import jQuery from 'jquery';
+import throttle from 'lodash.throttle';
 
 import {
   AnchorLocations, ArrowOverlay,
@@ -14,6 +15,7 @@ import {
 
 const FC_NODE_CLASS_NAMES = {
   Node: 'fc-node',
+  NodeText: 'fc-node-text',
   Skeleton: 'fc-node-skeleton',
   NodeSelected: 'fc-node-selected',
 
@@ -30,7 +32,9 @@ const NODE_HTML_RENDER = lodashTemplate(`
   </div>
 `);
 
-const NODE_SKELETON_HTML_TEMPLATE = '<div class="fc-node-skeleton"></div>';
+const NODE_SKELETON_HTML_RENDER = lodashTemplate(`
+  <div class="fc-node-skeleton"></div>
+`);
 
 const FC_NODE_TYPES = {
   Circle: 'Circle',
@@ -275,8 +279,16 @@ export class FlowChart {
     return { x, y };
   }
 
-  private getNodeContentByElement(el: HTMLElement) {
-    return el.textContent || '';
+  private getNodeContentByElement(fcNode: HTMLElement | JQuery<HTMLElement>) {
+    let $fcNode: JQuery<HTMLElement>;
+
+    if (fcNode instanceof HTMLElement) {
+      $fcNode = jQuery(fcNode);
+    } else {
+      $fcNode = fcNode;
+    }
+
+    return $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeText}`).html();
   }
 
   private createNodesByConfig(fcNodes: IFcNode[]) {
@@ -328,17 +340,31 @@ export class FlowChart {
   private bindListeners() {
     const $stage = jQuery(this.el);
 
+    const checkFcNode = (event: JQuery.TriggeredEvent) => {
+      const $target = jQuery(event.target);
+
+      const $fcNode = $target.closest(`.${FC_NODE_CLASS_NAMES.Node}`);
+
+      const isFcNode = $fcNode.length > 0;
+
+      return { $fcNode, isFcNode };
+    };
+
     $stage
-      .bind('click.fc', (event) => {
-        console.log('click');
-        const $target = jQuery(event.target);
-
-        const $fcNode = $target.closest(`.${FC_NODE_CLASS_NAMES.Node}`);
-
-        const isFcNode = $fcNode.length > 0;
+      .bind('mousedown.fc', throttle((event: JQuery.TriggeredEvent) => {
+        console.log('mousedown');
+        const { $fcNode, isFcNode } = checkFcNode(event);
 
         if (isFcNode) {
           this.onClickNode($fcNode);
+        }
+      }, 500, { trailing: false }))
+      .bind('dblclick.fc', (event) => {
+        console.log('dblclick');
+        const { $fcNode, isFcNode } = checkFcNode(event);
+
+        if (isFcNode) {
+          this.onDbClickNode($fcNode);
         }
       });
   }
@@ -355,7 +381,15 @@ export class FlowChart {
       return;
     }
 
-    $fcNode.append(NODE_SKELETON_HTML_TEMPLATE);
+    $fcNode.append(NODE_SKELETON_HTML_RENDER({}));
+  }
+
+  private onDbClickNode($fcNode: JQuery<HTMLElement>) {
+    const $nodeText = $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeText}`);
+
+    $nodeText
+      .prop('contenteditable', 'true')
+      .focus();
   }
 }
 

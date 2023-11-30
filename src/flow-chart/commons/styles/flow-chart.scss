@@ -56,7 +56,7 @@ $fc-node-skeleton-padding: 4px;
   }
 
   .fc-node-text {
-    padding: 0 2px;
+    padding: 2px 4px;
     text-align: center;
     word-break: break-all;
   }
@@ -96,6 +96,7 @@ $fc-node-skeleton-padding: 4px;
   }
 
   .fc-node-skeleton {
+    z-index: -1;
     display: none;
 
     position: absolute;
@@ -104,13 +105,30 @@ $fc-node-skeleton-padding: 4px;
     top: -$fc-node-skeleton-padding;
     bottom: -$fc-node-skeleton-padding;
 
+    padding: $fc-node-skeleton-padding;
+
     outline: dashed 1px $color-primary;
     opacity: 0.8;
+
+    pointer-events: none;
   }
 
   .fc-node-selected {
     .fc-node-skeleton {
       display: block;
+    }
+  }
+
+  .fc-node-text-input {
+    width: 100%;
+  }
+
+  [contenteditable='true'] {
+    caret-color: red;
+
+    &:focus {
+      outline: inset 1px transparent;
+      padding: 2px 4px;
     }
   }
 }

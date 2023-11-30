@@ -1,17 +1,7 @@
 <template>
   <div class="flow-chart-box">
     <FcToolbox ref="toolbox" />
-    <div class="flow-chart" ref="stage">
-
-      <div class="fc-node fc-node-rectangle" style="left: 50%; top: 40%">
-        <div class="fc-node-inner">
-          <div class="fc-node-text">流程xx</div>
-        </div>
-
-        <div class="fc-node-skeleton"></div>
-      </div>
-
-    </div>
+    <div class="flow-chart" ref="stage"></div>
   </div>
 </template>
 <script>
