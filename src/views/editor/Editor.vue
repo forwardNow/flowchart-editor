@@ -1,11 +1,10 @@
 <template>
-  <div class="page-editor" @click="handleClickEditor">
+  <div class="page-editor">
     <FlowChart @ready="ready" />
   </div>
 </template>
 <script>
 /* eslint-disable object-curly-newline */
-import { EVENT_CONTAINER_CHANGE } from '@jsplumb/browser-ui';
 import FlowChart from '@/flow-chart/FlowChart.vue';
 
 export default {
@@ -15,13 +14,7 @@ export default {
 
   methods: {
     ready(fc) {
-      this.fc = fc;
-    },
-
-    handleClickEditor() {
-      const config = this.fc.getConfig();
-
-      console.log(config);
+      // console.log('ready, FlowChart Instance = ', fc);
     },
   },
 };

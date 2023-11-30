@@ -123,6 +123,29 @@ export class FlowChart {
     return config;
   }
 
+  insertNode(el: HTMLElement) {
+    const { jsPlumbInstance } = this;
+
+    this.el.appendChild(el);
+
+    jsPlumbInstance.manage(el);
+
+    jsPlumbInstance.addEndpoints(el, [
+      {
+        source: true, target: true, anchor: 'Top', maxConnections: -1,
+      },
+      {
+        source: true, target: true, anchor: 'Right', maxConnections: -1,
+      },
+      {
+        source: true, target: true, anchor: 'Bottom', maxConnections: -1,
+      },
+      {
+        source: true, target: true, anchor: 'Left', maxConnections: -1,
+      },
+    ]);
+  }
+
   private getConfigByJsPlumbConnections(config: IFcConfig) {
     const jsPlumbConnections = this.jsPlumbInstance.getConnections() as JsPlumbConnection[];
 

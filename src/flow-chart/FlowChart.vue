@@ -1,6 +1,6 @@
 <template>
   <div class="flow-chart-box">
-    <FcToolbox ref="toolbox" @add-node="handleAddNode"/>
+    <FcToolbox ref="toolbox" />
     <div class="flow-chart" ref="stage"/>
   </div>
 </template>
@@ -16,37 +16,19 @@ export default {
   name: 'FlowChart',
   components: { FcToolbox },
 
+  provide() {
+    return {
+      flowChartRef: this,
+    };
+  },
+
   mounted() {
-    const stageEl = this.$refs.stage;
-
-    this.fc = new FlowChart(stageEl);
-
-    this.$refs.toolbox.init(stageEl);
+    this.fc = new FlowChart(this.$refs.stage);
 
     this.$emit(EVENTS.READY, this.fc);
   },
 
   methods: {
-    handleAddNode(el) {
-      const jsPlumbInstance = this.fc.getJsPlumbInstance();
-
-      jsPlumbInstance.manage(el);
-
-      jsPlumbInstance.addEndpoints(el, [
-        {
-          source: true, target: true, anchor: 'Top', maxConnections: -1,
-        },
-        {
-          source: true, target: true, anchor: 'Right', maxConnections: -1,
-        },
-        {
-          source: true, target: true, anchor: 'Bottom', maxConnections: -1,
-        },
-        {
-          source: true, target: true, anchor: 'Left', maxConnections: -1,
-        },
-      ]);
-    },
   },
 };
 </script>

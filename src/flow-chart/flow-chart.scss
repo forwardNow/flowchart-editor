@@ -3,7 +3,6 @@ $fc-border-color: #dfe2e5;
 
 $fc-node-base-width: 128px;
 $fc-node-base-height: 44px;
-
 $fc-node-base-border-width: 1px;
 
 .flow-chart-box {
@@ -35,7 +34,6 @@ $fc-node-base-border-width: 1px;
     position: absolute;
 
     width: $fc-node-base-width;
-    min-height: $fc-node-base-height;
 
     color: #666;
     background-color: #cce5ff;
@@ -51,13 +49,12 @@ $fc-node-base-border-width: 1px;
     align-items: center;
     justify-content: center;
 
-    padding: 0 2px;
-
     width: 100%;
-    height: 100%;
+    min-height: $fc-node-base-height;
   }
 
   .fc-node-text {
+    padding: 0 2px;
     text-align: center;
     word-break: break-all;
   }
@@ -108,9 +105,9 @@ $fc-node-base-border-width: 1px;
 
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 
-  padding: 0 24px;
+  padding: 0 16px;
 
   background-color: #f6f7f8;
   border: 1px solid #E9E9E9;
@@ -133,9 +130,12 @@ $fc-node-base-border-width: 1px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+
     margin-left: 8px;
+    padding: 4px;
+    height: 28px;
+    min-width: 28px;
+
     border-radius: 4px;
 
     &:first-of-type {
@@ -145,6 +145,12 @@ $fc-node-base-border-width: 1px;
     &:hover {
       background-color: #eaecee;
     }
+  }
+
+  .tool-divider {
+    height: 28px;
+    width: 1px;
+    background-color: #dfe2e5;
   }
 
   .fc-node {
@@ -160,6 +166,10 @@ $fc-node-base-border-width: 1px;
     height: 100%;
     border: solid 2px #212930;
     border-radius: 2px;
+  }
+
+  .fc-node-text {
+    display: none;
   }
 
   .fc-node-circle {

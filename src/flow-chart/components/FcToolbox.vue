@@ -1,32 +1,35 @@
 <template>
   <div class="fc-toolbox">
     <div class="feature-list">
-      <div class="feature-item">
-        <IconSave title="保存" />
+      <div class="feature-item" title="保存" @click="save">
+        <IconSave />
       </div>
     </div>
+
+    <div class="tool-divider"></div>
+
     <div class="shape-list">
 
-      <div class="shape-item" title="">
+      <div class="shape-item" title="开始/结束">
         <div class="fc-node fc-node-circle">
           <div class="fc-node-inner">
-            <div class="fc-node-text"></div>
+            <div class="fc-node-text">开始/结束</div>
           </div>
         </div>
       </div>
 
-      <div class="shape-item" title="">
+      <div class="shape-item" title="流程">
         <div class="fc-node fc-node-rectangle">
           <div class="fc-node-inner">
-            <div class="fc-node-text"></div>
+            <div class="fc-node-text">流程</div>
           </div>
         </div>
       </div>
 
-      <div class="shape-item" title="">
+      <div class="shape-item" title="判定">
         <div class="fc-node fc-node-diamond">
           <div class="fc-node-inner">
-            <span class="fc-node-text"></span>
+            <span class="fc-node-text">判定</span>
           </div>
         </div>
       </div>
@@ -38,84 +41,98 @@
 import interact from 'interactjs';
 import IconSave from '@/flow-chart/components/IconSave.vue';
 
+const EVENTS = {
+};
+
 export default {
   name: 'FcToolbox',
   components: { IconSave },
 
+  inject: ['flowChartRef'],
+
+  mounted() {
+    this.init();
+  },
+
   methods: {
-    init(stageEl) {
+    init() {
       const toolbox = {
         el: this.$el,
         x: 0,
         y: 0,
+        height: 0,
       };
 
-      ({ x: toolbox.x, y: toolbox.y } = toolbox.el.getBoundingClientRect());
+      ({ x: toolbox.x, y: toolbox.y, height: toolbox.height } = toolbox.el.getBoundingClientRect());
 
       const mirror = {
         el: null,
         x: 0,
         y: 0,
+
+        setAbsolute() {
+          this.el.style.position = 'absolute';
+        },
+        updatePosition() {
+          this.el.style.left = `${this.x}px`;
+          this.el.style.top = `${this.y}px`;
+        },
       };
 
-      interact('.fc-toolbox .fc-node')
-        .draggable({
-          autoScroll: true,
+      const onStart = (event) => {
+        const target = event.currentTarget;
 
-          cursorChecker() {
-            /* do nothing */
-          },
+        mirror.el = target.cloneNode(true);
+        mirror.x = target.offsetLeft;
+        mirror.y = target.offsetTop;
 
-          listeners: {
-            start: (event) => {
-              const { currentTarget } = event;
+        mirror.setAbsolute();
 
-              const mirrorNode = currentTarget.cloneNode(true);
+        mirror.updatePosition();
 
-              const { offsetLeft, offsetTop } = currentTarget;
+        toolbox.el.appendChild(mirror.el);
+      };
 
-              mirror.x = offsetLeft;
-              mirror.y = offsetTop;
+      const onMove = (event) => {
+        const { dx, dy } = event;
 
-              mirror.el = mirrorNode;
+        mirror.x += dx;
+        mirror.y += dy;
 
-              mirror.el.style.left = `${mirror.x}px`;
-              mirror.el.style.top = `${mirror.y}px`;
+        mirror.updatePosition();
+      };
 
-              mirror.el.style.position = 'absolute';
+      const onEnd = () => {
+        if (mirror.y < toolbox.height) {
+          toolbox.el.removeChild(mirror.el);
+          return;
+        }
 
-              toolbox.el.appendChild(mirror.el);
-            },
+        mirror.x += toolbox.x;
+        mirror.y += toolbox.y;
 
-            move: (event) => {
-              const { dx, dy } = event;
+        mirror.updatePosition();
 
-              mirror.x += dx;
-              mirror.y += dy;
+        this.flowChartRef.fc.insertNode(mirror.el);
+      };
 
-              mirror.el.style.left = `${mirror.x}px`;
-              mirror.el.style.top = `${mirror.y}px`;
-            },
-
-            end: () => {
-              if (mirror.x < 0) {
-                toolbox.el.removeChild(mirror.el);
-                return;
-              }
-
-              stageEl.appendChild(mirror.el);
-
-              mirror.x += toolbox.x;
-              mirror.y += toolbox.y;
-
-              mirror.el.style.left = `${mirror.x}px`;
-              mirror.el.style.top = `${mirror.y}px`;
-
-              this.$emit('add-node', mirror.el);
-            },
-          },
-        });
+      interact('.fc-toolbox .fc-node').draggable({
+        autoScroll: true,
+        cursorChecker() { /* do nothing */ },
+        listeners: {
+          start: onStart,
+          move: onMove,
+          end: onEnd,
+        },
+      });
     },
+
+    save() {
+      const config = this.flowChartRef.fc.getConfig();
+
+      console.log(config);
+    },
+
   },
 };
 </script>
