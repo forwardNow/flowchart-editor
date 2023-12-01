@@ -1,0 +1,80 @@
+@import "vars";
+
+// $ant-size 两节短线的总长度
+// $ant-width 一节短线的宽度
+// $speed 运动一圈的时间
+// $keyframe-id 帧动画 id
+@mixin marching-ants-init($ant-size, $ant-width, $speed, $keyframe-id){
+  background-size:
+    $ant-size $ant-width,
+    $ant-size $ant-width,
+    $ant-width $ant-size,
+    $ant-width $ant-size;
+  background-position:
+    0 0,
+    0 100%,
+    0 0,
+    100% 0;
+  background-repeat:
+    repeat-x,
+    repeat-x,
+    repeat-y,
+    repeat-y;
+  animation: marching-ants-#{$keyframe-id} $speed;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: paused;
+
+  &:hover,
+  &.marching {
+    animation-play-state: running;
+  }
+
+  &.reverse {
+    animation-direction: reverse;
+  }
+};
+
+// $color1 第一节线的颜色
+// $color2 第二节线的颜色
+@mixin marching-ants-color($color1, $color2){
+  background-image:
+    linear-gradient(to right, $color1 50%, $color2 50%),
+    linear-gradient(to right, $color1 50%, $color2 50%),
+    linear-gradient(to bottom, $color1 50%, $color2 50%),
+    linear-gradient(to bottom, $color1 50%, $color2 50%);
+};
+
+// $ant-size 两节短线的总长度
+@mixin marching-ants-animation($ant-size, $keyframe-id){
+  @keyframes marching-ants-#{$keyframe-id} {
+    0% {
+      background-position:
+        0 0,
+        0 100%,
+        0 0,
+        100% 0;
+    }
+    100% {
+      background-position:
+        2*$ant-size 0,
+        -2*$ant-size 100%,
+        0 -2*$ant-size,
+        100% 2*$ant-size;
+    }
+  }
+}
+
+@include marching-ants-animation(10px, 1);
+
+.marching-ants {
+  @include marching-ants-init(10px, 1px, 2s, 1);
+  @include marching-ants-color($color-primary, transparent);
+}
+
+
+
+
+
+
+

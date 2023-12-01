@@ -1,11 +1,6 @@
-$color-primary: #026dff;
-$fc-border-color: #dfe2e5;
+@import "vars";
+@import "march-ants";
 
-$fc-node-base-width: 128px;
-$fc-node-base-height: 44px;
-$fc-node-base-border-width: 1px;
-
-$fc-node-skeleton-padding: 4px;
 
 .flow-chart-box {
   position: relative;
@@ -107,8 +102,7 @@ $fc-node-skeleton-padding: 4px;
 
     padding: $fc-node-skeleton-padding;
 
-    outline: dashed 1px $color-primary;
-    opacity: 0.8;
+    opacity: 0.5;
 
     pointer-events: none;
   }

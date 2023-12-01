@@ -33,7 +33,7 @@ const NODE_HTML_RENDER = lodashTemplate(`
 `);
 
 const NODE_SKELETON_HTML_RENDER = lodashTemplate(`
-  <div class="fc-node-skeleton"></div>
+  <div class="fc-node-skeleton marching-ants marching"></div>
 `);
 
 const FC_NODE_TYPES = {
