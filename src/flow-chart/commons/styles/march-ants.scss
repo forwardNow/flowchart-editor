@@ -65,10 +65,10 @@
   }
 }
 
-@include marching-ants-animation(10px, 1);
+@include marching-ants-animation($ant-size, 1);
 
 .marching-ants {
-  @include marching-ants-init(10px, 1px, 2s, 1);
+  @include marching-ants-init($ant-size, 1px, 2s, 1);
   @include marching-ants-color($color-primary, transparent);
 }
 

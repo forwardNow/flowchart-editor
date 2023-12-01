@@ -15,7 +15,7 @@ import {
 
 const FC_NODE_CLASS_NAMES = {
   Node: 'fc-node',
-  NodeText: 'fc-node-text',
+  NodeContent: 'fc-node-text',
   Skeleton: 'fc-node-skeleton',
   NodeSelected: 'fc-node-selected',
 
@@ -180,10 +180,7 @@ export class FlowChart {
     const position: { x: number, y: number } = this.getPositionOfFcNode(el);
 
     return {
-      id,
-      type,
-      content,
-      position,
+      id, type, content, position,
     };
   }
 
@@ -257,7 +254,7 @@ export class FlowChart {
 
     this.createFcNodesWithConfig(nodes);
 
-    this.createFcConnectionsWithConfig(connections);
+    this.createFcConnections(connections);
   }
 
   private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
@@ -288,7 +285,7 @@ export class FlowChart {
       $fcNode = fcNode;
     }
 
-    return $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeText}`).html();
+    return $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeContent}`).html();
   }
 
   private createFcNodesWithConfig(fcNodes: IFcNode[]) {
@@ -312,13 +309,13 @@ export class FlowChart {
     this.createFcNodeWithElement(el, id);
   }
 
-  private createFcConnectionsWithConfig(fcConnections: IFcConnection[]) {
+  private createFcConnections(fcConnections: IFcConnection[]) {
     for (let i = 0, len = fcConnections.length; i < len; i += 1) {
-      this.createConnection(fcConnections[i]);
+      this.createFcConnection(fcConnections[i]);
     }
   }
 
-  private createConnection(fcConnection: IFcConnection) {
+  private createFcConnection(fcConnection: IFcConnection) {
     const {
       sourceId,
       sourceAnchor,
@@ -334,7 +331,7 @@ export class FlowChart {
   }
 
   private getElementByManagedId(id: string) {
-    return this.jsPlumbInstance.getManagedElement(id);
+    return this.jsPlumbInstance.getManagedElement(id) as HTMLElement;
   }
 
   private bindListeners() {
@@ -385,7 +382,7 @@ export class FlowChart {
   }
 
   private onDbClickNode($fcNode: JQuery<HTMLElement>) {
-    const $nodeText = $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeText}`);
+    const $nodeText = $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeContent}`);
 
     $nodeText
       .prop('contenteditable', 'true')
@@ -394,6 +391,24 @@ export class FlowChart {
         console.log(EVENTS.BLUR);
         $nodeText.removeAttr('contenteditable');
       });
+  }
+
+  removeFcNode(node: HTMLElement | IFcNode) {
+    let el: HTMLElement;
+
+    if (node instanceof HTMLElement) {
+      el = node;
+    } else {
+      el = this.getElementByManagedId(node.id);
+    }
+
+    this.jsPlumbInstance.deleteConnectionsForElement(el);
+
+    el.parentNode?.removeChild(el);
+  }
+
+  getSelectedFcNode() {
+    return jQuery(this.el).find(`.${FC_NODE_CLASS_NAMES.NodeSelected}`).get(0);
   }
 }
 

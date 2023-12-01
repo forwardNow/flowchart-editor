@@ -20,3 +20,15 @@ export const showSuccessToast = (message: string) => {
     title: message,
   });
 };
+
+const Alert = Swal.mixin({
+  showConfirmButton: true,
+  confirmButtonText: '确定',
+});
+
+export const showAlert = (message: string) => {
+  Alert.fire({
+    icon: 'warning',
+    title: message,
+  });
+};

@@ -44,7 +44,7 @@
 import interact from 'interactjs';
 import IconSave from '@/flow-chart/commons/components/IconSave.vue';
 import { STORE_KEY_CONFIG } from '@/flow-chart/commons/configs/constants';
-import { showSuccessToast } from '@/flow-chart/commons/utils/popup';
+import { showAlert, showSuccessToast } from '@/flow-chart/commons/utils/popup';
 import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
 
 export default {
@@ -154,7 +154,16 @@ export default {
     },
 
     remove() {
+      const { fc } = this.flowChartRef;
 
+      const selectedNode = fc.getSelectedFcNode();
+
+      if (selectedNode == null) {
+        showAlert('请选择节点！');
+        return;
+      }
+
+      fc.removeFcNode(selectedNode);
     },
   },
 };
