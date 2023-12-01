@@ -107,9 +107,11 @@
     pointer-events: none;
   }
 
-  .fc-node-selected {
-    .fc-node-skeleton {
-      display: block;
+  .fc-selected {
+    &.fc-node {
+      .fc-node-skeleton {
+        display: block;
+      }
     }
   }
 

@@ -13,11 +13,14 @@ import {
   newInstance,
 } from '@jsplumb/browser-ui';
 
-const FC_NODE_CLASS_NAMES = {
+const FC_CSS_CLASS_NAMES = {
   Node: 'fc-node',
   NodeContent: 'fc-node-text',
-  Skeleton: 'fc-node-skeleton',
-  NodeSelected: 'fc-node-selected',
+  NodeSkeleton: 'fc-node-skeleton',
+
+  Selected: 'fc-selected',
+
+  Connection: 'jtk-connector',
 
   Circle: 'fc-node-circle',
   Rectangle: 'fc-node-rectangle',
@@ -116,6 +119,49 @@ export class FlowChart {
     return jsPlumbInstance;
   }
 
+  private bindListeners() {
+    const check = (target: HTMLElement, cssClassSelector: string) => {
+      const $target = jQuery(target);
+      const selector = cssClassSelector.startsWith('.') ? cssClassSelector : `.${cssClassSelector}`;
+      const $fcNode = $target.closest(selector);
+      const isFcNode = $fcNode.length > 0;
+
+      if (!isFcNode) {
+        return null;
+      }
+
+      return $fcNode;
+    };
+
+    const debouncedMousedownHandler = throttle((event: JQuery.TriggeredEvent) => {
+      const { target } = event;
+
+      console.log(EVENTS.MOUSEDOWN, target);
+
+      const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
+
+      if ($fcNode) {
+        this.onClickNode($fcNode);
+      }
+    }, 500, { trailing: false });
+
+    const dblclickHandler = (event: JQuery.TriggeredEvent) => {
+      const { target } = event;
+
+      console.log(EVENTS.DBLCLICK, target);
+
+      const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
+
+      if ($fcNode) {
+        this.onDbClickNode($fcNode);
+      }
+    };
+
+    jQuery(this.el)
+      .bind(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
+      .bind(EVENTS.DBLCLICK, dblclickHandler);
+  }
+
   getJsPlumbInstance() {
     return this.jsPlumbInstance;
   }
@@ -203,7 +249,7 @@ export class FlowChart {
   private buildConfigOfUnconnectedFcNodes(fcConfig: IFcConfig) {
     const { jsPlumbInstance } = this;
 
-    const $nodes = jQuery(this.el).find(`.${FC_NODE_CLASS_NAMES.Node}`);
+    const $nodes = jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
 
     const fcNodes: IFcNode[] = [];
 
@@ -258,11 +304,11 @@ export class FlowChart {
   }
 
   private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
-    if (el.classList.contains(FC_NODE_CLASS_NAMES.Circle)) {
+    if (el.classList.contains(FC_CSS_CLASS_NAMES.Circle)) {
       return 'Circle';
     }
 
-    if (el.classList.contains(FC_NODE_CLASS_NAMES.Diamond)) {
+    if (el.classList.contains(FC_CSS_CLASS_NAMES.Diamond)) {
       return 'Diamond';
     }
 
@@ -285,7 +331,7 @@ export class FlowChart {
       $fcNode = fcNode;
     }
 
-    return $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeContent}`).html();
+    return $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`).html();
   }
 
   private createFcNodesWithConfig(fcNodes: IFcNode[]) {
@@ -334,45 +380,13 @@ export class FlowChart {
     return this.jsPlumbInstance.getManagedElement(id) as HTMLElement;
   }
 
-  private bindListeners() {
-    const checkFcNode = (event: JQuery.TriggeredEvent) => {
-      const $target = jQuery(event.target);
-      const $fcNode = $target.closest(`.${FC_NODE_CLASS_NAMES.Node}`);
-      const isFcNode = $fcNode.length > 0;
-
-      return { $fcNode, isFcNode };
-    };
-
-    const debouncedMousedownHandler = throttle((event: JQuery.TriggeredEvent) => {
-      console.log(EVENTS.MOUSEDOWN);
-      const { $fcNode, isFcNode } = checkFcNode(event);
-
-      if (isFcNode) {
-        this.onClickNode($fcNode);
-      }
-    }, 500, { trailing: false });
-
-    const dblclickHandler = (event: JQuery.TriggeredEvent) => {
-      console.log(EVENTS.DBLCLICK);
-      const { $fcNode, isFcNode } = checkFcNode(event);
-
-      if (isFcNode) {
-        this.onDbClickNode($fcNode);
-      }
-    };
-
-    jQuery(this.el)
-      .bind(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
-      .bind(EVENTS.DBLCLICK, dblclickHandler);
-  }
-
   private onClickNode($fcNode: JQuery<HTMLElement>) {
     // 1. add active class
-    $fcNode.siblings(`.${FC_NODE_CLASS_NAMES.Node}`).removeClass(FC_NODE_CLASS_NAMES.NodeSelected);
-    $fcNode.addClass(FC_NODE_CLASS_NAMES.NodeSelected);
+    $fcNode.siblings(`.${FC_CSS_CLASS_NAMES.Node}`).removeClass(FC_CSS_CLASS_NAMES.Selected);
+    $fcNode.addClass(FC_CSS_CLASS_NAMES.Selected);
 
     // 2. add skeleton element
-    const hasSkeleton = $fcNode.find(`.${FC_NODE_CLASS_NAMES.Skeleton}`).length > 0;
+    const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
 
     if (hasSkeleton) {
       return;
@@ -382,7 +396,7 @@ export class FlowChart {
   }
 
   private onDbClickNode($fcNode: JQuery<HTMLElement>) {
-    const $nodeText = $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeContent}`);
+    const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
 
     $nodeText
       .prop('contenteditable', 'true')
@@ -408,7 +422,7 @@ export class FlowChart {
   }
 
   getSelectedFcNode() {
-    return jQuery(this.el).find(`.${FC_NODE_CLASS_NAMES.NodeSelected}`).get(0);
+    return jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Selected}`).get(0);
   }
 }
 
