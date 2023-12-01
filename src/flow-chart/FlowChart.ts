@@ -49,7 +49,16 @@ const FC_NODE_ANCHORS = {
   Left: 'Left',
 };
 
+const EVENT_NAMESPACE = 'fc';
+
+const EVENTS = {
+  MOUSEDOWN: `mousedown.${EVENT_NAMESPACE}`,
+  DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
+  BLUR: `blur.${EVENT_NAMESPACE}`,
+};
+
 export class FlowChart {
+  /** stage element  */
   private readonly el: HTMLElement;
 
   private readonly jsPlumbInstance: BrowserJsPlumbInstance;
@@ -338,35 +347,35 @@ export class FlowChart {
   }
 
   private bindListeners() {
-    const $stage = jQuery(this.el);
-
     const checkFcNode = (event: JQuery.TriggeredEvent) => {
       const $target = jQuery(event.target);
-
       const $fcNode = $target.closest(`.${FC_NODE_CLASS_NAMES.Node}`);
-
       const isFcNode = $fcNode.length > 0;
 
       return { $fcNode, isFcNode };
     };
 
-    $stage
-      .bind('mousedown.fc', throttle((event: JQuery.TriggeredEvent) => {
-        console.log('mousedown');
-        const { $fcNode, isFcNode } = checkFcNode(event);
+    const debouncedMousedownHandler = throttle((event: JQuery.TriggeredEvent) => {
+      console.log(EVENTS.MOUSEDOWN);
+      const { $fcNode, isFcNode } = checkFcNode(event);
 
-        if (isFcNode) {
-          this.onClickNode($fcNode);
-        }
-      }, 500, { trailing: false }))
-      .bind('dblclick.fc', (event) => {
-        console.log('dblclick');
-        const { $fcNode, isFcNode } = checkFcNode(event);
+      if (isFcNode) {
+        this.onClickNode($fcNode);
+      }
+    }, 500, { trailing: false });
 
-        if (isFcNode) {
-          this.onDbClickNode($fcNode);
-        }
-      });
+    const dblclickHandler = (event: JQuery.TriggeredEvent) => {
+      console.log(EVENTS.DBLCLICK);
+      const { $fcNode, isFcNode } = checkFcNode(event);
+
+      if (isFcNode) {
+        this.onDbClickNode($fcNode);
+      }
+    };
+
+    jQuery(this.el)
+      .bind(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
+      .bind(EVENTS.DBLCLICK, dblclickHandler);
   }
 
   private onClickNode($fcNode: JQuery<HTMLElement>) {
@@ -389,7 +398,11 @@ export class FlowChart {
 
     $nodeText
       .prop('contenteditable', 'true')
-      .focus();
+      .focus()
+      .one(EVENTS.BLUR, () => {
+        console.log(EVENTS.BLUR);
+        $nodeText.removeAttr('contenteditable');
+      });
   }
 }
 
