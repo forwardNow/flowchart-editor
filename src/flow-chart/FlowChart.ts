@@ -27,7 +27,7 @@ const FC_NODE_CLASS_NAMES = {
 const NODE_HTML_RENDER = lodashTemplate(`
   <div class="fc-node fc-node-<%= type %>" style="left: <%= position.x %>px; top: <%= position.y %>px;">
     <div class="fc-node-inner">
-      <div class="fc-node-text"><%= text %></div>
+      <div class="fc-node-text"><%= content %></div>
     </div>
   </div>
 `);
@@ -120,25 +120,119 @@ export class FlowChart {
     return this.jsPlumbInstance;
   }
 
-  getConfig() {
-    const config: IFcConfig = { nodes: [], connections: [] };
+  getFlowChartConfig() {
+    const config: IFcConfig = this.buildConfig();
 
-    this.getConfigByJsPlumbConnections(config);
-
-    this.addUnconnectedNodesToConfig(config);
+    this.buildConfigOfUnconnectedFcNodes(config);
 
     return config;
   }
 
-  appendElement(el: HTMLElement, managedId?: string) {
+  private buildConfig() {
+    const fcConfig: IFcConfig = { nodes: [], connections: [] };
+
+    const jsPlumbConnections = this.jsPlumbInstance.getConnections() as JsPlumbConnection[];
+
+    for (let i = 0, len = jsPlumbConnections.length; i < len; i += 1) {
+      const jsPlumbConnection = jsPlumbConnections[i];
+
+      const fcConnection = this.buildConfigOfFcConnection(jsPlumbConnection);
+
+      const fcNodes = this.buildConfigOfFcNodes(jsPlumbConnection);
+
+      fcConfig.connections.push(fcConnection);
+
+      this.addFcNodesToConfig(fcNodes, fcConfig);
+    }
+
+    return fcConfig;
+  }
+
+  private buildConfigOfFcConnection(jsPlumbConnection: JsPlumbConnection) {
+    const { sourceId, targetId } = jsPlumbConnection;
+
+    const sourceAnchor = lodashGet(jsPlumbConnection, 'endpoints.0._anchor.type') as IFcAnchor;
+    const targetAnchor = lodashGet(jsPlumbConnection, 'endpoints.1._anchor.type') as IFcAnchor;
+
+    return {
+      type: 'Flowchart',
+      sourceId,
+      sourceAnchor,
+      targetId,
+      targetAnchor,
+      label: '',
+    };
+  }
+
+  private buildConfigOfFcNodes(jsPlumbConnection: JsPlumbConnection) {
+    const { source, target } = jsPlumbConnection;
+
+    return [
+      this.getFcNodeConfig(source),
+      this.getFcNodeConfig(target),
+    ];
+  }
+
+  getFcNodeConfig(el: HTMLElement) {
+    const id: string = this.getManagedIdOfFcNode(el);
+    const type: IFcNodeType = this.getTypeOfFcNode(el);
+    const content: string = this.getContentOfFcNode(el);
+    const position: { x: number, y: number } = this.getPositionOfFcNode(el);
+
+    return {
+      id,
+      type,
+      content,
+      position,
+    };
+  }
+
+  private getManagedIdOfFcNode(el: HTMLElement) {
+    return el.dataset.jtkManaged as string;
+  }
+
+  private addFcNodesToConfig(nodes: IFcNode[], config: IFcConfig) {
+    nodes.forEach((node) => {
+      const isExist = Boolean(config.nodes.find((item) => item.id === node.id));
+
+      if (isExist) {
+        return;
+      }
+
+      config.nodes.push(node);
+    });
+  }
+
+  private buildConfigOfUnconnectedFcNodes(fcConfig: IFcConfig) {
+    const { jsPlumbInstance } = this;
+
+    const $nodes = jQuery(this.el).find(`.${FC_NODE_CLASS_NAMES.Node}`);
+
+    const fcNodes: IFcNode[] = [];
+
+    $nodes.each((index: number, el: HTMLElement) => {
+      const id = jsPlumbInstance.getId(el);
+      const type = this.getTypeOfFcNode(el);
+      const content = this.getContentOfFcNode(el);
+      const position = this.getPositionOfFcNode(el);
+
+      fcNodes.push({
+        id, type, content, position,
+      });
+    });
+
+    this.addFcNodesToConfig(fcNodes, fcConfig);
+  }
+
+  createFcNodeWithElement(el: HTMLElement, managedId?: string) {
     this.el.appendChild(el);
 
     this.jsPlumbInstance.manage(el, managedId);
 
-    this.createNodeEndpoints(el);
+    this.createEndpointsForFcNode(el);
   }
 
-  createNodeEndpoints(el: HTMLElement) {
+  private createEndpointsForFcNode(el: HTMLElement) {
     this.jsPlumbInstance.addEndpoints(el, [
       {
         source: true, target: true, anchor: 'Top', maxConnections: -1,
@@ -155,121 +249,18 @@ export class FlowChart {
     ]);
   }
 
-  updateStageByConfig(fcConfig: IFcConfig) {
+  createFlowChartWithConfig(fcConfig: IFcConfig) {
     const {
       nodes,
       connections,
     } = fcConfig;
 
-    this.createNodesByConfig(nodes);
+    this.createFcNodesWithConfig(nodes);
 
-    this.createConnectionsByConfig(connections);
+    this.createFcConnectionsWithConfig(connections);
   }
 
-  private getConfigByJsPlumbConnections(fcConfig: IFcConfig) {
-    const jsPlumbConnections = this.jsPlumbInstance.getConnections() as JsPlumbConnection[];
-
-    for (let i = 0, len = jsPlumbConnections.length; i < len; i += 1) {
-      const jsPlumbConnection = jsPlumbConnections[i];
-
-      const fcConnection = this.getConfigConnection(jsPlumbConnection);
-
-      const fcNodes = this.getConfigNodes(jsPlumbConnection);
-
-      fcConfig.connections.push(fcConnection);
-
-      this.addConfigNodes(fcNodes, fcConfig);
-    }
-  }
-
-  private getConfigConnection(jsPlumbConnection: JsPlumbConnection) {
-    const {
-      sourceId,
-      targetId,
-    } = jsPlumbConnection;
-
-    const sourceAnchor = lodashGet(jsPlumbConnection, 'endpoints.0._anchor.type') as IFcAnchor;
-    const targetAnchor = lodashGet(jsPlumbConnection, 'endpoints.1._anchor.type') as IFcAnchor;
-
-    return {
-      type: 'Flowchart',
-
-      sourceId,
-      sourceAnchor,
-
-      targetId,
-      targetAnchor,
-
-      label: '',
-    };
-  }
-
-  private getConfigNodes(jsPlumbConnection: JsPlumbConnection) {
-    const {
-      sourceId,
-      source,
-
-      targetId,
-      target,
-    } = jsPlumbConnection;
-
-    return [
-      this.getConfigNode(sourceId, source),
-      this.getConfigNode(targetId, target),
-    ];
-  }
-
-  private getConfigNode(id: string, el: HTMLElement) {
-    const type: IFcNodeType = this.getNodeTypeByElement(el);
-    const text: string = this.getNodeContentByElement(el);
-    const position: { x: number, y: number } = this.getNodePositionByElement(el);
-
-    return {
-      id,
-      type,
-      text,
-      position,
-    };
-  }
-
-  private addUnconnectedNodesToConfig(fcConfig: IFcConfig) {
-    const { jsPlumbInstance } = this;
-
-    const $nodes = jQuery(this.el).find(`.${FC_NODE_CLASS_NAMES.Node}`);
-
-    const fcNodes: IFcNode[] = [];
-
-    $nodes.each((index: number, el: HTMLElement) => {
-      const id = jsPlumbInstance.getId(el);
-      const type = this.getNodeTypeByElement(el);
-      const text = this.getNodeContentByElement(el);
-      const position = this.getNodePositionByElement(el);
-
-      fcNodes.push({
-        id, type, text, position,
-      });
-    });
-
-    this.addConfigNodes(fcNodes, fcConfig);
-  }
-
-  toString() {
-    return JSON.stringify(this.getConfig(), null, 2);
-  }
-
-  private addConfigNodes(nodes: IFcNode[], config: IFcConfig) {
-    nodes.forEach((node) => {
-      const isExist = Boolean(config.nodes.find((item) => item.id === node.id));
-
-      if (isExist) {
-        return;
-      }
-
-      config.nodes.push(node);
-    });
-  }
-
-  private getNodeTypeByElement(el: HTMLElement): IFcNodeType {
+  private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
     if (el.classList.contains(FC_NODE_CLASS_NAMES.Circle)) {
       return 'Circle';
     }
@@ -281,14 +272,14 @@ export class FlowChart {
     return 'Rectangle';
   }
 
-  private getNodePositionByElement(el: HTMLElement) {
+  private getPositionOfFcNode(el: HTMLElement) {
     const x = parseFloat(el.style.left);
     const y = parseFloat(el.style.top);
 
     return { x, y };
   }
 
-  private getNodeContentByElement(fcNode: HTMLElement | JQuery<HTMLElement>) {
+  private getContentOfFcNode(fcNode: HTMLElement | JQuery<HTMLElement>) {
     let $fcNode: JQuery<HTMLElement>;
 
     if (fcNode instanceof HTMLElement) {
@@ -300,19 +291,13 @@ export class FlowChart {
     return $fcNode.find(`.${FC_NODE_CLASS_NAMES.NodeText}`).html();
   }
 
-  private createNodesByConfig(fcNodes: IFcNode[]) {
+  private createFcNodesWithConfig(fcNodes: IFcNode[]) {
     for (let i = 0, len = fcNodes.length; i < len; i += 1) {
-      this.createNode(fcNodes[i]);
+      this.createFcNode(fcNodes[i]);
     }
   }
 
-  private createConnectionsByConfig(fcConnections: IFcConnection[]) {
-    for (let i = 0, len = fcConnections.length; i < len; i += 1) {
-      this.createConnection(fcConnections[i]);
-    }
-  }
-
-  private createNode(fcNode: IFcNode) {
+  private createFcNode(fcNode: IFcNode) {
     const { id, type } = fcNode;
 
     const html = NODE_HTML_RENDER({
@@ -324,7 +309,13 @@ export class FlowChart {
 
     const el = $el.get(0) as HTMLElement;
 
-    this.appendElement(el, id);
+    this.createFcNodeWithElement(el, id);
+  }
+
+  private createFcConnectionsWithConfig(fcConnections: IFcConnection[]) {
+    for (let i = 0, len = fcConnections.length; i < len; i += 1) {
+      this.createConnection(fcConnections[i]);
+    }
   }
 
   private createConnection(fcConnection: IFcConnection) {
@@ -415,7 +406,7 @@ type IFcAnchor = keyof typeof FC_NODE_ANCHORS;
 interface IFcNode {
   id: string, // managedId
   type: IFcNodeType,
-  text: string,
+  content: string,
   position: { x: number, y: number },
 }
 

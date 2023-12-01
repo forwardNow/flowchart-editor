@@ -4,6 +4,9 @@
       <div class="feature-item" title="保存" @click="save">
         <IconSave />
       </div>
+      <div class="feature-item" title="删除" @click="remove">
+        <IconDelete />
+      </div>
     </div>
 
     <div class="tool-divider"></div>
@@ -42,10 +45,11 @@ import interact from 'interactjs';
 import IconSave from '@/flow-chart/commons/components/IconSave.vue';
 import { STORE_KEY_CONFIG } from '@/flow-chart/commons/configs/constants';
 import { showSuccessToast } from '@/flow-chart/commons/utils/popup';
+import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
 
 export default {
   name: 'FcToolbox',
-  components: { IconSave },
+  components: { IconDelete, IconSave },
 
   inject: ['flowChartRef'],
 
@@ -123,7 +127,7 @@ export default {
 
         mirror.updatePosition();
 
-        this.flowChartRef.fc.appendElement(mirror.el);
+        this.flowChartRef.fc.createFcNodeWithElement(mirror.el);
       };
 
       interact('.fc-toolbox .fc-node')
@@ -140,7 +144,7 @@ export default {
     },
 
     save() {
-      const config = this.flowChartRef.fc.getConfig();
+      const config = this.flowChartRef.fc.getFlowChartConfig();
 
       console.log(config);
 
@@ -149,6 +153,9 @@ export default {
       showSuccessToast('保存成功!');
     },
 
+    remove() {
+
+    },
   },
 };
 </script>

@@ -43,7 +43,7 @@ export default {
 
       console.log('config in localStorage: ', config);
 
-      this.fc.updateStageByConfig(config);
+      this.fc.createFlowChartWithConfig(config);
     },
   },
 };
