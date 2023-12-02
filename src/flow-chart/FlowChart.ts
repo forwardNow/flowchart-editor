@@ -1,16 +1,19 @@
 /* eslint-disable class-methods-use-this */
-import type { Connection as JsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
+import type { Connection as IJsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
 import lodashGet from 'lodash.get';
 import lodashTemplate from 'lodash.template';
 import jQuery from 'jquery';
 import throttle from 'lodash.throttle';
+import marker from 'makerjs';
 
 import {
-  AnchorLocations, ArrowOverlay,
+  AnchorLocations,
+  ArrowOverlay,
   BrowserJsPlumbInstance,
   DotEndpoint,
   FlowchartConnector,
   newInstance,
+  Connection as JsPlumbConnection, EVENT_CONNECTION_CLICK,
 } from '@jsplumb/browser-ui';
 
 const FC_CSS_CLASS_NAMES = {
@@ -144,6 +147,13 @@ export class FlowChart {
 
       if ($fcNode) {
         this.onClickNode($fcNode);
+        return;
+      }
+
+      const $fcConnection = check(target, FC_CSS_CLASS_NAMES.Connection);
+
+      if ($fcConnection) {
+        this.onClickConnection($fcConnection);
       }
     }, 200, { trailing: false });
 
@@ -162,6 +172,24 @@ export class FlowChart {
     jQuery(this.el)
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
       .on(EVENTS.DBLCLICK, dblclickHandler);
+
+    this.jsPlumbInstance.bind(EVENT_CONNECTION_CLICK, (connection: IJsPlumbConnection, event: PointerEvent) => {
+      // console.dir(connection);
+      const pathData = this.jsPlumbInstance.getPathData(connection.connector);
+
+      const model = marker.importer.fromSVGPathData(pathData);
+
+      const outlineModel = marker.model.outline(model, 10, 0);
+
+      const simplifyModel = marker.model.simplify(outlineModel);
+
+      const outlinePathData = marker.exporter.toSVGPathData(simplifyModel, {
+        origin: [0, 0],
+      });
+
+      console.log(pathData);
+      console.log(outlinePathData);
+    });
   }
 
   private onClickNode($fcNode: JQuery<HTMLElement>) {
@@ -185,6 +213,14 @@ export class FlowChart {
 
   private addSelectedCssClass($el: JQuery<HTMLElement>) {
     $el.addClass(FC_CSS_CLASS_NAMES.Selected);
+  }
+
+  private onClickConnection(connection: JQuery<HTMLElement> | JsPlumbConnection) {
+    if (connection instanceof JsPlumbConnection) {
+      console.log(connection);
+    } else {
+      this.addSelectedCssClass(connection);
+    }
   }
 
   private onDbClickNode($fcNode: JQuery<HTMLElement>) {
@@ -214,7 +250,7 @@ export class FlowChart {
   private buildConfig() {
     const fcConfig: IFcConfig = { nodes: [], connections: [] };
 
-    const jsPlumbConnections = this.jsPlumbInstance.getConnections() as JsPlumbConnection[];
+    const jsPlumbConnections = this.jsPlumbInstance.getConnections() as IJsPlumbConnection[];
 
     for (let i = 0, len = jsPlumbConnections.length; i < len; i += 1) {
       const jsPlumbConnection = jsPlumbConnections[i];
@@ -231,7 +267,7 @@ export class FlowChart {
     return fcConfig;
   }
 
-  private buildConfigOfFcConnection(jsPlumbConnection: JsPlumbConnection) {
+  private buildConfigOfFcConnection(jsPlumbConnection: IJsPlumbConnection) {
     const { sourceId, targetId } = jsPlumbConnection;
 
     const sourceAnchor = lodashGet(jsPlumbConnection, 'endpoints.0._anchor.type') as IFcAnchor;
@@ -247,7 +283,7 @@ export class FlowChart {
     };
   }
 
-  private buildConfigOfFcNodes(jsPlumbConnection: JsPlumbConnection) {
+  private buildConfigOfFcNodes(jsPlumbConnection: IJsPlumbConnection) {
     const { source, target } = jsPlumbConnection;
 
     return [

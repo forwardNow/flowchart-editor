@@ -1,7 +1,9 @@
 <template>
   <div class="flow-chart-box">
     <FcToolbox ref="toolbox" />
-    <div class="flow-chart" ref="stage"></div>
+    <div class="flow-chart" ref="stage">
+      <!-- <div class="fc-line-ball"></div> -->
+    </div>
   </div>
 </template>
 <script>
