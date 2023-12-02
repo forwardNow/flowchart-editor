@@ -120,17 +120,17 @@ export class FlowChart {
   }
 
   private bindListeners() {
-    const check = (target: HTMLElement, cssClassSelector: string) => {
+    const check = (target: HTMLElement, ancestorClassSelector: string) => {
+      const ancestorSelector = ancestorClassSelector.startsWith('.') ? ancestorClassSelector : `.${ancestorClassSelector}`;
       const $target = jQuery(target);
-      const selector = cssClassSelector.startsWith('.') ? cssClassSelector : `.${cssClassSelector}`;
-      const $fcNode = $target.closest(selector);
-      const isFcNode = $fcNode.length > 0;
+      const $ancestor = $target.closest(ancestorSelector);
+      const isAncestor = $ancestor.length > 0 || $target.is(ancestorSelector);
 
-      if (!isFcNode) {
+      if (!isAncestor) {
         return null;
       }
 
-      return $fcNode;
+      return $ancestor;
     };
 
     const debouncedMousedownHandler = throttle((event: JQuery.TriggeredEvent) => {
@@ -138,12 +138,14 @@ export class FlowChart {
 
       console.log(EVENTS.MOUSEDOWN, target);
 
+      this.removeSelectedCssClass();
+
       const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
 
       if ($fcNode) {
         this.onClickNode($fcNode);
       }
-    }, 500, { trailing: false });
+    }, 200, { trailing: false });
 
     const dblclickHandler = (event: JQuery.TriggeredEvent) => {
       const { target } = event;
@@ -158,8 +160,43 @@ export class FlowChart {
     };
 
     jQuery(this.el)
-      .bind(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
-      .bind(EVENTS.DBLCLICK, dblclickHandler);
+      .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
+      .on(EVENTS.DBLCLICK, dblclickHandler);
+  }
+
+  private onClickNode($fcNode: JQuery<HTMLElement>) {
+    this.addSelectedCssClass($fcNode);
+
+    // add skeleton element
+    const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
+
+    if (hasSkeleton) {
+      return;
+    }
+
+    $fcNode.append(NODE_SKELETON_HTML_RENDER({}));
+  }
+
+  private removeSelectedCssClass() {
+    const selector = `.${FC_CSS_CLASS_NAMES.Node}, .${FC_CSS_CLASS_NAMES.Connection}`;
+
+    jQuery(this.el).find(selector).removeClass(FC_CSS_CLASS_NAMES.Selected);
+  }
+
+  private addSelectedCssClass($el: JQuery<HTMLElement>) {
+    $el.addClass(FC_CSS_CLASS_NAMES.Selected);
+  }
+
+  private onDbClickNode($fcNode: JQuery<HTMLElement>) {
+    const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
+
+    $nodeText
+      .prop('contenteditable', 'true')
+      .focus()
+      .one(EVENTS.BLUR, () => {
+        console.log(EVENTS.BLUR);
+        $nodeText.removeAttr('contenteditable');
+      });
   }
 
   getJsPlumbInstance() {
@@ -378,33 +415,6 @@ export class FlowChart {
 
   private getElementByManagedId(id: string) {
     return this.jsPlumbInstance.getManagedElement(id) as HTMLElement;
-  }
-
-  private onClickNode($fcNode: JQuery<HTMLElement>) {
-    // 1. add active class
-    $fcNode.siblings(`.${FC_CSS_CLASS_NAMES.Node}`).removeClass(FC_CSS_CLASS_NAMES.Selected);
-    $fcNode.addClass(FC_CSS_CLASS_NAMES.Selected);
-
-    // 2. add skeleton element
-    const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
-
-    if (hasSkeleton) {
-      return;
-    }
-
-    $fcNode.append(NODE_SKELETON_HTML_RENDER({}));
-  }
-
-  private onDbClickNode($fcNode: JQuery<HTMLElement>) {
-    const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
-
-    $nodeText
-      .prop('contenteditable', 'true')
-      .focus()
-      .one(EVENTS.BLUR, () => {
-        console.log(EVENTS.BLUR);
-        $nodeText.removeAttr('contenteditable');
-      });
   }
 
   removeFcNode(node: HTMLElement | IFcNode) {
