@@ -201,6 +201,26 @@
     background-color: #dfe2e5;
   }
 
+  .node-info {}
+
+  .fc-item-info {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+  }
+
+  .fc-ii-item {
+    margin-right: 24px;
+  }
+
+  .fc-ii-label {
+    color: #999;
+  }
+  .fc-ii-cont {
+    margin-left: 8px;
+    color: #333;
+  }
+
   .fc-node {
     display: flex;
     justify-content: center;

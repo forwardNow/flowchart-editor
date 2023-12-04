@@ -4,16 +4,15 @@ import lodashGet from 'lodash.get';
 import lodashTemplate from 'lodash.template';
 import jQuery from 'jquery';
 import throttle from 'lodash.throttle';
-import marker from 'makerjs';
 
 import {
   AnchorLocations,
   ArrowOverlay,
   BrowserJsPlumbInstance,
+  Connection as JsPlumbConnection,
   DotEndpoint,
   FlowchartConnector,
   newInstance,
-  Connection as JsPlumbConnection, EVENT_CONNECTION_CLICK,
 } from '@jsplumb/browser-ui';
 
 const FC_CSS_CLASS_NAMES = {
@@ -57,10 +56,14 @@ const FC_NODE_ANCHORS = {
 
 const EVENT_NAMESPACE = 'fc';
 
-const EVENTS = {
+export const EVENTS = {
   MOUSEDOWN: `mousedown.${EVENT_NAMESPACE}`,
   DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
   BLUR: `blur.${EVENT_NAMESPACE}`,
+
+  SELECT_NODE: `select-node.${EVENT_NAMESPACE}`,
+  SELECT_CONNECTION: `select-connection.${EVENT_NAMESPACE}`,
+  UNSELECT_ALL: `unselect-all.${EVENT_NAMESPACE}`,
 };
 
 export class FlowChart {
@@ -68,6 +71,12 @@ export class FlowChart {
   private readonly el: HTMLElement;
 
   private readonly jsPlumbInstance: BrowserJsPlumbInstance;
+
+  private eventHandlers = {
+    [EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
+    [EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
+    [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
+  };
 
   constructor(el: HTMLElement, options?: IOptions) {
     this.el = el;
@@ -83,6 +92,8 @@ export class FlowChart {
     });
 
     jsPlumbInstance.importDefaults({
+      connectionsDetachable: false,
+
       connector: {
         type: FlowchartConnector.type,
         options: {
@@ -147,6 +158,7 @@ export class FlowChart {
 
       if ($fcNode) {
         this.onClickNode($fcNode);
+        this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig($fcNode.get(0) as HTMLElement));
         return;
       }
 
@@ -154,7 +166,15 @@ export class FlowChart {
 
       if ($fcConnection) {
         this.onClickConnection($fcConnection);
+
+        const jsPlumbConnection = this.getSelectedJsPlumbConnection();
+        const fcConnection = jsPlumbConnection ? this.buildConfigOfFcConnection(jsPlumbConnection) : null;
+        this.emit(EVENTS.SELECT_CONNECTION, fcConnection);
+
+        return;
       }
+
+      this.emit(EVENTS.UNSELECT_ALL);
     }, 200, { trailing: false });
 
     const dblclickHandler = (event: JQuery.TriggeredEvent) => {
@@ -172,24 +192,6 @@ export class FlowChart {
     jQuery(this.el)
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
       .on(EVENTS.DBLCLICK, dblclickHandler);
-
-    this.jsPlumbInstance.bind(EVENT_CONNECTION_CLICK, (connection: IJsPlumbConnection, event: PointerEvent) => {
-      // console.dir(connection);
-      const pathData = this.jsPlumbInstance.getPathData(connection.connector);
-
-      const model = marker.importer.fromSVGPathData(pathData);
-
-      const outlineModel = marker.model.outline(model, 10, 0);
-
-      const simplifyModel = marker.model.simplify(outlineModel);
-
-      const outlinePathData = marker.exporter.toSVGPathData(simplifyModel, {
-        origin: [0, 0],
-      });
-
-      console.log(pathData);
-      console.log(outlinePathData);
-    });
   }
 
   private onClickNode($fcNode: JQuery<HTMLElement>) {
@@ -283,7 +285,7 @@ export class FlowChart {
     };
   }
 
-  private buildConfigOfFcNodes(jsPlumbConnection: IJsPlumbConnection) {
+  private buildConfigOfFcNodes(jsPlumbConnection: IJsPlumbConnection): [IFcNode, IFcNode] {
     const { source, target } = jsPlumbConnection;
 
     return [
@@ -293,18 +295,15 @@ export class FlowChart {
   }
 
   getFcNodeConfig(el: HTMLElement) {
-    const id: string = this.getManagedIdOfFcNode(el);
-    const type: IFcNodeType = this.getTypeOfFcNode(el);
-    const content: string = this.getContentOfFcNode(el);
-    const position: { x: number, y: number } = this.getPositionOfFcNode(el);
+    const id = this.jsPlumbInstance.getId(el);
+    const type = this.getTypeOfFcNode(el);
+    const { html: content, text } = this.getContentOfFcNode(el);
+    const position = this.getPositionOfFcNode(el);
+    const stepIndex = this.getStepIndexOfFcNode(el);
 
     return {
-      id, type, content, position,
+      id, type, content, text, position, stepIndex,
     };
-  }
-
-  private getManagedIdOfFcNode(el: HTMLElement) {
-    return el.dataset.jtkManaged as string;
   }
 
   private addFcNodesToConfig(nodes: IFcNode[], config: IFcConfig) {
@@ -320,21 +319,12 @@ export class FlowChart {
   }
 
   private buildConfigOfUnconnectedFcNodes(fcConfig: IFcConfig) {
-    const { jsPlumbInstance } = this;
-
     const $nodes = jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
 
     const fcNodes: IFcNode[] = [];
 
     $nodes.each((index: number, el: HTMLElement) => {
-      const id = jsPlumbInstance.getId(el);
-      const type = this.getTypeOfFcNode(el);
-      const content = this.getContentOfFcNode(el);
-      const position = this.getPositionOfFcNode(el);
-
-      fcNodes.push({
-        id, type, content, position,
-      });
+      fcNodes.push(this.getFcNodeConfig(el));
     });
 
     this.addFcNodesToConfig(fcNodes, fcConfig);
@@ -366,10 +356,7 @@ export class FlowChart {
   }
 
   createFlowChartWithConfig(fcConfig: IFcConfig) {
-    const {
-      nodes,
-      connections,
-    } = fcConfig;
+    const { nodes, connections } = fcConfig;
 
     this.createFcNodesWithConfig(nodes);
 
@@ -388,6 +375,12 @@ export class FlowChart {
     return 'Rectangle';
   }
 
+  private getStepIndexOfFcNode(el: HTMLElement) {
+    const stepIndexStr = jQuery(el).attr('data-step-index') || '0';
+
+    return Number(stepIndexStr);
+  }
+
   private getPositionOfFcNode(el: HTMLElement) {
     const x = parseFloat(el.style.left);
     const y = parseFloat(el.style.top);
@@ -404,7 +397,12 @@ export class FlowChart {
       $fcNode = fcNode;
     }
 
-    return $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`).html();
+    const $content = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
+
+    const html = $content.html();
+    const text = $content.text();
+
+    return { html, text };
   }
 
   private createFcNodesWithConfig(fcNodes: IFcNode[]) {
@@ -468,7 +466,69 @@ export class FlowChart {
   }
 
   getSelectedFcNode() {
-    return jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Selected}`).get(0);
+    const selector = `.${FC_CSS_CLASS_NAMES.Selected}.${FC_CSS_CLASS_NAMES.Node}`;
+
+    return jQuery(this.el).find(selector).get(0);
+  }
+
+  getSelectedJsPlumbConnection() {
+    const selector = `.${FC_CSS_CLASS_NAMES.Selected}.${FC_CSS_CLASS_NAMES.Connection}`;
+
+    const connectionElement = jQuery(this.el).find(selector).get(0);
+
+    if (!connectionElement) {
+      return null;
+    }
+
+    return this.getJsPlumbConnectionByElement(connectionElement);
+  }
+
+  private getJsPlumbConnectionByElement(el: HTMLElement): IJsPlumbConnection | null {
+    const connections = this.jsPlumbInstance.getConnections() as IJsPlumbConnection[];
+
+    for (let i = 0, len = connections.length; i < len; i += 1) {
+      const connection = connections[i];
+
+      const svg: HTMLElement = (connection.connector as any).canvas;
+
+      if (svg === el) {
+        return connection;
+      }
+    }
+
+    return null;
+  }
+
+  removeFcConnection(connection: IJsPlumbConnection) {
+    this.jsPlumbInstance.deleteConnection(connection);
+  }
+
+  emit(eventName: string, payload?: any) {
+    const handlers = this.eventHandlers[eventName];
+
+    if (!handlers) {
+      return;
+    }
+
+    for (let i = 0, len = handlers.length; i < len; i += 1) {
+      const handler = handlers[i];
+
+      try {
+        handler(payload);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  }
+
+  on(eventName: string, callback: (payload: any) => void) {
+    const eventHandler = this.eventHandlers[eventName];
+
+    if (!eventHandler) {
+      throw new Error(`为定义这个类型的事件: ${eventName}`);
+    }
+
+    eventHandler.push(callback);
   }
 }
 
@@ -479,9 +539,11 @@ type IFcNodeType = keyof typeof FC_NODE_TYPES;
 type IFcAnchor = keyof typeof FC_NODE_ANCHORS;
 
 interface IFcNode {
+  stepIndex: number,
   id: string, // managedId
   type: IFcNodeType,
   content: string,
+  text: string,
   position: { x: number, y: number },
 }
 
