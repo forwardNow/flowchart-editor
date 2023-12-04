@@ -12,6 +12,7 @@ import {
   Connection as JsPlumbConnection,
   DotEndpoint,
   FlowchartConnector,
+  LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
 
@@ -30,7 +31,11 @@ const FC_CSS_CLASS_NAMES = {
 };
 
 const NODE_HTML_RENDER = lodashTemplate(`
-  <div class="fc-node fc-node-<%= type %>" style="left: <%= position.x %>px; top: <%= position.y %>px;">
+  <div
+    class="fc-node fc-node-<%= type %>"
+    data-step-index="<%= stepIndex %>"
+    style="left: <%= position.x %>px; top: <%= position.y %>px;"
+  >
     <div class="fc-node-inner">
       <div class="fc-node-text"><%= content %></div>
     </div>
@@ -275,13 +280,15 @@ export class FlowChart {
     const sourceAnchor = lodashGet(jsPlumbConnection, 'endpoints.0._anchor.type') as IFcAnchor;
     const targetAnchor = lodashGet(jsPlumbConnection, 'endpoints.1._anchor.type') as IFcAnchor;
 
+    const label = this.getLabelOfJsplumbConnection(jsPlumbConnection);
+
     return {
       type: 'Flowchart',
       sourceId,
       sourceAnchor,
       targetId,
       targetAnchor,
-      label: '',
+      label,
     };
   }
 
@@ -438,12 +445,21 @@ export class FlowChart {
       sourceAnchor,
       targetId,
       targetAnchor,
+      label,
     } = fcConnection;
 
     this.jsPlumbInstance.connect({
       source: this.getElementByManagedId(sourceId),
       target: this.getElementByManagedId(targetId),
       anchors: [sourceAnchor, targetAnchor],
+      overlays: [
+        {
+          type: LabelOverlay.type,
+          options: {
+            label,
+          },
+        },
+      ],
     });
   }
 
@@ -503,6 +519,39 @@ export class FlowChart {
     this.jsPlumbInstance.deleteConnection(connection);
   }
 
+  setLabelOfJsPlumbConnection(jsPlumbConnection: IJsPlumbConnection, label: string) {
+    const labelOverlay = this.getLabelOverlayOfJsPlumbConnection(jsPlumbConnection);
+
+    if (!labelOverlay) {
+      console.log('setLabelOfJsPlumbConnection(), labelOverlay is None');
+      return;
+    }
+
+    labelOverlay.setLabel(label);
+  }
+
+  getLabelOfJsplumbConnection(jsPlumbConnection: IJsPlumbConnection) {
+    const labelOverlay = this.getLabelOverlayOfJsPlumbConnection(jsPlumbConnection);
+
+    if (!labelOverlay) {
+      return '';
+    }
+
+    return labelOverlay.labelText;
+  }
+
+  private getLabelOverlayOfJsPlumbConnection(jsPlumbConnection: IJsPlumbConnection) {
+    const overlays = Object.values(jsPlumbConnection.getOverlays());
+
+    const labelOverlay = overlays.find((item) => item instanceof LabelOverlay);
+
+    if (!labelOverlay) {
+      return null;
+    }
+
+    return labelOverlay as LabelOverlay;
+  }
+
   emit(eventName: string, payload?: any) {
     const handlers = this.eventHandlers[eventName];
 
@@ -529,6 +578,10 @@ export class FlowChart {
     }
 
     eventHandler.push(callback);
+  }
+
+  changeFcNodeStepIndex(el: HTMLElement, stepIndex: number) {
+    jQuery(el).attr('data-step-index', stepIndex);
   }
 }
 

@@ -41,33 +41,24 @@
 
     <div class="tool-divider" />
 
-    <div class="node-info fc-item-info" v-if="nodeInfo.isSelected">
+    <div class="node-info fc-item-info" v-show="nodeInfo.isSelected">
       <div class="fc-ii-item">
-        <span class="fc-ii-label">id:</span><span class="fc-ii-cont">{{ nodeInfo.id }}</span>
-      </div>
-      <div class="fc-ii-item">
-        <span class="fc-ii-label">stepIndex:</span><span class="fc-ii-cont">{{ nodeInfo.stepIndex }}</span>
-      </div>
-      <div class="fc-ii-item">
-        <span class="fc-ii-label">type:</span><span class="fc-ii-cont">{{ nodeInfo.type }}</span>
+        <span class="fc-ii-label">stepIndex:</span>
+        <input class="fc-ii-cont fc-ii-input"
+               v-model.trim="nodeInfo.stepIndex"
+               @input="changeNodeStepIndex(nodeInfo.stepIndex)" />
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">text:</span><span class="fc-ii-cont">{{ nodeInfo.text }}</span>
       </div>
-      <div class="fc-ii-item">
-        <span class="fc-ii-label">position:</span><span class="fc-ii-cont">{{ nodeInfo.position }}</span>
-      </div>
     </div>
 
-    <div class="connection-info fc-item-info" v-if="connectionInfo.isSelected">
+    <div class="connection-info fc-item-info" v-show="connectionInfo.isSelected">
       <div class="fc-ii-item">
-        <span class="fc-ii-label">sourceAnchor:</span><span class="fc-ii-cont">{{ connectionInfo.sourceAnchor }}</span>
-      </div>
-      <div class="fc-ii-item">
-        <span class="fc-ii-label">targetAnchor:</span><span class="fc-ii-cont">{{ connectionInfo.targetAnchor }}</span>
-      </div>
-      <div class="fc-ii-item">
-        <span class="fc-ii-label">label:</span><span class="fc-ii-cont">{{ connectionInfo.label }}</span>
+        <span class="fc-ii-label">label:</span>
+        <input class="fc-ii-cont fc-ii-input"
+               v-model.trim="connectionInfo.label"
+               @input="changeConnectionLabel(connectionInfo.label)" />
       </div>
     </div>
 
@@ -258,7 +249,7 @@ export default {
         return;
       }
 
-      const selectedConnection = fc.getSelectedFcConnection();
+      const selectedConnection = fc.getSelectedJsPlumbConnection();
 
       if (!selectedConnection) {
         showAlert('请选择要删除的节点或连线！');
@@ -266,6 +257,22 @@ export default {
       }
 
       fc.removeFcConnection(selectedConnection);
+    },
+
+    changeNodeStepIndex(stepIndex) {
+      const { fc } = this.flowChartRef;
+
+      const selectedNode = fc.getSelectedFcNode();
+
+      fc.changeFcNodeStepIndex(selectedNode, stepIndex);
+    },
+
+    changeConnectionLabel(label) {
+      const { fc } = this.flowChartRef;
+
+      const selectedJsPlumbConnection = fc.getSelectedJsPlumbConnection();
+
+      fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, label);
     },
   },
 };
