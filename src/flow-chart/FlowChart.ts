@@ -8,7 +8,7 @@ import throttle from 'lodash.throttle';
 
 import {
   AnchorLocations,
-  ArrowOverlay,
+  ArrowOverlay, BlankEndpoint,
   BrowserJsPlumbInstance,
   Connection as JsPlumbConnection,
   DotEndpoint,
@@ -19,6 +19,7 @@ import {
 
 const DEFAULT_OPTIONS: IOptions = {
   currentStepIndex: -1,
+  visibleOfEndpoints: false,
   config: undefined,
 };
 
@@ -122,7 +123,7 @@ export class FlowChart {
       },
 
       endpoint: {
-        type: DotEndpoint.type,
+        type: this.options.visibleOfEndpoints ? DotEndpoint.type : BlankEndpoint.type,
         options: {
           radius: 4,
         },
@@ -417,6 +418,8 @@ export class FlowChart {
     this.createFcNodesWithConfig(nodes);
 
     this.createFcConnections(connections);
+
+    this.updateVisibleOfEndpoints();
   }
 
   private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
@@ -623,7 +626,7 @@ export class FlowChart {
     const eventHandler = this.eventHandlers[eventName];
 
     if (!eventHandler) {
-      throw new Error(`为定义这个类型的事件: ${eventName}`);
+      throw new Error(`未定义这个类型的事件: ${eventName}`);
     }
 
     eventHandler.push(callback);
@@ -636,6 +639,24 @@ export class FlowChart {
   setCurrentStepIndex(currentStepIndex: number | string) {
     this.options.currentStepIndex = Number(currentStepIndex);
     this.updateHighlights();
+  }
+
+  setVisibleOfEndpoints(visible: boolean) {
+    this.options.visibleOfEndpoints = visible;
+
+    this.updateVisibleOfEndpoints();
+  }
+
+  updateVisibleOfEndpoints() {
+    const { visibleOfEndpoints = false } = this.options;
+
+    this.jsPlumbInstance.selectEndpoints().each((endpoint) => {
+      this.jsPlumbInstance.setEndpointVisible(endpoint, visibleOfEndpoints);
+    });
+  }
+
+  getOptions() {
+    return this.options;
   }
 }
 
@@ -673,5 +694,6 @@ interface IFcConfig {
 
 interface IOptions {
   currentStepIndex: number,
+  visibleOfEndpoints?: boolean,
   config?: IFcConfig,
 }

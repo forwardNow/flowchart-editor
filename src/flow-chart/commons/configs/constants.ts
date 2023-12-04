@@ -1,1 +1,1 @@
-export const STORE_KEY_CONFIG = 'CONFIG';
+export const STORE_KEY_OPTIONS = 'FC_OPTIONS';

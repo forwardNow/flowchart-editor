@@ -41,13 +41,19 @@
 
     <div class="tool-divider" />
 
-    <div class="fc-options fc-item-info" v-show="options.visible">
+    <div class="fc-options fc-item-info">
       <div class="fc-ii-item">
         <span class="fc-ii-label">currentStepIndex:</span>
         <input class="fc-ii-cont fc-ii-input"
                type="number"
                v-model.trim.number="options.currentStepIndex"
                @input="changeCurrentStepIndex(options.currentStepIndex)" />
+      </div>
+      <div class="fc-ii-item">
+        <span class="fc-ii-label">visibleOfEndpoints:</span>
+        <input class="fc-ii-cont" type="checkbox"
+               v-model="options.visibleOfEndpoints"
+               @change="changeVisibleOfEndpoints(options.visibleOfEndpoints)">
       </div>
     </div>
 
@@ -80,7 +86,7 @@
 <script>
 import interact from 'interactjs';
 import IconSave from '@/flow-chart/commons/components/IconSave.vue';
-import { STORE_KEY_CONFIG } from '@/flow-chart/commons/configs/constants';
+import { STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
 import { showAlert, showSuccessToast } from '@/flow-chart/commons/utils/popup';
 import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
 import { EVENTS } from '@/flow-chart/FlowChart';
@@ -98,8 +104,9 @@ export default {
   data() {
     return {
       options: {
-        visible: true,
         currentStepIndex: -1,
+        config: null,
+        visibleOfEndpoints: false,
       },
 
       nodeInfo: {
@@ -128,43 +135,49 @@ export default {
   methods: {
     init() {
       this.initDnd();
-      this.bindListeners();
 
-      this.options.currentStepIndex = this.flowChartRef.options.currentStepIndex;
+      this.onFcReady(() => {
+        this.bindListeners();
+        this.options = this.flowChartRef.getOptions();
+      });
+    },
+
+    onFcReady(callback = () => ({})) {
+      this.flowChartRef.$on('ready', () => {
+        callback();
+      });
     },
 
     bindListeners() {
-      this.flowChartRef.$on('ready', () => {
-        const { fc } = this.flowChartRef;
+      const { fc } = this.flowChartRef;
 
-        fc.on(EVENTS.SELECT_NODE, (fcNode) => {
-          if (!fcNode) {
-            return;
-          }
+      fc.on(EVENTS.SELECT_NODE, (fcNode) => {
+        if (!fcNode) {
+          return;
+        }
 
-          this.connectionInfo.visible = false;
-          this.nodeInfo = {
-            ...fcNode,
-            visible: true,
-          };
-        });
+        this.connectionInfo.visible = false;
+        this.nodeInfo = {
+          ...fcNode,
+          visible: true,
+        };
+      });
 
-        fc.on(EVENTS.SELECT_CONNECTION, (fcConnection) => {
-          if (!fcConnection) {
-            return;
-          }
+      fc.on(EVENTS.SELECT_CONNECTION, (fcConnection) => {
+        if (!fcConnection) {
+          return;
+        }
 
-          this.nodeInfo.visible = false;
-          this.connectionInfo = {
-            ...fcConnection,
-            visible: true,
-          };
-        });
+        this.nodeInfo.visible = false;
+        this.connectionInfo = {
+          ...fcConnection,
+          visible: true,
+        };
+      });
 
-        fc.on(EVENTS.UNSELECT_ALL, () => {
-          this.connectionInfo.visible = false;
-          this.nodeInfo.visible = false;
-        });
+      fc.on(EVENTS.UNSELECT_ALL, () => {
+        this.connectionInfo.visible = false;
+        this.nodeInfo.visible = false;
       });
     },
 
@@ -250,11 +263,14 @@ export default {
     },
 
     save() {
-      const config = this.flowChartRef.fc.getFlowChartConfig();
+      const { fc } = this.flowChartRef;
+      const options = fc.getOptions();
 
-      console.log(config);
+      options.config = fc.getFlowChartConfig();
 
-      localStorage.setItem(STORE_KEY_CONFIG, JSON.stringify(config));
+      console.log('options', options);
+
+      localStorage.setItem(STORE_KEY_OPTIONS, JSON.stringify(options));
 
       showSuccessToast('保存成功!');
     },
@@ -299,6 +315,12 @@ export default {
       const { fc } = this.flowChartRef;
 
       fc.setCurrentStepIndex(currentStepIndex);
+    },
+
+    changeVisibleOfEndpoints(visibleOfEndpoints) {
+      const { fc } = this.flowChartRef;
+
+      fc.setVisibleOfEndpoints(visibleOfEndpoints);
     },
   },
 };

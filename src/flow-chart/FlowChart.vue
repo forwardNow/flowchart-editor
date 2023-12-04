@@ -8,7 +8,7 @@
 </template>
 <script>
 import FcToolbox from '@/flow-chart/commons/components/FcToolbox.vue';
-import { STORE_KEY_CONFIG } from '@/flow-chart/commons/configs/constants';
+import { STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
 import { FlowChart } from './FlowChart';
 
 const EVENTS = {
@@ -26,10 +26,9 @@ export default {
   },
 
   mounted() {
-    this.fc = new FlowChart(this.$refs.stage, {
-      currentStepIndex: this.options.currentStepIndex,
-      config: this.getConfig(),
-    });
+    this.getOptions();
+
+    this.fc = new FlowChart(this.$refs.stage, this.options);
 
     this.$emit(EVENTS.READY, this.fc);
   },
@@ -38,19 +37,29 @@ export default {
     return {
       options: {
         currentStepIndex: 2,
+        visibleOfEndpoints: false,
+        config: null,
       },
     };
   },
 
   methods: {
-    getConfig() {
-      const configStr = localStorage.getItem(STORE_KEY_CONFIG);
+    getOptions() {
+      const optionsStr = localStorage.getItem(STORE_KEY_OPTIONS);
 
-      if (!configStr) {
+      if (!optionsStr) {
         return null;
       }
 
-      return JSON.parse(configStr);
+      const options = JSON.parse(optionsStr);
+
+      if (options.currentStepIndex == null) {
+        options.currentStepIndex = -1;
+      }
+
+      this.options = options;
+
+      return options;
     },
   },
 };
