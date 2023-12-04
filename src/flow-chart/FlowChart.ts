@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import type { Connection as IJsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
 import lodashGet from 'lodash.get';
+import lodashMerge from 'lodash.merge';
 import lodashTemplate from 'lodash.template';
 import jQuery from 'jquery';
 import throttle from 'lodash.throttle';
@@ -16,12 +17,18 @@ import {
   newInstance,
 } from '@jsplumb/browser-ui';
 
+const DEFAULT_OPTIONS: IOptions = {
+  currentStepIndex: -1,
+  config: undefined,
+};
+
 const FC_CSS_CLASS_NAMES = {
   Node: 'fc-node',
   NodeContent: 'fc-node-text',
   NodeSkeleton: 'fc-node-skeleton',
 
   Selected: 'fc-selected',
+  Disabled: 'fc-disabled',
 
   Connection: 'jtk-connector',
 
@@ -83,12 +90,20 @@ export class FlowChart {
     [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
   };
 
+  private readonly options: IOptions;
+
   constructor(el: HTMLElement, options?: IOptions) {
     this.el = el;
+
+    this.options = lodashMerge({}, DEFAULT_OPTIONS, options);
 
     this.jsPlumbInstance = this.createJsPlumbInstance();
 
     this.bindListeners();
+
+    this.createFlowChartWithConfig();
+
+    this.updateHighlights();
   }
 
   private createJsPlumbInstance() {
@@ -197,6 +212,29 @@ export class FlowChart {
     jQuery(this.el)
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
       .on(EVENTS.DBLCLICK, dblclickHandler);
+  }
+
+  updateHighlights() {
+    const { currentStepIndex } = this.options;
+    const $node = this.getJqOfAllFcNodes();
+
+    $node.each((index, element) => {
+      const $el = jQuery(element);
+
+      if (currentStepIndex === -1) {
+        $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
+        return;
+      }
+
+      const stepIndex = this.getStepIndexOfFcNode(element);
+
+      if (stepIndex <= currentStepIndex) {
+        $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
+        return;
+      }
+
+      $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
+    });
   }
 
   private onClickNode($fcNode: JQuery<HTMLElement>) {
@@ -326,7 +364,7 @@ export class FlowChart {
   }
 
   private buildConfigOfUnconnectedFcNodes(fcConfig: IFcConfig) {
-    const $nodes = jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
+    const $nodes = this.getJqOfAllFcNodes();
 
     const fcNodes: IFcNode[] = [];
 
@@ -335,6 +373,11 @@ export class FlowChart {
     });
 
     this.addFcNodesToConfig(fcNodes, fcConfig);
+  }
+
+  private getJqOfAllFcNodes() {
+    return jQuery(this.el)
+      .find(`.${FC_CSS_CLASS_NAMES.Node}`);
   }
 
   createFcNodeWithElement(el: HTMLElement, managedId?: string) {
@@ -362,8 +405,14 @@ export class FlowChart {
     ]);
   }
 
-  createFlowChartWithConfig(fcConfig: IFcConfig) {
-    const { nodes, connections } = fcConfig;
+  createFlowChartWithConfig() {
+    const { config } = this.options;
+
+    if (!config) {
+      return;
+    }
+
+    const { nodes, connections } = config;
 
     this.createFcNodesWithConfig(nodes);
 
@@ -583,6 +632,11 @@ export class FlowChart {
   changeFcNodeStepIndex(el: HTMLElement, stepIndex: number) {
     jQuery(el).attr('data-step-index', stepIndex);
   }
+
+  setCurrentStepIndex(currentStepIndex: number | string) {
+    this.options.currentStepIndex = Number(currentStepIndex);
+    this.updateHighlights();
+  }
 }
 
 // --
@@ -618,5 +672,6 @@ interface IFcConfig {
 }
 
 interface IOptions {
-  toolboxEl: HTMLElement,
+  currentStepIndex: number,
+  config?: IFcConfig,
 }

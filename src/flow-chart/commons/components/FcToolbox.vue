@@ -41,11 +41,24 @@
 
     <div class="tool-divider" />
 
-    <div class="node-info fc-item-info" v-show="nodeInfo.isSelected">
+    <div class="fc-options fc-item-info" v-show="options.visible">
+      <div class="fc-ii-item">
+        <span class="fc-ii-label">currentStepIndex:</span>
+        <input class="fc-ii-cont fc-ii-input"
+               type="number"
+               v-model.trim.number="options.currentStepIndex"
+               @input="changeCurrentStepIndex(options.currentStepIndex)" />
+      </div>
+    </div>
+
+    <div class="tool-divider" />
+
+    <div class="node-info fc-item-info" v-show="nodeInfo.visible">
       <div class="fc-ii-item">
         <span class="fc-ii-label">stepIndex:</span>
         <input class="fc-ii-cont fc-ii-input"
-               v-model.trim="nodeInfo.stepIndex"
+               type="number"
+               v-model.trim.number="nodeInfo.stepIndex"
                @input="changeNodeStepIndex(nodeInfo.stepIndex)" />
       </div>
       <div class="fc-ii-item">
@@ -53,7 +66,7 @@
       </div>
     </div>
 
-    <div class="connection-info fc-item-info" v-show="connectionInfo.isSelected">
+    <div class="connection-info fc-item-info" v-show="connectionInfo.visible">
       <div class="fc-ii-item">
         <span class="fc-ii-label">label:</span>
         <input class="fc-ii-cont fc-ii-input"
@@ -84,8 +97,13 @@ export default {
 
   data() {
     return {
+      options: {
+        visible: true,
+        currentStepIndex: -1,
+      },
+
       nodeInfo: {
-        isSelected: false,
+        visible: false,
 
         stepIndex: 0,
         id: '',
@@ -95,7 +113,7 @@ export default {
       },
 
       connectionInfo: {
-        isSelected: false,
+        visible: false,
 
         type: '',
         sourceId: '',
@@ -111,6 +129,8 @@ export default {
     init() {
       this.initDnd();
       this.bindListeners();
+
+      this.options.currentStepIndex = this.flowChartRef.options.currentStepIndex;
     },
 
     bindListeners() {
@@ -122,10 +142,10 @@ export default {
             return;
           }
 
-          this.connectionInfo.isSelected = false;
+          this.connectionInfo.visible = false;
           this.nodeInfo = {
             ...fcNode,
-            isSelected: true,
+            visible: true,
           };
         });
 
@@ -134,16 +154,16 @@ export default {
             return;
           }
 
-          this.nodeInfo.isSelected = false;
+          this.nodeInfo.visible = false;
           this.connectionInfo = {
             ...fcConnection,
-            isSelected: true,
+            visible: true,
           };
         });
 
         fc.on(EVENTS.UNSELECT_ALL, () => {
-          this.connectionInfo.isSelected = false;
-          this.nodeInfo.isSelected = false;
+          this.connectionInfo.visible = false;
+          this.nodeInfo.visible = false;
         });
       });
     },
@@ -273,6 +293,12 @@ export default {
       const selectedJsPlumbConnection = fc.getSelectedJsPlumbConnection();
 
       fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, label);
+    },
+
+    changeCurrentStepIndex(currentStepIndex) {
+      const { fc } = this.flowChartRef;
+
+      fc.setCurrentStepIndex(currentStepIndex);
     },
   },
 };

@@ -26,26 +26,31 @@ export default {
   },
 
   mounted() {
-    this.fc = new FlowChart(this.$refs.stage);
-
-    this.restore();
+    this.fc = new FlowChart(this.$refs.stage, {
+      currentStepIndex: this.options.currentStepIndex,
+      config: this.getConfig(),
+    });
 
     this.$emit(EVENTS.READY, this.fc);
   },
 
+  data() {
+    return {
+      options: {
+        currentStepIndex: 2,
+      },
+    };
+  },
+
   methods: {
-    restore() {
+    getConfig() {
       const configStr = localStorage.getItem(STORE_KEY_CONFIG);
 
       if (!configStr) {
-        return;
+        return null;
       }
 
-      const config = JSON.parse(configStr);
-
-      console.log('config in localStorage: ', config);
-
-      this.fc.createFlowChartWithConfig(config);
+      return JSON.parse(configStr);
     },
   },
 };
