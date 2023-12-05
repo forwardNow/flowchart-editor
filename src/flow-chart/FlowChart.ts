@@ -17,10 +17,15 @@ import {
   newInstance,
 } from '@jsplumb/browser-ui';
 
-const DEFAULT_OPTIONS: IOptions = {
+const DEFAULT_OPTIONS: Required<IOptions> = {
   currentStepIndex: -1,
   visibleOfEndpoints: false,
-  config: undefined,
+  scale: 1,
+  scaleStep: 0.1,
+  minScale: 0.5,
+  maxScale: 2,
+  offset: { x: 0, y: 0 },
+  config: { nodes: [], connections: [] },
 };
 
 const FC_CSS_CLASS_NAMES = {
@@ -73,6 +78,7 @@ export const EVENTS = {
   MOUSEDOWN: `mousedown.${EVENT_NAMESPACE}`,
   DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
   BLUR: `blur.${EVENT_NAMESPACE}`,
+  WHEEL: `wheel.${EVENT_NAMESPACE}`,
 
   SELECT_NODE: `select-node.${EVENT_NAMESPACE}`,
   SELECT_CONNECTION: `select-connection.${EVENT_NAMESPACE}`,
@@ -91,7 +97,7 @@ export class FlowChart {
     [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
   };
 
-  private readonly options: IOptions;
+  private readonly options: Required<IOptions>;
 
   constructor(el: HTMLElement, options?: IOptions) {
     this.el = el;
@@ -210,9 +216,24 @@ export class FlowChart {
       }
     };
 
+    const mousewheelHandler = (event: JQuery.TriggeredEvent) => {
+      event.stopPropagation();
+
+      const wheelEvent = event.originalEvent as WheelEvent;
+      const { deltaY } = wheelEvent;
+
+      if (deltaY < 0) {
+        this.decreaseScale();
+        return;
+      }
+
+      this.increaseScale();
+    };
+
     jQuery(this.el)
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
-      .on(EVENTS.DBLCLICK, dblclickHandler);
+      .on(EVENTS.DBLCLICK, dblclickHandler)
+      .on(EVENTS.WHEEL, mousewheelHandler);
   }
 
   updateHighlights() {
@@ -658,6 +679,38 @@ export class FlowChart {
   getOptions() {
     return this.options;
   }
+
+  decreaseScale() {
+    const { scale, scaleStep, minScale } = this.options;
+
+    if (scale <= minScale) {
+      return;
+    }
+
+    this.options.scale -= scaleStep;
+
+    this.updateStageScale();
+  }
+
+  increaseScale() {
+    const { scale, scaleStep, maxScale } = this.options;
+
+    if (scale >= maxScale) {
+      return;
+    }
+
+    this.options.scale += scaleStep;
+
+    this.updateStageScale();
+  }
+
+  updateStageScale() {
+    const { scale } = this.options;
+
+    this.el.style.transform = `scale(${scale})`;
+
+    this.jsPlumbInstance.setZoom(scale);
+  }
 }
 
 // --
@@ -695,5 +748,12 @@ interface IFcConfig {
 interface IOptions {
   currentStepIndex: number,
   visibleOfEndpoints?: boolean,
+
+  scale?: number,
+  scaleStep?: number,
+  minScale?: number,
+  maxScale?: number,
+  offset?: { x: number, y: number },
+
   config?: IFcConfig,
 }

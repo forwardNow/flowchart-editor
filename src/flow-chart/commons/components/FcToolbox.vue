@@ -57,20 +57,23 @@
       </div>
     </div>
 
-    <div class="tool-divider" />
+    <template >
+      <div class="tool-divider" />
 
-    <div class="node-info fc-item-info" v-show="nodeInfo.visible">
-      <div class="fc-ii-item">
-        <span class="fc-ii-label">stepIndex:</span>
-        <input class="fc-ii-cont fc-ii-input"
-               type="number"
-               v-model.trim.number="nodeInfo.stepIndex"
-               @input="changeNodeStepIndex(nodeInfo.stepIndex)" />
+      <div class="node-info fc-item-info" v-show="nodeInfo.visible">
+        <div class="fc-ii-item">
+          <span class="fc-ii-label">stepIndex:</span>
+          <input class="fc-ii-cont fc-ii-input"
+                 type="number"
+                 v-model.trim.number="nodeInfo.stepIndex"
+                 @input="changeNodeStepIndex(nodeInfo.stepIndex)" />
+        </div>
+        <div class="fc-ii-item">
+          <span class="fc-ii-label">text:</span>
+          <span class="fc-ii-cont">{{ nodeInfo.text }}</span>
+        </div>
       </div>
-      <div class="fc-ii-item">
-        <span class="fc-ii-label">text:</span><span class="fc-ii-cont">{{ nodeInfo.text }}</span>
-      </div>
-    </div>
+    </template>
 
     <div class="connection-info fc-item-info" v-show="connectionInfo.visible">
       <div class="fc-ii-item">
