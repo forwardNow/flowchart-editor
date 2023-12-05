@@ -16,8 +16,10 @@ import {
   LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
+import { toFixedNumber } from '@/flow-chart/commons/utils/number';
+import interact from 'interactjs';
 
-const DEFAULT_OPTIONS: Required<IOptions> = {
+export const DEFAULT_OPTIONS: Required<IOptions> = {
   currentStepIndex: -1,
   visibleOfEndpoints: false,
   scale: 1,
@@ -29,6 +31,7 @@ const DEFAULT_OPTIONS: Required<IOptions> = {
 };
 
 const FC_CSS_CLASS_NAMES = {
+  Stage: 'flow-chart',
   Node: 'fc-node',
   NodeContent: 'fc-node-text',
   NodeSkeleton: 'fc-node-skeleton',
@@ -95,6 +98,7 @@ export class FlowChart {
     [EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
     [EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
     [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
+    [EVENTS.WHEEL]: [] as Array<(scale: number) => void>,
   };
 
   private readonly options: Required<IOptions>;
@@ -224,16 +228,44 @@ export class FlowChart {
 
       if (deltaY < 0) {
         this.decreaseScale();
-        return;
+      } else {
+        this.increaseScale();
       }
 
-      this.increaseScale();
+      this.emit(EVENTS.WHEEL, this.options.scale);
     };
 
     jQuery(this.el)
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
       .on(EVENTS.DBLCLICK, dblclickHandler)
       .on(EVENTS.WHEEL, mousewheelHandler);
+
+    this.bindDragStage();
+  }
+
+  bindDragStage() {
+    interact(this.el)
+      .draggable({
+        autoScroll: true,
+        cursorChecker: () => 'default',
+        listeners: {
+          move: (event) => {
+            const {
+              dx,
+              dy,
+            } = event;
+
+            if (jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Selected}`).length > 0) {
+              return;
+            }
+
+            this.options.offset.x += dx;
+            this.options.offset.y += dy;
+
+            this.updateStageTransform();
+          },
+        },
+      });
   }
 
   updateHighlights() {
@@ -687,9 +719,9 @@ export class FlowChart {
       return;
     }
 
-    this.options.scale -= scaleStep;
+    this.options.scale = toFixedNumber(scale - scaleStep);
 
-    this.updateStageScale();
+    this.updateStageTransform();
   }
 
   increaseScale() {
@@ -699,15 +731,15 @@ export class FlowChart {
       return;
     }
 
-    this.options.scale += scaleStep;
+    this.options.scale = toFixedNumber(scale + scaleStep);
 
-    this.updateStageScale();
+    this.updateStageTransform();
   }
 
-  updateStageScale() {
-    const { scale } = this.options;
+  updateStageTransform() {
+    const { scale, offset: { x, y } } = this.options;
 
-    this.el.style.transform = `scale(${scale})`;
+    this.el.style.transform = `scale(${scale}) translateX(${x}px) translateY(${y}px)`;
 
     this.jsPlumbInstance.setZoom(scale);
   }

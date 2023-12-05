@@ -9,7 +9,8 @@
 <script>
 import FcToolbox from '@/flow-chart/commons/components/FcToolbox.vue';
 import { STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
-import { FlowChart } from './FlowChart';
+import lodashMerge from 'lodash.merge';
+import { DEFAULT_OPTIONS, FlowChart } from './FlowChart';
 
 const EVENTS = {
   READY: 'ready',
@@ -35,11 +36,7 @@ export default {
 
   data() {
     return {
-      options: {
-        currentStepIndex: 2,
-        visibleOfEndpoints: false,
-        config: null,
-      },
+      options: {},
     };
   },
 
@@ -48,16 +45,12 @@ export default {
       const optionsStr = localStorage.getItem(STORE_KEY_OPTIONS);
 
       if (!optionsStr) {
-        return null;
+        return DEFAULT_OPTIONS;
       }
 
       const options = JSON.parse(optionsStr);
 
-      if (options.currentStepIndex == null) {
-        options.currentStepIndex = -1;
-      }
-
-      this.options = options;
+      this.options = lodashMerge({}, DEFAULT_OPTIONS, options);
 
       return options;
     },

@@ -55,6 +55,10 @@
                v-model="options.visibleOfEndpoints"
                @change="changeVisibleOfEndpoints(options.visibleOfEndpoints)">
       </div>
+      <div class="fc-ii-item">
+        <span class="fc-ii-label">scale:</span>
+        <span class="fc-ii-cont">{{ options.scale }}</span>
+      </div>
     </div>
 
     <template >
@@ -110,6 +114,7 @@ export default {
         currentStepIndex: -1,
         config: null,
         visibleOfEndpoints: false,
+        scale: 1,
       },
 
       nodeInfo: {
@@ -181,6 +186,10 @@ export default {
       fc.on(EVENTS.UNSELECT_ALL, () => {
         this.connectionInfo.visible = false;
         this.nodeInfo.visible = false;
+      });
+
+      fc.on(EVENTS.WHEEL, (scale) => {
+        this.options.scale = scale;
       });
     },
 
@@ -255,8 +264,7 @@ export default {
       interact('.fc-toolbox .fc-node')
         .draggable({
           autoScroll: true,
-          cursorChecker() { /* do nothing */
-          },
+          cursorChecker: () => 'default',
           listeners: {
             start: onStart,
             move: onMove,
