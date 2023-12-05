@@ -192,7 +192,7 @@ export class FlowChart {
     const debouncedMousedownHandler = throttle((event: JQuery.TriggeredEvent) => {
       const { target } = event;
 
-      console.log(EVENTS.MOUSEDOWN, target);
+      // console.log(EVENTS.MOUSEDOWN, target);
 
       this.removeSelectedCssClass();
 
@@ -222,7 +222,7 @@ export class FlowChart {
     const dblclickHandler = (event: JQuery.TriggeredEvent) => {
       const { target } = event;
 
-      console.log(EVENTS.DBLCLICK, target);
+      // console.log(EVENTS.DBLCLICK, target);
 
       const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
 
@@ -248,12 +248,14 @@ export class FlowChart {
 
     jQuery(this.el)
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
-      .on(EVENTS.DBLCLICK, dblclickHandler)
+      .on(EVENTS.DBLCLICK, dblclickHandler);
+
+    jQuery(this.el.parentElement as HTMLElement)
       .on(EVENTS.WHEEL, mousewheelHandler);
   }
 
   private bindDragStage() {
-    interact(this.el)
+    interact(this.el.parentElement as HTMLElement)
       .draggable({
         autoScroll: true,
         cursorChecker: () => 'default',
@@ -753,6 +755,10 @@ export class FlowChart {
     this.el.style.transform = `scale(${scale}) translateX(${x}px) translateY(${y}px)`;
 
     this.jsPlumbInstance.setZoom(scale);
+  }
+
+  getStageElement() {
+    return this.el;
   }
 }
 

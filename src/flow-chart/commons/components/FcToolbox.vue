@@ -156,9 +156,8 @@ export default {
 
   methods: {
     init() {
-      this.initDnd();
-
       this.onFcReady(() => {
+        this.initDnd();
         this.bindListeners();
         this.options = this.flowChartRef.getOptions();
       });
@@ -271,8 +270,15 @@ export default {
           return;
         }
 
-        mirror.x += toolbox.x;
-        mirror.y += toolbox.y;
+        const { scale } = this.options;
+
+        const { x: offsetX, y: offsetY } = this.flowChartRef.fc.getStageElement().getBoundingClientRect();
+
+        mirror.x -= offsetX;
+        mirror.y -= offsetY;
+
+        mirror.x /= scale;
+        mirror.y /= scale;
 
         mirror.updatePosition();
 
