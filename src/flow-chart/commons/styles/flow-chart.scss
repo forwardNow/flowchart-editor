@@ -239,9 +239,9 @@
   }
   .fc-ii-input {
     display: inline-block;
-    padding: 0 0 0 16px;
+    padding: 0 0 0 8px;
     height: 32px;
-    width: 8em;
+    width: 10em;
     line-height: 32px;
     outline: none;
     border: 1px solid #dcdfe6;
@@ -253,7 +253,17 @@
     &:focus {
       border-color: $color-primary;
     }
+
+    &[type="number"] {
+      width: 4.5em;
+    }
   }
+  .fc-ii-position {
+    display: inline-block;
+    min-width: 3em;
+    text-align: center;
+  }
+
 
   .fc-node {
     display: flex;

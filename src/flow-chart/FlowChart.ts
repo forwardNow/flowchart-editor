@@ -86,6 +86,8 @@ export const EVENTS = {
   SELECT_NODE: `select-node.${EVENT_NAMESPACE}`,
   SELECT_CONNECTION: `select-connection.${EVENT_NAMESPACE}`,
   UNSELECT_ALL: `unselect-all.${EVENT_NAMESPACE}`,
+
+  STAGE_MOVE: `stage-move.${EVENT_NAMESPACE}`,
 };
 
 export class FlowChart {
@@ -99,6 +101,7 @@ export class FlowChart {
     [EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
     [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
     [EVENTS.WHEEL]: [] as Array<(scale: number) => void>,
+    [EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
   };
 
   private readonly options: Required<IOptions>;
@@ -115,6 +118,8 @@ export class FlowChart {
     this.createFlowChartWithConfig();
 
     this.updateHighlights();
+
+    this.updateStageTransform();
   }
 
   private createJsPlumbInstance() {
@@ -165,6 +170,12 @@ export class FlowChart {
   }
 
   private bindListeners() {
+    this.bindNormalEventListeners();
+
+    this.bindDragStage();
+  }
+
+  private bindNormalEventListeners() {
     const check = (target: HTMLElement, ancestorClassSelector: string) => {
       const ancestorSelector = ancestorClassSelector.startsWith('.') ? ancestorClassSelector : `.${ancestorClassSelector}`;
       const $target = jQuery(target);
@@ -239,11 +250,9 @@ export class FlowChart {
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
       .on(EVENTS.DBLCLICK, dblclickHandler)
       .on(EVENTS.WHEEL, mousewheelHandler);
-
-    this.bindDragStage();
   }
 
-  bindDragStage() {
+  private bindDragStage() {
     interact(this.el)
       .draggable({
         autoScroll: true,
@@ -261,6 +270,8 @@ export class FlowChart {
 
             this.options.offset.x += dx;
             this.options.offset.y += dy;
+
+            this.emit(EVENTS.STAGE_MOVE, this.options.offset);
 
             this.updateStageTransform();
           },

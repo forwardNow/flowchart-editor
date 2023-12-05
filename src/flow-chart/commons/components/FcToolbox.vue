@@ -7,6 +7,9 @@
       <div class="feature-item tl-item" title="删除" @click="remove">
         <IconDelete />
       </div>
+      <div class="feature-item tl-item" title="重置" @click="resetSetting">
+        <IconResetSettings />
+      </div>
     </div>
 
     <div class="tool-divider" />
@@ -59,10 +62,20 @@
         <span class="fc-ii-label">scale:</span>
         <span class="fc-ii-cont">{{ options.scale }}</span>
       </div>
+      <div class="fc-ii-item">
+        <span class="fc-ii-label">offset:</span>
+        <span class="fc-ii-cont">
+          (
+          <span class="fc-ii-position">{{ options.offset?.x }}</span>
+          ,
+          <span class="fc-ii-position">{{ options.offset?.y }}</span>
+          )
+        </span>
+      </div>
     </div>
 
     <template >
-      <div class="tool-divider" />
+      <div class="tool-divider" v-if="nodeInfo.visible || connectionInfo.visible"/>
 
       <div class="node-info fc-item-info" v-show="nodeInfo.visible">
         <div class="fc-ii-item">
@@ -97,10 +110,11 @@ import { STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
 import { showAlert, showSuccessToast } from '@/flow-chart/commons/utils/popup';
 import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
 import { EVENTS } from '@/flow-chart/FlowChart';
+import IconResetSettings from '@/flow-chart/commons/components/IconResetSettings.vue';
 
 export default {
   name: 'FcToolbox',
-  components: { IconDelete, IconSave },
+  components: { IconResetSettings, IconDelete, IconSave },
 
   inject: ['flowChartRef'],
 
@@ -190,6 +204,10 @@ export default {
 
       fc.on(EVENTS.WHEEL, (scale) => {
         this.options.scale = scale;
+      });
+
+      fc.on(EVENTS.STAGE_MOVE, (offset) => {
+        this.options.offset = offset;
       });
     },
 
@@ -304,6 +322,19 @@ export default {
       }
 
       fc.removeFcConnection(selectedConnection);
+    },
+
+    resetSetting() {
+      const { fc } = this.flowChartRef;
+
+      const options = fc.getOptions();
+
+      options.scale = 1;
+      options.offset = { x: 0, y: 0 };
+
+      this.options = options;
+
+      fc.updateStageTransform();
     },
 
     changeNodeStepIndex(stepIndex) {
