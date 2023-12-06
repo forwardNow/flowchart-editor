@@ -4,6 +4,9 @@
       <div class="feature-item tl-item" title="保存" @click="save">
         <IconSave />
       </div>
+      <div class="feature-item tl-item" title="下载" @click="downloadConfigFile">
+        <IconDownload />
+      </div>
       <div class="feature-item tl-item" title="删除" @click="remove">
         <IconDelete />
       </div>
@@ -111,10 +114,11 @@ import { showAlert, showSuccessToast } from '@/flow-chart/commons/utils/popup';
 import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
 import { EVENTS } from '@/flow-chart/FlowChart';
 import IconResetSettings from '@/flow-chart/commons/components/IconResetSettings.vue';
+import IconDownload from '@/flow-chart/commons/components/IconDownload.vue';
 
 export default {
   name: 'FcToolbox',
-  components: { IconResetSettings, IconDelete, IconSave },
+  components: { IconDownload, IconResetSettings, IconDelete, IconSave },
 
   inject: ['flowChartRef'],
 
@@ -341,6 +345,10 @@ export default {
       this.options = options;
 
       fc.updateStageTransform();
+    },
+
+    downloadConfigFile() {
+      // TODO
     },
 
     changeNodeStepIndex(stepIndex) {
