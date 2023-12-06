@@ -339,6 +339,7 @@
 }
 
 .fc-line-ball {
+  display: none;
   z-index: $z-index-line-ball;
   position: absolute;
   left: 259px;

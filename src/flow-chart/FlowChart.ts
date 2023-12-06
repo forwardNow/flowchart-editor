@@ -255,18 +255,36 @@ export class FlowChart {
   }
 
   private bindDragStage() {
-    interact(this.el.parentElement as HTMLElement)
+    const stageParentElement = this.el.parentElement as HTMLElement;
+    const $stage = jQuery(this.el);
+
+    let isStageMovable = false;
+
+    let isMouseOverStage = false;
+
+    $stage.on('mouseover', (event) => {
+      isMouseOverStage = event.target === this.el;
+
+      if (isMouseOverStage) {
+        console.log('mouse over stage');
+      }
+    });
+
+    interact(stageParentElement)
       .draggable({
         autoScroll: true,
         cursorChecker: () => 'default',
         listeners: {
+          start: () => {
+            isStageMovable = isMouseOverStage;
+          },
           move: (event) => {
             const {
               dx,
               dy,
             } = event;
 
-            if (jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Selected}`).length > 0) {
+            if (!isStageMovable) {
               return;
             }
 
@@ -307,6 +325,8 @@ export class FlowChart {
   private onClickNode($fcNode: JQuery<HTMLElement>) {
     this.addSelectedCssClass($fcNode);
 
+    // this.showLineBalls($fcNode);
+
     // add skeleton element
     const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
 
@@ -315,6 +335,31 @@ export class FlowChart {
     }
 
     $fcNode.append(NODE_SKELETON_HTML_RENDER({}));
+  }
+
+  private showLineBalls($fcNode: JQuery<HTMLElement>) {
+    const el = $fcNode.get(0) as HTMLElement;
+
+    const jsplumbConnections = this.jsPlumbInstance.getConnections({ source: el }) as IJsPlumbConnection[];
+
+    for (let i = 0, len = jsplumbConnections.length; i < len; i += 1) {
+      const jsplumbConnection = jsplumbConnections[i];
+
+      const { connector } = jsplumbConnection;
+      const svgElement = (connector as any).canvas as SVGElement;
+
+      const path = this.jsPlumbInstance.getPathData(connector);
+      const position = jQuery(svgElement).position();
+
+      jQuery(this.el)
+        .find('.fc-line-ball')
+        .show()
+        .css({
+          left: position.left,
+          top: position.top,
+          'offset-path': `path('${path}')`,
+        });
+    }
   }
 
   private removeSelectedCssClass() {
@@ -614,10 +659,10 @@ export class FlowChart {
       return null;
     }
 
-    return this.getJsPlumbConnectionByElement(connectionElement);
+    return this.getJsPlumbConnectionBySvgElement(connectionElement);
   }
 
-  private getJsPlumbConnectionByElement(el: HTMLElement): IJsPlumbConnection | null {
+  private getJsPlumbConnectionBySvgElement(el: HTMLElement): IJsPlumbConnection | null {
     const connections = this.jsPlumbInstance.getConnections() as IJsPlumbConnection[];
 
     for (let i = 0, len = connections.length; i < len; i += 1) {
