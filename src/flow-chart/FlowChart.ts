@@ -266,7 +266,7 @@ export class FlowChart {
       isMouseOverStage = event.target === this.el;
 
       if (isMouseOverStage) {
-        console.log('mouse over stage');
+        // console.log('mouse over stage');
       }
     });
 
@@ -685,8 +685,9 @@ export class FlowChart {
   setLabelOfJsPlumbConnection(jsPlumbConnection: IJsPlumbConnection, label: string) {
     const labelOverlay = this.getLabelOverlayOfJsPlumbConnection(jsPlumbConnection);
 
-    if (!labelOverlay) {
+    if (labelOverlay == null) {
       console.log('setLabelOfJsPlumbConnection(), labelOverlay is None');
+      this.jsPlumbInstance.addOverlay(jsPlumbConnection, { type: LabelOverlay.type, options: { label } });
       return;
     }
 

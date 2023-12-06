@@ -97,7 +97,7 @@
         <span class="fc-ii-label">label:</span>
         <input class="fc-ii-cont fc-ii-input"
                v-model.trim="connectionInfo.label"
-               @input="changeConnectionLabel(connectionInfo.label)" />
+               @blur="changeConnectionLabel(connectionInfo.label)" />
       </div>
     </div>
 
