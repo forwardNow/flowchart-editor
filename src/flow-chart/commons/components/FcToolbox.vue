@@ -117,7 +117,7 @@ import {
   STEP_INDEX_HIGHLIGHT,
   STORE_KEY_OPTIONS,
 } from '@/flow-chart/commons/configs/constants';
-import { showAlert, showSuccessToast } from '@/flow-chart/commons/utils/popup';
+import { showAlert, showConfirm, showSuccessToast } from '@/flow-chart/commons/utils/popup';
 import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
 import IconResetSettings from '@/flow-chart/commons/components/IconResetSettings.vue';
 import IconDownload from '@/flow-chart/commons/components/IconDownload.vue';
@@ -325,7 +325,11 @@ export default {
       const selectedNode = fc.getSelectedFcNode();
 
       if (selectedNode) {
-        fc.removeFcNode(selectedNode);
+        showConfirm('确认删除选中的节点？')
+          .then(() => {
+            fc.removeFcNode(selectedNode);
+          })
+          .catch((e) => console.log(e));
         return;
       }
 
@@ -336,7 +340,11 @@ export default {
         return;
       }
 
-      fc.removeFcConnection(selectedConnection);
+      showConfirm('确认删除选中的连线？')
+        .then(() => {
+          fc.removeFcConnection(selectedConnection);
+        })
+        .catch((e) => console.log(e));
     },
 
     resetSetting() {
