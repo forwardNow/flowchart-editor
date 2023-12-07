@@ -112,9 +112,10 @@ import lodashDebounce from 'lodash.debounce';
 import interact from 'interactjs';
 import IconSave from '@/flow-chart/commons/components/IconSave.vue';
 import {
-  DEFAULT_OPTIONS, EVENTS,
+  DEFAULT_OPTIONS,
+  EVENTS,
   STEP_INDEX_HIGHLIGHT,
-  STORE_KEY_OPTIONS
+  STORE_KEY_OPTIONS,
 } from '@/flow-chart/commons/configs/constants';
 import { showAlert, showSuccessToast } from '@/flow-chart/commons/utils/popup';
 import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';

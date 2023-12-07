@@ -5,7 +5,6 @@ import type {
 
 import {
   AnchorLocations,
-  ArrowOverlay,
   BlankEndpoint,
   BrowserJsPlumbInstance,
   Connection as JsPlumbConnection,
@@ -38,7 +37,8 @@ import {
   DEFAULT_STEP_INDEX_ATTR_VALUE,
   DIAMOND_NODE_TYPE,
   EVENTS,
-  FC_CSS_CLASS_NAMES, JS_PLUMB_DEFAULTS,
+  FC_CSS_CLASS_NAMES,
+  JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
   RECTANGLE_NODE_TYPE,
@@ -69,13 +69,17 @@ export class FlowChart {
 
     this.jsPlumbInstance = this.createJsPlumbInstance();
 
-    this.bindListeners();
+    this.buildFlowChart();
 
-    this.createFlowChartWithConfig();
+    this.bindListeners();
 
     this.updateHighlights();
 
-    this.updateStageTransform();
+    this.updateStageScaleAndOffset();
+  }
+
+  getOptions() {
+    return this.options;
   }
 
   private createJsPlumbInstance() {
@@ -83,51 +87,146 @@ export class FlowChart {
       container: this.el,
     });
 
-    const type = this.options.node.endpoint.show ? DotEndpoint.type : BlankEndpoint.type;
-
     const defaults = JS_PLUMB_DEFAULTS();
 
-    defaults.connector.type = type;
+    defaults.endpoint.type = this.options.node.endpoint.show ? DotEndpoint.type : BlankEndpoint.type;
 
     jsPlumbInstance.importDefaults(defaults);
 
     return jsPlumbInstance;
   }
 
+  private buildFlowChart() {
+    const { config } = this.options;
+
+    if (config == null) {
+      console.warn('this.options.config is None');
+      return;
+    }
+
+    const { nodes, connections } = config;
+
+    this.createFcNodes(nodes);
+
+    this.createFcConnections(connections);
+
+    this.updateVisibleOfEndpoints();
+  }
+
+  private createFcNodes(fcNodes: IFcNode[]) {
+    for (let i = 0, len = fcNodes.length; i < len; i += 1) {
+      this.createFcNode(fcNodes[i]);
+    }
+  }
+
+  private createFcNode(fcNode: IFcNode) {
+    const { id, type } = fcNode;
+
+    const html = NODE_HTML_RENDER({
+      ...fcNode,
+      type: type.toLowerCase(),
+    });
+
+    const el = jQuery(html).get(0) as HTMLElement;
+
+    this.createFcNodeWithElement(el, id);
+  }
+
+  createFcNodeWithElement(el: HTMLElement, managedId?: string) {
+    this.el.appendChild(el);
+
+    this.jsPlumbInstance.manage(el, managedId);
+
+    this.createEndpointsForFcNode(el);
+  }
+
+  private createEndpointsForFcNode(el: HTMLElement) {
+    this.jsPlumbInstance.addEndpoints(el, [
+      {
+        source: true, target: true, anchor: AnchorLocations.Top, maxConnections: -1,
+      },
+      {
+        source: true, target: true, anchor: AnchorLocations.Right, maxConnections: -1,
+      },
+      {
+        source: true, target: true, anchor: AnchorLocations.Bottom, maxConnections: -1,
+      },
+      {
+        source: true, target: true, anchor: AnchorLocations.Left, maxConnections: -1,
+      },
+    ]);
+  }
+
+  private createFcConnections(fcConnections: IFcConnection[]) {
+    for (let i = 0, len = fcConnections.length; i < len; i += 1) {
+      this.createFcConnection(fcConnections[i]);
+    }
+  }
+
+  private createFcConnection(fcConnection: IFcConnection) {
+    const {
+      sourceId,
+      sourceAnchor,
+      targetId,
+      targetAnchor,
+      label,
+    } = fcConnection;
+
+    this.jsPlumbInstance.connect({
+      source: this.getElementByManagedId(sourceId),
+      target: this.getElementByManagedId(targetId),
+      anchors: [sourceAnchor, targetAnchor],
+      overlays: [
+        {
+          type: LabelOverlay.type,
+          options: {
+            label,
+          },
+        },
+      ],
+    });
+  }
+
+  private getElementByManagedId(id: string) {
+    return this.jsPlumbInstance.getManagedElement(id) as HTMLElement;
+  }
+
+  updateVisibleOfEndpoints() {
+    const { show } = this.options.node.endpoint;
+
+    this.jsPlumbInstance.selectEndpoints().each((endpoint) => {
+      this.jsPlumbInstance.setEndpointVisible(endpoint, show);
+    });
+  }
+
   private bindListeners() {
     this.bindNormalEventListeners();
-
     this.bindDragStage();
   }
 
   private bindNormalEventListeners() {
-    const check = (target: HTMLElement, ancestorClassSelector: string) => {
-      const ancestorSelector = ancestorClassSelector.startsWith('.') ? ancestorClassSelector : `.${ancestorClassSelector}`;
-      const $target = jQuery(target);
-      const $ancestor = $target.closest(ancestorSelector);
-      const isAncestor = $ancestor.length > 0 || $target.is(ancestorSelector);
+    this.bindMousedownListener();
 
-      if (!isAncestor) {
-        return null;
-      }
+    this.bindDoubleClickListener();
 
-      return $ancestor;
-    };
+    this.bindMouseWheelListener();
+  }
 
+  private bindMousedownListener() {
     const debouncedMousedownHandler = throttle((event: JQuery.TriggeredEvent) => {
       const { target } = event;
 
       this.removeSelectedCssClass();
 
-      const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
+      const $fcNode = this.isContainTarget(target, FC_CSS_CLASS_NAMES.Node);
 
       if ($fcNode) {
         this.onClickNode($fcNode);
-        this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig($fcNode.get(0) as HTMLElement));
+        this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqObject($fcNode)));
         return;
       }
 
-      const $fcConnection = check(target, FC_CSS_CLASS_NAMES.Connection);
+      const $fcConnection = this.isContainTarget(target, FC_CSS_CLASS_NAMES.Connection);
 
       if ($fcConnection) {
         this.onClickConnection($fcConnection);
@@ -142,16 +241,88 @@ export class FlowChart {
       this.emit(EVENTS.UNSELECT_ALL);
     }, 200, { trailing: false });
 
+    jQuery(this.el)
+      .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler);
+  }
+
+  private isContainTarget(target: HTMLElement, cssClassName: string) {
+    const $target = jQuery(target);
+    const cssClassSelector = this.getCssClassSelector(cssClassName);
+
+    if ($target.is(cssClassSelector)) {
+      return $target;
+    }
+
+    const $ancestor = $target.closest(cssClassSelector);
+
+    if (!this.isExistElement($ancestor)) {
+      return null;
+    }
+
+    return $ancestor;
+  }
+
+  private getCssClassSelector(cssClassName: string) {
+    return cssClassName.startsWith('.') ? cssClassName : `.${cssClassName}`;
+  }
+
+  private isExistElement(jqObject: JQuery<HTMLElement>) {
+    return jqObject.length > 0;
+  }
+
+  private getElementFromJqObject(jqObject: JQuery<HTMLElement>) {
+    return jqObject.get(0) as HTMLElement;
+  }
+
+  private removeSelectedCssClass() {
+    const selector = `.${FC_CSS_CLASS_NAMES.Node}, .${FC_CSS_CLASS_NAMES.Connection}`;
+
+    jQuery(this.el).find(selector).removeClass(FC_CSS_CLASS_NAMES.Selected);
+  }
+
+  private onClickNode($fcNode: JQuery<HTMLElement>) {
+    this.addSelectedCssClass($fcNode);
+
+    // this.showLineBalls($fcNode);
+
+    // add skeleton element
+    const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
+
+    if (hasSkeleton) {
+      return;
+    }
+
+    $fcNode.append(NODE_SKELETON_HTML_RENDER({}));
+  }
+
+  private bindDoubleClickListener() {
     const dblclickHandler = (event: JQuery.TriggeredEvent) => {
       const { target } = event;
 
-      const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
+      const $fcNode = this.isContainTarget(target, FC_CSS_CLASS_NAMES.Node);
 
       if ($fcNode) {
-        this.onDbClickNode($fcNode);
+        this.onDoubleClickNode($fcNode);
       }
     };
 
+    jQuery(this.el)
+      .on(EVENTS.DBLCLICK, dblclickHandler);
+  }
+
+  private onDoubleClickNode($fcNode: JQuery<HTMLElement>) {
+    const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
+
+    $nodeText
+      .prop('contenteditable', 'true')
+      .trigger('focus')
+      .one(EVENTS.BLUR, () => {
+        console.log(EVENTS.BLUR);
+        $nodeText.removeAttr('contenteditable');
+      });
+  }
+
+  private bindMouseWheelListener() {
     const mousewheelHandler = (event: JQuery.TriggeredEvent) => {
       event.stopPropagation();
 
@@ -167,37 +338,74 @@ export class FlowChart {
       this.emit(EVENTS.WHEEL, this.options.stage.scale.value);
     };
 
-    jQuery(this.el)
-      .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler)
-      .on(EVENTS.DBLCLICK, dblclickHandler);
-
     jQuery(this.el.parentElement as HTMLElement)
       .on(EVENTS.WHEEL, mousewheelHandler);
   }
 
+  decreaseScale() {
+    const {
+      value: scale,
+      step: scaleStep,
+      min: minScale,
+    } = this.options.stage.scale;
+
+    if (scale <= minScale) {
+      return;
+    }
+
+    this.options.stage.scale.value = toFixedNumber(scale - scaleStep);
+
+    this.updateStageScaleAndOffset();
+  }
+
+  increaseScale() {
+    const {
+      value: scale,
+      step: scaleStep,
+      max: maxScale,
+    } = this.options.stage.scale;
+
+    if (scale >= maxScale) {
+      return;
+    }
+
+    this.options.stage.scale.value = toFixedNumber(scale + scaleStep);
+
+    this.updateStageScaleAndOffset();
+  }
+
+  updateStageScaleAndOffset() {
+    const {
+      scale: { value: scale },
+      offset: { x, y },
+    } = this.options.stage;
+
+    this.el.style.transform = `scale(${scale}) translateX(${x}px) translateY(${y}px)`;
+
+    this.jsPlumbInstance.setZoom(scale);
+  }
+
   private bindDragStage() {
-    const stageParentElement = this.el.parentElement as HTMLElement;
-    const $stage = jQuery(this.el);
+    const stageContainerElement = this.el.parentElement as HTMLElement;
 
     let isStageMovable = false;
-
     let isMouseOverStage = false;
 
-    $stage
-      .on('mouseover', (event) => {
+    jQuery(this.el)
+      .on(EVENTS.MOUSEOVER, (event) => {
         isMouseOverStage = event.target === this.el;
 
         if (isMouseOverStage) {
         // console.log('mouse over stage');
         }
       })
-      .on('mouseleave', (event) => {
+      .on(EVENTS.MOUSELEAVE, (event) => {
         if (event.target === this.el) {
           isMouseOverStage = false;
         }
       });
 
-    interact(stageParentElement)
+    interact(stageContainerElement)
       .draggable({
         autoScroll: true,
         cursorChecker: () => 'default',
@@ -217,7 +425,7 @@ export class FlowChart {
 
             this.emit(EVENTS.STAGE_MOVE, this.options.stage.offset);
 
-            this.updateStageTransform();
+            this.updateStageScaleAndOffset();
           },
         },
       });
@@ -228,44 +436,38 @@ export class FlowChart {
       highlight: { type, value },
     } = this.options;
 
-    const $node = this.getJqOfAllFcNodes();
+    const $allNodes = this.getAllFcNodes();
 
     if (type === STEP_INDEX_HIGHLIGHT) {
       const currentStepIndex = value as number;
 
-      $node.each((index, element) => {
-        const $el = jQuery(element);
-
+      $allNodes.each((index, element) => {
         if (currentStepIndex === -1) {
-          $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
+          this.setHighlightOfFcNode(element, false);
           return;
         }
 
         const stepIndex = this.getStepIndexOfFcNode(element);
 
         if (stepIndex <= currentStepIndex) {
-          $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
+          this.setHighlightOfFcNode(element, false);
           return;
         }
 
-        $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
+        this.setHighlightOfFcNode(element, true);
       });
     }
   }
 
-  private onClickNode($fcNode: JQuery<HTMLElement>) {
-    this.addSelectedCssClass($fcNode);
+  setHighlightOfFcNode(el: HTMLElement | JQuery<HTMLElement>, isHighlight = true) {
+    const $el = el instanceof HTMLElement ? jQuery(el) : el;
 
-    // this.showLineBalls($fcNode);
-
-    // add skeleton element
-    const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
-
-    if (hasSkeleton) {
+    if (isHighlight) {
+      $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
       return;
     }
 
-    $fcNode.append(NODE_SKELETON_HTML_RENDER({}));
+    $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
   }
 
   private showLineBalls($fcNode: JQuery<HTMLElement>) {
@@ -293,12 +495,6 @@ export class FlowChart {
     }
   }
 
-  private removeSelectedCssClass() {
-    const selector = `.${FC_CSS_CLASS_NAMES.Node}, .${FC_CSS_CLASS_NAMES.Connection}`;
-
-    jQuery(this.el).find(selector).removeClass(FC_CSS_CLASS_NAMES.Selected);
-  }
-
   private addSelectedCssClass($el: JQuery<HTMLElement>) {
     $el.addClass(FC_CSS_CLASS_NAMES.Selected);
   }
@@ -309,18 +505,6 @@ export class FlowChart {
     } else {
       this.addSelectedCssClass(connection);
     }
-  }
-
-  private onDbClickNode($fcNode: JQuery<HTMLElement>) {
-    const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
-
-    $nodeText
-      .prop('contenteditable', 'true')
-      .trigger('focus')
-      .one(EVENTS.BLUR, () => {
-        console.log(EVENTS.BLUR);
-        $nodeText.removeAttr('contenteditable');
-      });
   }
 
   getJsPlumbInstance() {
@@ -407,7 +591,7 @@ export class FlowChart {
   }
 
   private buildConfigOfUnconnectedFcNodes(fcConfig: IFcConfig) {
-    const $nodes = this.getJqOfAllFcNodes();
+    const $nodes = this.getAllFcNodes();
 
     const fcNodes: IFcNode[] = [];
 
@@ -418,49 +602,8 @@ export class FlowChart {
     this.addFcNodesToConfig(fcNodes, fcConfig);
   }
 
-  private getJqOfAllFcNodes() {
+  private getAllFcNodes() {
     return jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
-  }
-
-  createFcNodeWithElement(el: HTMLElement, managedId?: string) {
-    this.el.appendChild(el);
-
-    this.jsPlumbInstance.manage(el, managedId);
-
-    this.createEndpointsForFcNode(el);
-  }
-
-  private createEndpointsForFcNode(el: HTMLElement) {
-    this.jsPlumbInstance.addEndpoints(el, [
-      {
-        source: true, target: true, anchor: AnchorLocations.Top, maxConnections: -1,
-      },
-      {
-        source: true, target: true, anchor: AnchorLocations.Right, maxConnections: -1,
-      },
-      {
-        source: true, target: true, anchor: AnchorLocations.Bottom, maxConnections: -1,
-      },
-      {
-        source: true, target: true, anchor: AnchorLocations.Left, maxConnections: -1,
-      },
-    ]);
-  }
-
-  createFlowChartWithConfig() {
-    const { config } = this.options;
-
-    if (!config) {
-      return;
-    }
-
-    const { nodes, connections } = config;
-
-    this.createFcNodesWithConfig(nodes);
-
-    this.createFcConnections(connections);
-
-    this.updateVisibleOfEndpoints();
   }
 
   private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
@@ -503,61 +646,6 @@ export class FlowChart {
     const text = $content.text();
 
     return { html, text };
-  }
-
-  private createFcNodesWithConfig(fcNodes: IFcNode[]) {
-    for (let i = 0, len = fcNodes.length; i < len; i += 1) {
-      this.createFcNode(fcNodes[i]);
-    }
-  }
-
-  private createFcNode(fcNode: IFcNode) {
-    const { id, type } = fcNode;
-
-    const html = NODE_HTML_RENDER({
-      ...fcNode,
-      type: type.toLowerCase(),
-    });
-
-    const $el = jQuery(html);
-
-    const el = $el.get(0) as HTMLElement;
-
-    this.createFcNodeWithElement(el, id);
-  }
-
-  private createFcConnections(fcConnections: IFcConnection[]) {
-    for (let i = 0, len = fcConnections.length; i < len; i += 1) {
-      this.createFcConnection(fcConnections[i]);
-    }
-  }
-
-  private createFcConnection(fcConnection: IFcConnection) {
-    const {
-      sourceId,
-      sourceAnchor,
-      targetId,
-      targetAnchor,
-      label,
-    } = fcConnection;
-
-    this.jsPlumbInstance.connect({
-      source: this.getElementByManagedId(sourceId),
-      target: this.getElementByManagedId(targetId),
-      anchors: [sourceAnchor, targetAnchor],
-      overlays: [
-        {
-          type: LabelOverlay.type,
-          options: {
-            label,
-          },
-        },
-      ],
-    });
-  }
-
-  private getElementByManagedId(id: string) {
-    return this.jsPlumbInstance.getManagedElement(id) as HTMLElement;
   }
 
   removeFcNode(node: HTMLElement | IFcNode) {
@@ -696,66 +784,6 @@ export class FlowChart {
     this.updateVisibleOfEndpoints();
   }
 
-  updateVisibleOfEndpoints() {
-    const {
-      node: {
-        endpoint: {
-          show: visibleOfEndpoints,
-        },
-      },
-    } = this.options;
-
-    this.jsPlumbInstance.selectEndpoints().each((endpoint) => {
-      this.jsPlumbInstance.setEndpointVisible(endpoint, visibleOfEndpoints);
-    });
-  }
-
-  getOptions() {
-    return this.options;
-  }
-
-  decreaseScale() {
-    const {
-      value: scale,
-      step: scaleStep,
-      min: minScale,
-    } = this.options.stage.scale;
-
-    if (scale <= minScale) {
-      return;
-    }
-
-    this.options.stage.scale.value = toFixedNumber(scale - scaleStep);
-
-    this.updateStageTransform();
-  }
-
-  increaseScale() {
-    const {
-      value: scale,
-      step: scaleStep,
-      max: maxScale,
-    } = this.options.stage.scale;
-
-    if (scale >= maxScale) {
-      return;
-    }
-
-    this.options.stage.scale.value = toFixedNumber(scale + scaleStep);
-
-    this.updateStageTransform();
-  }
-
-  updateStageTransform() {
-    const {
-      scale: { value: scale },
-      offset: { x, y },
-    } = this.options.stage;
-
-    this.el.style.transform = `scale(${scale}) translateX(${x}px) translateY(${y}px)`;
-
-    this.jsPlumbInstance.setZoom(scale);
-  }
 
   getStageElement() {
     return this.el;

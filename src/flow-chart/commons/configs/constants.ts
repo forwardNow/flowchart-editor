@@ -1,8 +1,8 @@
 import { IFcOptions } from '@/flow-chart/commons/configs/types';
 import lodashTemplate from 'lodash.template';
 import {
-  AnchorLocations, ArrowOverlay,
-  BlankEndpoint,
+  AnchorLocations,
+  ArrowOverlay,
   DotEndpoint,
   FlowchartConnector,
 } from '@jsplumb/browser-ui';
@@ -102,6 +102,8 @@ export const EVENTS = {
   DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
   BLUR: `blur.${EVENT_NAMESPACE}`,
   WHEEL: `wheel.${EVENT_NAMESPACE}`,
+  MOUSEOVER: `mouseover.${EVENT_NAMESPACE}`,
+  MOUSELEAVE: `mouseleave.${EVENT_NAMESPACE}`,
 
   SELECT_NODE: `select-node.${EVENT_NAMESPACE}`,
   SELECT_CONNECTION: `select-connection.${EVENT_NAMESPACE}`,
