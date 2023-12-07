@@ -1,5 +1,5 @@
-import { IFcOptions } from '@/flow-chart/commons/configs/types';
 import lodashTemplate from 'lodash.template';
+
 import {
   AnchorLocations,
   ArrowOverlay,
@@ -7,32 +7,21 @@ import {
   FlowchartConnector,
 } from '@jsplumb/browser-ui';
 
-export const STORE_KEY_OPTIONS = 'FC_OPTIONS';
+import { IFcOptions } from '@/flow-chart/commons/configs/types';
 
-export const STEP_INDEX_HIGHLIGHT = 'STEP_INDEX';
-export const BIZ_IDS_HIGHLIGHT = 'BIZ_IDS';
+import {
+  CIRCLE_NODE_TYPE,
+  DIAMOND_NODE_TYPE,
+  RECTANGLE_NODE_TYPE,
+  STEP_INDEX_HIGHLIGHT,
+} from '@/flow-chart/commons/configs/commons';
+
+export const STORE_KEY_OPTIONS = 'FC_OPTIONS';
 
 export const STEP_INDEX_ATTR_NAME = 'data-step-index';
 export const DEFAULT_STEP_INDEX_ATTR_VALUE = '0';
 
-export const CIRCLE_NODE_TYPE = 'Circle';
-export const DIAMOND_NODE_TYPE = 'Diamond';
-export const RECTANGLE_NODE_TYPE = 'Rectangle';
-
-export const FC_NODE_TYPES = {
-  [CIRCLE_NODE_TYPE]: CIRCLE_NODE_TYPE,
-  [RECTANGLE_NODE_TYPE]: RECTANGLE_NODE_TYPE,
-  [DIAMOND_NODE_TYPE]: DIAMOND_NODE_TYPE,
-};
-
 export const FC_CONNECTION_TYPE = FlowchartConnector.type;
-
-export const FC_NODE_ANCHORS = {
-  Top: 'Top',
-  Right: 'Right',
-  Bottom: 'Bottom',
-  Left: 'Left',
-};
 
 export const EVENT_NAMESPACE = 'fc';
 

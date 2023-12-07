@@ -101,7 +101,7 @@
         <span class="fc-ii-label">label:</span>
         <input class="fc-ii-cont fc-ii-input"
                v-model.trim="connectionInfo.label"
-               @input="changeConnectionLabel(connectionInfo.label)" />
+               @input="changeConnectionLabel" />
       </div>
     </div>
 
@@ -114,7 +114,6 @@ import IconSave from '@/flow-chart/commons/components/IconSave.vue';
 import {
   DEFAULT_OPTIONS,
   EVENTS,
-  STEP_INDEX_HIGHLIGHT,
   STORE_KEY_OPTIONS,
 } from '@/flow-chart/commons/configs/constants';
 import { showAlert, showConfirm, showSuccessToast } from '@/flow-chart/commons/utils/popup';
@@ -122,6 +121,7 @@ import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
 import IconResetSettings from '@/flow-chart/commons/components/IconResetSettings.vue';
 import IconDownload from '@/flow-chart/commons/components/IconDownload.vue';
 import { merge } from '@jsplumb/browser-ui';
+import { STEP_INDEX_HIGHLIGHT } from '@/flow-chart/commons/configs/commons';
 
 export default {
   name: 'FcToolbox',
@@ -357,7 +357,7 @@ export default {
 
       this.options = options;
 
-      fc.updateStageTransform();
+      fc.updateStageScaleAndOffset();
     },
 
     downloadConfigFile() {
@@ -380,12 +380,12 @@ export default {
       fc.changeFcNodeStepIndex(selectedNode, stepIndex);
     },
 
-    changeConnectionLabel: lodashDebounce(function f(label) {
+    changeConnectionLabel: lodashDebounce(function f() {
       const { fc } = this.flowChartRef;
 
       const selectedJsPlumbConnection = fc.getSelectedJsPlumbConnection();
 
-      fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, label);
+      fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, this.connectionInfo.label);
     }, 300),
 
     changeHighlightType() {

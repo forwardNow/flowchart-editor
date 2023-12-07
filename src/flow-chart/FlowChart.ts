@@ -1,7 +1,11 @@
 /* eslint-disable class-methods-use-this, @typescript-eslint/no-explicit-any */
-import type {
-  Connection as IJsPlumbConnection,
-} from '@jsplumb/browser-ui/types/core/connector/connection-impl';
+import type { Connection as IJsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
+
+import interact from 'interactjs';
+import lodashGet from 'lodash.get';
+import lodashMerge from 'lodash.merge';
+import jQuery from 'jquery';
+import throttle from 'lodash.throttle';
 
 import {
   AnchorLocations,
@@ -13,36 +17,32 @@ import {
   newInstance,
 } from '@jsplumb/browser-ui';
 
-import interact from 'interactjs';
-import lodashGet from 'lodash.get';
-import lodashMerge from 'lodash.merge';
-import jQuery from 'jquery';
-import throttle from 'lodash.throttle';
-
 import {
   IFcAnchor,
   IFcConfig,
   IFcConnection,
-  IFcNode,
-  IFcNodeType,
+  IFcNode, IFcNodeType,
   IFcOptions,
 } from '@/flow-chart/commons/configs/types';
+
+import {
+  CIRCLE_NODE_TYPE,
+  DIAMOND_NODE_TYPE,
+  RECTANGLE_NODE_TYPE,
+  STEP_INDEX_HIGHLIGHT,
+} from '@/flow-chart/commons/configs/commons';
 
 import { toFixedNumber } from './commons/utils/number';
 
 import {
-  CIRCLE_NODE_TYPE,
   DEFAULT_OPTIONS,
   DEFAULT_STEP_INDEX_ATTR_VALUE,
-  DIAMOND_NODE_TYPE,
   EVENTS, FC_CONNECTION_TYPE,
   FC_CSS_CLASS_NAMES,
   JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
-  RECTANGLE_NODE_TYPE,
   STEP_INDEX_ATTR_NAME,
-  STEP_INDEX_HIGHLIGHT,
 } from './commons/configs/constants';
 
 export type IJQuery = JQuery<HTMLElement>;
