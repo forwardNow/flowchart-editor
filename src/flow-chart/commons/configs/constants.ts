@@ -25,6 +25,8 @@ export const FC_NODE_TYPES = {
   [DIAMOND_NODE_TYPE]: DIAMOND_NODE_TYPE,
 };
 
+export const FC_CONNECTION_TYPE = FlowchartConnector.type;
+
 export const FC_NODE_ANCHORS = {
   Top: 'Top',
   Right: 'Right',

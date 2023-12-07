@@ -9,7 +9,6 @@ import {
   BrowserJsPlumbInstance,
   Connection as JsPlumbConnection,
   DotEndpoint,
-  FlowchartConnector,
   LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
@@ -36,7 +35,7 @@ import {
   DEFAULT_OPTIONS,
   DEFAULT_STEP_INDEX_ATTR_VALUE,
   DIAMOND_NODE_TYPE,
-  EVENTS,
+  EVENTS, FC_CONNECTION_TYPE,
   FC_CSS_CLASS_NAMES,
   JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
@@ -228,7 +227,7 @@ export class FlowChart {
         this.onClickConnection($fcConnection);
 
         const jsPlumbConnection = this.getSelectedJsPlumbConnection();
-        const fcConnection = jsPlumbConnection ? this.buildConfigOfFcConnection(jsPlumbConnection) : null;
+        const fcConnection = jsPlumbConnection ? this.getFcConnectionConfig(jsPlumbConnection) : null;
         this.emit(EVENTS.SELECT_CONNECTION, fcConnection);
 
         return;
@@ -516,34 +515,44 @@ export class FlowChart {
   }
 
   getFlowChartConfig() {
-    const config: IFcConfig = this.buildConfig();
+    const fcConfig: IFcConfig = { connections: [], nodes: [] };
 
-    this.buildConfigOfUnconnectedFcNodes(config);
+    this.buildNodesConfig(fcConfig);
 
-    return config;
+    this.buildConnectionsConfig(fcConfig);
+
+    return fcConfig;
   }
 
-  private buildConfig() {
-    const fcConfig: IFcConfig = { nodes: [], connections: [] };
+  private buildNodesConfig(fcConfig: IFcConfig) {
+    const $nodes = this.getAllFcNodes();
 
+    const fcNodes: IFcNode[] = [];
+
+    $nodes.each((index: number, el: HTMLElement) => {
+      fcNodes.push(this.getFcNodeConfig(el));
+    });
+
+    this.addFcNodesToConfig(fcNodes, fcConfig);
+  }
+
+  private getAllFcNodes() {
+    return jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
+  }
+
+  private buildConnectionsConfig(config: IFcConfig) {
     const jsPlumbConnections = this.jsPlumbInstance.getConnections() as IJsPlumbConnection[];
 
     for (let i = 0, len = jsPlumbConnections.length; i < len; i += 1) {
       const jsPlumbConnection = jsPlumbConnections[i];
 
-      const fcConnection = this.buildConfigOfFcConnection(jsPlumbConnection);
+      const fcConnection = this.getFcConnectionConfig(jsPlumbConnection);
 
-      const fcNodes = this.buildConfigOfFcNodes(jsPlumbConnection);
-
-      fcConfig.connections.push(fcConnection);
-
-      this.addFcNodesToConfig(fcNodes, fcConfig);
+      this.addFcConnectionsToConfig([fcConnection], config);
     }
-
-    return fcConfig;
   }
 
-  private buildConfigOfFcConnection(jsPlumbConnection: IJsPlumbConnection) {
+  private getFcConnectionConfig(jsPlumbConnection: IJsPlumbConnection) {
     const { sourceId, targetId } = jsPlumbConnection;
 
     const sourceAnchor = lodashGet(jsPlumbConnection, 'endpoints.0._anchor.type') as IFcAnchor;
@@ -552,7 +561,7 @@ export class FlowChart {
     const label = this.getLabelOfJsplumbConnection(jsPlumbConnection);
 
     return {
-      type: FlowchartConnector.type,
+      type: FC_CONNECTION_TYPE,
       sourceId,
       sourceAnchor,
       targetId,
@@ -561,13 +570,26 @@ export class FlowChart {
     };
   }
 
-  private buildConfigOfFcNodes(jsPlumbConnection: IJsPlumbConnection): [IFcNode, IFcNode] {
-    const { source, target } = jsPlumbConnection;
+  getLabelOfJsplumbConnection(jsPlumbConnection: IJsPlumbConnection) {
+    const labelOverlay = this.getLabelOverlayOfJsPlumbConnection(jsPlumbConnection);
 
-    return [
-      this.getFcNodeConfig(source),
-      this.getFcNodeConfig(target),
-    ];
+    if (!labelOverlay) {
+      return '';
+    }
+
+    return labelOverlay.labelText;
+  }
+
+  private getLabelOverlayOfJsPlumbConnection(jsPlumbConnection: IJsPlumbConnection) {
+    const overlays = Object.values(jsPlumbConnection.getOverlays());
+
+    const labelOverlay = overlays.find((item) => item instanceof LabelOverlay);
+
+    if (!labelOverlay) {
+      return null;
+    }
+
+    return labelOverlay as LabelOverlay;
   }
 
   getFcNodeConfig(el: HTMLElement): IFcNode {
@@ -582,32 +604,24 @@ export class FlowChart {
     };
   }
 
+  private addFcConnectionsToConfig(connections: IFcConnection[], config: IFcConfig) {
+    for (let i = 0; i < connections.length; i += 1) {
+      config.connections.push(connections[i]);
+    }
+  }
+
   private addFcNodesToConfig(nodes: IFcNode[], config: IFcConfig) {
-    nodes.forEach((node) => {
-      const isExist = Boolean(config.nodes.find((item) => item.id === node.id));
+    for (let i = 0; i < nodes.length; i += 1) {
+      const node = nodes[i];
+
+      const isExist = config.nodes.findIndex((item) => item.id === node.id) !== -1;
 
       if (isExist) {
         return;
       }
 
       config.nodes.push(node);
-    });
-  }
-
-  private buildConfigOfUnconnectedFcNodes(fcConfig: IFcConfig) {
-    const $nodes = this.getAllFcNodes();
-
-    const fcNodes: IFcNode[] = [];
-
-    $nodes.each((index: number, el: HTMLElement) => {
-      fcNodes.push(this.getFcNodeConfig(el));
-    });
-
-    this.addFcNodesToConfig(fcNodes, fcConfig);
-  }
-
-  private getAllFcNodes() {
-    return jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
+    }
   }
 
   private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
@@ -716,28 +730,6 @@ export class FlowChart {
     labelOverlay.setLabel(label);
   }
 
-  getLabelOfJsplumbConnection(jsPlumbConnection: IJsPlumbConnection) {
-    const labelOverlay = this.getLabelOverlayOfJsPlumbConnection(jsPlumbConnection);
-
-    if (!labelOverlay) {
-      return '';
-    }
-
-    return labelOverlay.labelText;
-  }
-
-  private getLabelOverlayOfJsPlumbConnection(jsPlumbConnection: IJsPlumbConnection) {
-    const overlays = Object.values(jsPlumbConnection.getOverlays());
-
-    const labelOverlay = overlays.find((item) => item instanceof LabelOverlay);
-
-    if (!labelOverlay) {
-      return null;
-    }
-
-    return labelOverlay as LabelOverlay;
-  }
-
   emit(eventName: string, payload?: any) {
     const handlers = this.eventHandlers[eventName];
 
@@ -787,5 +779,4 @@ export class FlowChart {
 
     this.updateVisibleOfEndpoints();
   }
-
 }
