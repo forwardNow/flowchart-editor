@@ -118,7 +118,9 @@ import IconDownload from '@/flow-chart/commons/components/IconDownload.vue';
 
 export default {
   name: 'FcToolbox',
-  components: { IconDownload, IconResetSettings, IconDelete, IconSave },
+  components: {
+    IconDownload, IconResetSettings, IconDelete, IconSave,
+  },
 
   inject: ['flowChartRef'],
 
@@ -348,7 +350,15 @@ export default {
     },
 
     downloadConfigFile() {
-      // TODO
+      const { fc } = this.flowChartRef;
+      const options = fc.getOptions();
+
+      options.config = fc.getFlowChartConfig();
+
+      const filename = 'flowchart.config.json';
+      const content = JSON.stringify(options, null, 2);
+
+      download(filename, content);
     },
 
     changeNodeStepIndex(stepIndex) {
@@ -380,4 +390,17 @@ export default {
     },
   },
 };
+
+function download(filename, text) {
+  const element = document.createElement('a');
+  element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`);
+  element.setAttribute('download', filename);
+
+  element.style.display = 'none';
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+}
 </script>

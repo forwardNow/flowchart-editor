@@ -262,13 +262,19 @@ export class FlowChart {
 
     let isMouseOverStage = false;
 
-    $stage.on('mouseover', (event) => {
-      isMouseOverStage = event.target === this.el;
+    $stage
+      .on('mouseover', (event) => {
+        isMouseOverStage = event.target === this.el;
 
-      if (isMouseOverStage) {
+        if (isMouseOverStage) {
         // console.log('mouse over stage');
-      }
-    });
+        }
+      })
+      .on('mouseleave', (event) => {
+        if (event.target === this.el) {
+          isMouseOverStage = false;
+        }
+      });
 
     interact(stageParentElement)
       .draggable({
