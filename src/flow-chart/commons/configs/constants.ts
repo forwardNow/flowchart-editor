@@ -1,5 +1,11 @@
 import { IFcOptions } from '@/flow-chart/commons/configs/types';
 import lodashTemplate from 'lodash.template';
+import {
+  AnchorLocations, ArrowOverlay,
+  BlankEndpoint,
+  DotEndpoint,
+  FlowchartConnector,
+} from '@jsplumb/browser-ui';
 
 export const STORE_KEY_OPTIONS = 'FC_OPTIONS';
 
@@ -103,3 +109,43 @@ export const EVENTS = {
 
   STAGE_MOVE: `stage-move.${EVENT_NAMESPACE}`,
 };
+
+export const JS_PLUMB_DEFAULTS = () => ({
+  connectionsDetachable: false,
+
+  connector: {
+    type: FlowchartConnector.type,
+    options: {
+      cornerRadius: 3,
+    },
+  },
+
+  endpoint: {
+    type: DotEndpoint.type,
+    options: {
+      radius: 4,
+    },
+  },
+
+  endpointStyle: {
+    fill: '#fff',
+    strokeWidth: 1,
+    stroke: '#067bef',
+  },
+
+  paintStyle: { strokeWidth: 2, stroke: '#AAB7C4' },
+
+  anchor: AnchorLocations.AutoDefault,
+
+  connectionOverlays: [
+    {
+      type: ArrowOverlay.type,
+      options: {
+        location: 1,
+        width: 10,
+        length: 10,
+      },
+    },
+  ],
+
+});

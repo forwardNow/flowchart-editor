@@ -38,7 +38,7 @@ import {
   DEFAULT_STEP_INDEX_ATTR_VALUE,
   DIAMOND_NODE_TYPE,
   EVENTS,
-  FC_CSS_CLASS_NAMES,
+  FC_CSS_CLASS_NAMES, JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
   RECTANGLE_NODE_TYPE,
@@ -83,52 +83,13 @@ export class FlowChart {
       container: this.el,
     });
 
-    const {
-      node: {
-        endpoint: {
-          show: visibleOfEndpoints,
-        },
-      },
-    } = this.options;
+    const type = this.options.node.endpoint.show ? DotEndpoint.type : BlankEndpoint.type;
 
-    jsPlumbInstance.importDefaults({
-      connectionsDetachable: false,
+    const defaults = JS_PLUMB_DEFAULTS();
 
-      connector: {
-        type: FlowchartConnector.type,
-        options: {
-          cornerRadius: 3,
-        },
-      },
+    defaults.connector.type = type;
 
-      endpoint: {
-        type: visibleOfEndpoints ? DotEndpoint.type : BlankEndpoint.type,
-        options: {
-          radius: 4,
-        },
-      },
-
-      endpointStyle: {
-        fill: '#fff',
-        strokeWidth: 1,
-        stroke: '#067bef',
-      },
-
-      paintStyle: { strokeWidth: 2, stroke: '#AAB7C4' },
-
-      anchor: AnchorLocations.AutoDefault,
-
-      connectionOverlays: [
-        {
-          type: ArrowOverlay.type,
-          options: {
-            location: 1,
-            width: 10,
-            length: 10,
-          },
-        },
-      ],
-    });
+    jsPlumbInstance.importDefaults(defaults);
 
     return jsPlumbInstance;
   }
@@ -245,10 +206,7 @@ export class FlowChart {
             isStageMovable = isMouseOverStage;
           },
           move: (event) => {
-            const {
-              dx,
-              dy,
-            } = event;
+            const { dx, dy } = event;
 
             if (!isStageMovable) {
               return;
@@ -267,11 +225,9 @@ export class FlowChart {
 
   updateHighlights() {
     const {
-      highlight: {
-        type,
-        value,
-      },
+      highlight: { type, value },
     } = this.options;
+
     const $node = this.getJqOfAllFcNodes();
 
     if (type === STEP_INDEX_HIGHLIGHT) {
@@ -760,14 +716,10 @@ export class FlowChart {
 
   decreaseScale() {
     const {
-      stage: {
-        scale: {
-          value: scale,
-          step: scaleStep,
-          min: minScale,
-        },
-      },
-    } = this.options;
+      value: scale,
+      step: scaleStep,
+      min: minScale,
+    } = this.options.stage.scale;
 
     if (scale <= minScale) {
       return;
@@ -780,14 +732,10 @@ export class FlowChart {
 
   increaseScale() {
     const {
-      stage: {
-        scale: {
-          value: scale,
-          step: scaleStep,
-          max: maxScale,
-        },
-      },
-    } = this.options;
+      value: scale,
+      step: scaleStep,
+      max: maxScale,
+    } = this.options.stage.scale;
 
     if (scale >= maxScale) {
       return;
@@ -800,11 +748,9 @@ export class FlowChart {
 
   updateStageTransform() {
     const {
-      stage: {
-        scale: { value: scale },
-        offset: { x, y },
-      },
-    } = this.options;
+      scale: { value: scale },
+      offset: { x, y },
+    } = this.options.stage;
 
     this.el.style.transform = `scale(${scale}) translateX(${x}px) translateY(${y}px)`;
 
