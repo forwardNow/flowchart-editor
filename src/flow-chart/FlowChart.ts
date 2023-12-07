@@ -8,7 +8,8 @@ import throttle from 'lodash.throttle';
 
 import {
   AnchorLocations,
-  ArrowOverlay, BlankEndpoint,
+  ArrowOverlay,
+  BlankEndpoint,
   BrowserJsPlumbInstance,
   Connection as JsPlumbConnection,
   DotEndpoint,
@@ -19,6 +20,16 @@ import {
 import { toFixedNumber } from '@/flow-chart/commons/utils/number';
 import interact from 'interactjs';
 
+export const STEP_INDEX_ATTR_NAME = 'data-step-index';
+export const DEFAULT_STEP_INDEX_ATTR_VALUE = '0';
+
+export const STEP_INDEX_HIGHLIGHT = 'STEP_INDEX';
+export const BIZ_IDS_HIGHLIGHT = 'BIZ_IDS';
+
+export const CIRCLE_NODE_TYPE = 'Circle';
+export const DIAMOND_NODE_TYPE = 'Diamond';
+export const RECTANGLE_NODE_TYPE = 'Rectangle';
+
 export const DEFAULT_OPTIONS: Required<IOptions> = {
   node: {
     endpoint: {
@@ -27,7 +38,7 @@ export const DEFAULT_OPTIONS: Required<IOptions> = {
   },
 
   highlight: {
-    type: 'STEP_INDEX',
+    type: STEP_INDEX_HIGHLIGHT,
     value: -1,
   },
 
@@ -58,9 +69,9 @@ const FC_CSS_CLASS_NAMES = {
 
   Connection: 'jtk-connector',
 
-  Circle: 'fc-node-circle',
-  Rectangle: 'fc-node-rectangle',
-  Diamond: 'fc-node-diamond',
+  [CIRCLE_NODE_TYPE]: 'fc-node-circle',
+  [RECTANGLE_NODE_TYPE]: 'fc-node-rectangle',
+  [DIAMOND_NODE_TYPE]: 'fc-node-diamond',
 };
 
 const NODE_HTML_RENDER = lodashTemplate(`
@@ -80,9 +91,9 @@ const NODE_SKELETON_HTML_RENDER = lodashTemplate(`
 `);
 
 const FC_NODE_TYPES = {
-  Circle: 'Circle',
-  Rectangle: 'Rectangle',
-  Diamond: 'Diamond',
+  [CIRCLE_NODE_TYPE]: CIRCLE_NODE_TYPE,
+  [RECTANGLE_NODE_TYPE]: RECTANGLE_NODE_TYPE,
+  [DIAMOND_NODE_TYPE]: DIAMOND_NODE_TYPE,
 };
 
 const FC_NODE_ANCHORS = {
@@ -339,7 +350,7 @@ export class FlowChart {
     } = this.options;
     const $node = this.getJqOfAllFcNodes();
 
-    if (type === 'STEP_INDEX') {
+    if (type === STEP_INDEX_HIGHLIGHT) {
       const currentStepIndex = value as number;
 
       $node.each((index, element) => {
@@ -425,7 +436,7 @@ export class FlowChart {
 
     $nodeText
       .prop('contenteditable', 'true')
-      .focus()
+      .trigger('focus')
       .one(EVENTS.BLUR, () => {
         console.log(EVENTS.BLUR);
         $nodeText.removeAttr('contenteditable');
@@ -473,7 +484,7 @@ export class FlowChart {
     const label = this.getLabelOfJsplumbConnection(jsPlumbConnection);
 
     return {
-      type: 'Flowchart',
+      type: FlowchartConnector.type,
       sourceId,
       sourceAnchor,
       targetId,
@@ -491,7 +502,7 @@ export class FlowChart {
     ];
   }
 
-  getFcNodeConfig(el: HTMLElement) {
+  getFcNodeConfig(el: HTMLElement): IFcNode {
     const id = this.jsPlumbInstance.getId(el);
     const type = this.getTypeOfFcNode(el);
     const { html: content, text } = this.getContentOfFcNode(el);
@@ -528,8 +539,7 @@ export class FlowChart {
   }
 
   private getJqOfAllFcNodes() {
-    return jQuery(this.el)
-      .find(`.${FC_CSS_CLASS_NAMES.Node}`);
+    return jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
   }
 
   createFcNodeWithElement(el: HTMLElement, managedId?: string) {
@@ -543,16 +553,16 @@ export class FlowChart {
   private createEndpointsForFcNode(el: HTMLElement) {
     this.jsPlumbInstance.addEndpoints(el, [
       {
-        source: true, target: true, anchor: 'Top', maxConnections: -1,
+        source: true, target: true, anchor: AnchorLocations.Top, maxConnections: -1,
       },
       {
-        source: true, target: true, anchor: 'Right', maxConnections: -1,
+        source: true, target: true, anchor: AnchorLocations.Right, maxConnections: -1,
       },
       {
-        source: true, target: true, anchor: 'Bottom', maxConnections: -1,
+        source: true, target: true, anchor: AnchorLocations.Bottom, maxConnections: -1,
       },
       {
-        source: true, target: true, anchor: 'Left', maxConnections: -1,
+        source: true, target: true, anchor: AnchorLocations.Left, maxConnections: -1,
       },
     ]);
   }
@@ -575,18 +585,18 @@ export class FlowChart {
 
   private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
     if (el.classList.contains(FC_CSS_CLASS_NAMES.Circle)) {
-      return 'Circle';
+      return CIRCLE_NODE_TYPE;
     }
 
     if (el.classList.contains(FC_CSS_CLASS_NAMES.Diamond)) {
-      return 'Diamond';
+      return DIAMOND_NODE_TYPE;
     }
 
-    return 'Rectangle';
+    return RECTANGLE_NODE_TYPE;
   }
 
   private getStepIndexOfFcNode(el: HTMLElement) {
-    const stepIndexStr = jQuery(el).attr('data-step-index') || '0';
+    const stepIndexStr = jQuery(el).attr(STEP_INDEX_ATTR_NAME) || DEFAULT_STEP_INDEX_ATTR_VALUE;
 
     return Number(stepIndexStr);
   }
@@ -778,14 +788,14 @@ export class FlowChart {
     const eventHandler = this.eventHandlers[eventName];
 
     if (!eventHandler) {
-      throw new Error(`未定义这个类型的事件: ${eventName}`);
+      throw new Error(`FlowChart.eventHandlers.${eventName} is None`);
     }
 
     eventHandler.push(callback);
   }
 
   changeFcNodeStepIndex(el: HTMLElement, stepIndex: number) {
-    jQuery(el).attr('data-step-index', stepIndex);
+    jQuery(el).attr(STEP_INDEX_ATTR_NAME, stepIndex);
   }
 
   setValueOfStepIndexHighlight(currentStepIndex: number | string) {
@@ -916,7 +926,7 @@ interface IFcConfig {
 
 interface IOptions {
   highlight: {
-    type: 'BIZ_IDS' | 'STEP_INDEX',
+    type: typeof BIZ_IDS_HIGHLIGHT | typeof STEP_INDEX_HIGHLIGHT,
     value: string[] | number,
   },
 
