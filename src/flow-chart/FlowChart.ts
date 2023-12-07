@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this */
+/* eslint-disable class-methods-use-this, @typescript-eslint/no-explicit-any */
 import type {
   Connection as IJsPlumbConnection,
 } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
@@ -51,6 +51,8 @@ export class FlowChart {
   /** stage element  */
   private readonly el: HTMLElement;
 
+  private readonly $stage: IJQuery;
+
   private readonly jsPlumbInstance: BrowserJsPlumbInstance;
 
   private eventHandlers = {
@@ -65,6 +67,8 @@ export class FlowChart {
 
   constructor(el: HTMLElement, options?: IFcOptions) {
     this.el = el;
+
+    this.$stage = jQuery(el);
 
     this.options = lodashMerge({}, DEFAULT_OPTIONS, options);
 
@@ -238,7 +242,7 @@ export class FlowChart {
       this.emit(EVENTS.UNSELECT_ALL);
     }, 200, { trailing: false });
 
-    jQuery(this.el)
+    this.$stage
       .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler);
   }
 
@@ -274,7 +278,9 @@ export class FlowChart {
   private removeSelectedCssClass() {
     const selector = `.${FC_CSS_CLASS_NAMES.Node}, .${FC_CSS_CLASS_NAMES.Connection}`;
 
-    jQuery(this.el).find(selector).removeClass(FC_CSS_CLASS_NAMES.Selected);
+    this.$stage
+      .find(selector)
+      .removeClass(FC_CSS_CLASS_NAMES.Selected);
   }
 
   private onClickNode($fcNode: IJQuery) {
@@ -303,7 +309,7 @@ export class FlowChart {
       }
     };
 
-    jQuery(this.el)
+    this.$stage
       .on(EVENTS.DBLCLICK, dblclickHandler);
   }
 
@@ -388,15 +394,15 @@ export class FlowChart {
     let isStageMovable = false;
     let isMouseOverStage = false;
 
-    jQuery(this.el)
-      .on(EVENTS.MOUSEOVER, (event) => {
+    this.$stage
+      .on(EVENTS.MOUSEOVER, (event: JQuery.TriggeredEvent) => {
         isMouseOverStage = event.target === this.el;
 
         if (isMouseOverStage) {
         // console.log('mouse over stage');
         }
       })
-      .on(EVENTS.MOUSELEAVE, (event) => {
+      .on(EVENTS.MOUSELEAVE, (event: JQuery.TriggeredEvent) => {
         if (event.target === this.el) {
           isMouseOverStage = false;
         }
@@ -433,26 +439,28 @@ export class FlowChart {
       highlight: { type, value },
     } = this.options;
 
-    const $allNodes = this.getAllFcNodes();
+    const nodes = this.getAllFcNodes();
 
     if (type === STEP_INDEX_HIGHLIGHT) {
       const currentStepIndex = value as number;
 
-      $allNodes.each((index, element) => {
+      for (let i = 0; i < nodes.length; i += 1) {
+        const node = nodes[i];
+
         if (currentStepIndex === -1) {
-          this.setHighlightOfFcNode(element, false);
+          this.setHighlightOfFcNode(node, false);
           return;
         }
 
-        const stepIndex = this.getStepIndexOfFcNode(element);
+        const stepIndex = this.getStepIndexOfFcNode(node);
 
         if (stepIndex <= currentStepIndex) {
-          this.setHighlightOfFcNode(element, false);
+          this.setHighlightOfFcNode(node, false);
           return;
         }
 
-        this.setHighlightOfFcNode(element, true);
-      });
+        this.setHighlightOfFcNode(node, true);
+      }
     }
   }
 
@@ -479,9 +487,9 @@ export class FlowChart {
       const svgElement = (connector as any).canvas as SVGElement;
 
       const path = this.jsPlumbInstance.getPathData(connector);
-      const position = jQuery(svgElement).position();
+      const position: JQuery.Coordinates = jQuery(svgElement).position();
 
-      (jQuery(this.el) as IJQuery)
+      this.$stage
         .find('.fc-line-ball')
         .show()
         .css({
@@ -504,10 +512,6 @@ export class FlowChart {
     }
   }
 
-  getJsPlumbInstance() {
-    return this.jsPlumbInstance;
-  }
-
   getOptions() {
     return this.options;
   }
@@ -527,11 +531,11 @@ export class FlowChart {
   }
 
   private buildNodesConfig(fcConfig: IFcConfig) {
-    const $nodes = this.getAllFcNodes();
+    const nodes = this.getAllFcNodes();
 
     const fcNodes: IFcNode[] = [];
 
-    Array.from($nodes).forEach((el) => {
+    nodes.forEach((el) => {
       fcNodes.push(this.getFcNodeConfig(el));
     });
 
@@ -539,7 +543,8 @@ export class FlowChart {
   }
 
   private getAllFcNodes() {
-    return jQuery(this.el).find(`.${FC_CSS_CLASS_NAMES.Node}`);
+    const $nodes = this.$stage.find(this.getCssClassSelector(FC_CSS_CLASS_NAMES.Node));
+    return Array.from($nodes);
   }
 
   private buildConnectionsConfig(config: IFcConfig) {
@@ -685,13 +690,15 @@ export class FlowChart {
   getSelectedFcNode() {
     const selector = `.${FC_CSS_CLASS_NAMES.Selected}.${FC_CSS_CLASS_NAMES.Node}`;
 
-    return jQuery(this.el).find(selector).get(0);
+    const $node = this.$stage.find(selector);
+
+    return this.getElementFromJqObject($node);
   }
 
   getSelectedJsPlumbConnection() {
     const selector = `.${FC_CSS_CLASS_NAMES.Selected}.${FC_CSS_CLASS_NAMES.Connection}`;
 
-    const connectionElement = jQuery(this.el).find(selector).get(0);
+    const connectionElement = this.$stage.find(selector).get(0);
 
     if (!connectionElement) {
       return null;
