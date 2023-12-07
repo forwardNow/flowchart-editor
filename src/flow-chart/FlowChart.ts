@@ -340,19 +340,19 @@ export class FlowChart {
     const $node = this.getJqOfAllFcNodes();
 
     if (type === 'STEP_INDEX') {
-      const endStepIndex = value as number;
+      const currentStepIndex = value as number;
 
       $node.each((index, element) => {
         const $el = jQuery(element);
 
-        if (endStepIndex === -1) {
+        if (currentStepIndex === -1) {
           $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
           return;
         }
 
         const stepIndex = this.getStepIndexOfFcNode(element);
 
-        if (stepIndex <= endStepIndex) {
+        if (stepIndex <= currentStepIndex) {
           $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
           return;
         }
@@ -788,8 +788,15 @@ export class FlowChart {
     jQuery(el).attr('data-step-index', stepIndex);
   }
 
-  setCurrentStepIndex(endStepIndex: number | string) {
-    this.options.highlight.value = Number(endStepIndex);
+  setValueOfStepIndexHighlight(currentStepIndex: number | string) {
+    this.options.highlight.value = Number(currentStepIndex);
+
+    this.updateHighlights();
+  }
+
+  setHighlightType(type: IOptions['highlight']['type']) {
+    this.options.highlight.type = type;
+
     this.updateHighlights();
   }
 

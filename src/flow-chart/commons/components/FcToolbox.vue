@@ -49,11 +49,18 @@
 
     <div class="fc-options fc-item-info">
       <div class="fc-ii-item">
+        <span class="fc-ii-label">highlight.type:</span>
+        <input class="fc-ii-cont" type="checkbox"
+               v-model="options.highlight.type"
+               @change="changeHighlightType()">
+      </div>
+
+      <div class="fc-ii-item">
         <span class="fc-ii-label">highlight.value:</span>
         <input class="fc-ii-cont fc-ii-input"
                type="number"
                v-model.trim.number="options.highlight.value"
-               @input="changeEndStepIndex(options.highlight.value)" />
+               @input="changeHighlightValue" />
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">node.endpoint.show:</span>
@@ -62,18 +69,12 @@
                @change="changeVisibleOfEndpoints(options.node.endpoint.show)">
       </div>
       <div class="fc-ii-item">
-        <span class="fc-ii-label">scale:</span>
+        <span class="fc-ii-label">stage.scale.value:</span>
         <span class="fc-ii-cont">{{ options.stage.scale.value }}</span>
       </div>
       <div class="fc-ii-item">
-        <span class="fc-ii-label">offset:</span>
-        <span class="fc-ii-cont">
-          (
-          <span class="fc-ii-position">{{ options.stage.offset.x }}</span>
-          ,
-          <span class="fc-ii-position">{{ options.stage.offset.y }}</span>
-          )
-        </span>
+        <span class="fc-ii-label">stage.offset:</span>
+        <span class="fc-ii-cont fc-ii-position">{{ options.stage.offset }}</span>
       </div>
     </div>
 
@@ -100,13 +101,14 @@
         <span class="fc-ii-label">label:</span>
         <input class="fc-ii-cont fc-ii-input"
                v-model.trim="connectionInfo.label"
-               @blur="changeConnectionLabel(connectionInfo.label)" />
+               @input="changeConnectionLabel(connectionInfo.label)" />
       </div>
     </div>
 
   </div>
 </template>
 <script>
+import lodashDebounce from 'lodash.debounce';
 import interact from 'interactjs';
 import IconSave from '@/flow-chart/commons/components/IconSave.vue';
 import { STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
@@ -366,18 +368,36 @@ export default {
       fc.changeFcNodeStepIndex(selectedNode, stepIndex);
     },
 
-    changeConnectionLabel(label) {
+    changeConnectionLabel: lodashDebounce(function f(label) {
       const { fc } = this.flowChartRef;
 
       const selectedJsPlumbConnection = fc.getSelectedJsPlumbConnection();
 
       fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, label);
-    },
+    }, 300),
 
-    changeEndStepIndex(endStepIndex) {
+    changeHighlightType() {
       const { fc } = this.flowChartRef;
 
-      fc.setCurrentStepIndex(endStepIndex);
+      const {
+        highlight: { type },
+      } = this.options;
+
+      if (type === 'STEP_INDEX') {
+        fc.setHighlightType(type);
+      }
+    },
+
+    changeHighlightValue() {
+      const { fc } = this.flowChartRef;
+
+      const {
+        highlight: { type, value },
+      } = this.options;
+
+      if (type === 'STEP_INDEX') {
+        fc.setValueOfStepIndexHighlight(Number(value));
+      }
     },
 
     changeVisibleOfEndpoints(visibleOfEndpoints) {
