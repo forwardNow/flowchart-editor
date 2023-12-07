@@ -45,6 +45,8 @@ import {
   STEP_INDEX_HIGHLIGHT,
 } from './commons/configs/constants';
 
+export type IJQuery = JQuery<HTMLElement>;
+
 export class FlowChart {
   /** stage element  */
   private readonly el: HTMLElement;
@@ -261,11 +263,11 @@ export class FlowChart {
     return cssClassName.startsWith('.') ? cssClassName : `.${cssClassName}`;
   }
 
-  private isExistElement(jqObject: JQuery<HTMLElement>) {
+  private isExistElement(jqObject: IJQuery) {
     return jqObject.length > 0;
   }
 
-  private getElementFromJqObject(jqObject: JQuery<HTMLElement>) {
+  private getElementFromJqObject(jqObject: IJQuery) {
     return jqObject.get(0) as HTMLElement;
   }
 
@@ -275,7 +277,7 @@ export class FlowChart {
     jQuery(this.el).find(selector).removeClass(FC_CSS_CLASS_NAMES.Selected);
   }
 
-  private onClickNode($fcNode: JQuery<HTMLElement>) {
+  private onClickNode($fcNode: IJQuery) {
     this.addSelectedCssClass($fcNode);
 
     // this.showLineBalls($fcNode);
@@ -305,7 +307,7 @@ export class FlowChart {
       .on(EVENTS.DBLCLICK, dblclickHandler);
   }
 
-  private onDoubleClickNode($fcNode: JQuery<HTMLElement>) {
+  private onDoubleClickNode($fcNode: IJQuery) {
     const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
 
     $nodeText
@@ -454,7 +456,7 @@ export class FlowChart {
     }
   }
 
-  setHighlightOfFcNode(el: HTMLElement | JQuery<HTMLElement>, isHighlight = true) {
+  setHighlightOfFcNode(el: HTMLElement | IJQuery, isHighlight = true) {
     const $el = el instanceof HTMLElement ? jQuery(el) : el;
 
     if (isHighlight) {
@@ -465,7 +467,7 @@ export class FlowChart {
     $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
   }
 
-  private showLineBalls($fcNode: JQuery<HTMLElement>) {
+  showLineBalls($fcNode: IJQuery) {
     const el = $fcNode.get(0) as HTMLElement;
 
     const jsplumbConnections = this.jsPlumbInstance.getConnections({ source: el }) as IJsPlumbConnection[];
@@ -479,7 +481,7 @@ export class FlowChart {
       const path = this.jsPlumbInstance.getPathData(connector);
       const position = jQuery(svgElement).position();
 
-      jQuery(this.el)
+      (jQuery(this.el) as IJQuery)
         .find('.fc-line-ball')
         .show()
         .css({
@@ -490,11 +492,11 @@ export class FlowChart {
     }
   }
 
-  private addSelectedCssClass($el: JQuery<HTMLElement>) {
+  private addSelectedCssClass($el: IJQuery) {
     $el.addClass(FC_CSS_CLASS_NAMES.Selected);
   }
 
-  private onClickConnection(connection: JQuery<HTMLElement> | JsPlumbConnection) {
+  private onClickConnection(connection: IJQuery | JsPlumbConnection) {
     if (connection instanceof JsPlumbConnection) {
       console.log(connection);
     } else {
@@ -529,7 +531,7 @@ export class FlowChart {
 
     const fcNodes: IFcNode[] = [];
 
-    $nodes.each((index: number, el: HTMLElement) => {
+    Array.from($nodes).forEach((el) => {
       fcNodes.push(this.getFcNodeConfig(el));
     });
 
@@ -649,8 +651,8 @@ export class FlowChart {
     return { x, y };
   }
 
-  private getContentOfFcNode(fcNode: HTMLElement | JQuery<HTMLElement>) {
-    let $fcNode: JQuery<HTMLElement>;
+  private getContentOfFcNode(fcNode: HTMLElement | IJQuery) {
+    let $fcNode: IJQuery;
 
     if (fcNode instanceof HTMLElement) {
       $fcNode = jQuery(fcNode);

@@ -1,34 +1,9 @@
-/* eslint-disable no-param-reassign */
-import Swal from 'sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
-
-const Toast = Swal.mixin({
-  toast: true,
-  position: 'top-end',
-  showConfirmButton: false,
-  timer: 3000,
-  timerProgressBar: true,
-  didOpen: (toast) => {
-    toast.onmouseenter = Swal.stopTimer;
-    toast.onmouseleave = Swal.resumeTimer;
-  },
-});
+/* eslint-disable no-param-reassign,no-alert */
 
 export const showSuccessToast = (message: string) => {
-  Toast.fire({
-    icon: 'success',
-    title: message,
-  });
+  window.alert(message);
 };
 
-const Alert = Swal.mixin({
-  showConfirmButton: true,
-  confirmButtonText: '确定',
-});
-
 export const showAlert = (message: string) => {
-  Alert.fire({
-    icon: 'warning',
-    title: message,
-  });
+  window.alert(message);
 };
