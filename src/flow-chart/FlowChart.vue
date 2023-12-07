@@ -10,9 +10,9 @@
 </template>
 <script>
 import FcToolbox from '@/flow-chart/commons/components/FcToolbox.vue';
-import { STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
+import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
 import lodashMerge from 'lodash.merge';
-import { DEFAULT_OPTIONS, FlowChart } from './FlowChart';
+import { FlowChart } from './FlowChart';
 
 const EVENTS = {
   READY: 'ready',

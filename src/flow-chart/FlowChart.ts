@@ -1,10 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import type { Connection as IJsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
-import lodashGet from 'lodash.get';
-import lodashMerge from 'lodash.merge';
-import lodashTemplate from 'lodash.template';
-import jQuery from 'jquery';
-import throttle from 'lodash.throttle';
+import type {
+  Connection as IJsPlumbConnection,
+} from '@jsplumb/browser-ui/types/core/connector/connection-impl';
 
 import {
   AnchorLocations,
@@ -17,106 +14,37 @@ import {
   LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
-import { toFixedNumber } from '@/flow-chart/commons/utils/number';
+
 import interact from 'interactjs';
+import lodashGet from 'lodash.get';
+import lodashMerge from 'lodash.merge';
+import jQuery from 'jquery';
+import throttle from 'lodash.throttle';
 
-export const STEP_INDEX_ATTR_NAME = 'data-step-index';
-export const DEFAULT_STEP_INDEX_ATTR_VALUE = '0';
+import {
+  IFcAnchor,
+  IFcConfig,
+  IFcConnection,
+  IFcNode,
+  IFcNodeType,
+  IFcOptions,
+} from '@/flow-chart/commons/configs/types';
 
-export const STEP_INDEX_HIGHLIGHT = 'STEP_INDEX';
-export const BIZ_IDS_HIGHLIGHT = 'BIZ_IDS';
+import { toFixedNumber } from './commons/utils/number';
 
-export const CIRCLE_NODE_TYPE = 'Circle';
-export const DIAMOND_NODE_TYPE = 'Diamond';
-export const RECTANGLE_NODE_TYPE = 'Rectangle';
-
-export const DEFAULT_OPTIONS: Required<IOptions> = {
-  node: {
-    endpoint: {
-      show: true,
-    },
-  },
-
-  highlight: {
-    type: STEP_INDEX_HIGHLIGHT,
-    value: -1,
-  },
-
-  stage: {
-    scale: {
-      value: 1,
-      step: 0.1,
-      min: 0.5,
-      max: 2,
-    },
-    offset: {
-      x: 0,
-      y: 0,
-    },
-  },
-
-  config: { nodes: [], connections: [] },
-};
-
-const FC_CSS_CLASS_NAMES = {
-  Stage: 'flow-chart',
-  Node: 'fc-node',
-  NodeContent: 'fc-node-text',
-  NodeSkeleton: 'fc-node-skeleton',
-
-  Selected: 'fc-selected',
-  Disabled: 'fc-disabled',
-
-  Connection: 'jtk-connector',
-
-  [CIRCLE_NODE_TYPE]: 'fc-node-circle',
-  [RECTANGLE_NODE_TYPE]: 'fc-node-rectangle',
-  [DIAMOND_NODE_TYPE]: 'fc-node-diamond',
-};
-
-const NODE_HTML_RENDER = lodashTemplate(`
-  <div
-    class="fc-node fc-node-<%= type %>"
-    data-step-index="<%= stepIndex %>"
-    style="left: <%= position.x %>px; top: <%= position.y %>px;"
-  >
-    <div class="fc-node-inner">
-      <div class="fc-node-text"><%= content %></div>
-    </div>
-  </div>
-`);
-
-const NODE_SKELETON_HTML_RENDER = lodashTemplate(`
-  <div class="fc-node-skeleton marching-ants marching"></div>
-`);
-
-const FC_NODE_TYPES = {
-  [CIRCLE_NODE_TYPE]: CIRCLE_NODE_TYPE,
-  [RECTANGLE_NODE_TYPE]: RECTANGLE_NODE_TYPE,
-  [DIAMOND_NODE_TYPE]: DIAMOND_NODE_TYPE,
-};
-
-const FC_NODE_ANCHORS = {
-  Top: 'Top',
-  Right: 'Right',
-  Bottom: 'Bottom',
-  Left: 'Left',
-};
-
-const EVENT_NAMESPACE = 'fc';
-
-export const EVENTS = {
-  MOUSEDOWN: `mousedown.${EVENT_NAMESPACE}`,
-  DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
-  BLUR: `blur.${EVENT_NAMESPACE}`,
-  WHEEL: `wheel.${EVENT_NAMESPACE}`,
-
-  SELECT_NODE: `select-node.${EVENT_NAMESPACE}`,
-  SELECT_CONNECTION: `select-connection.${EVENT_NAMESPACE}`,
-  UNSELECT_ALL: `unselect-all.${EVENT_NAMESPACE}`,
-
-  STAGE_MOVE: `stage-move.${EVENT_NAMESPACE}`,
-};
+import {
+  CIRCLE_NODE_TYPE,
+  DEFAULT_OPTIONS,
+  DEFAULT_STEP_INDEX_ATTR_VALUE,
+  DIAMOND_NODE_TYPE,
+  EVENTS,
+  FC_CSS_CLASS_NAMES,
+  NODE_HTML_RENDER,
+  NODE_SKELETON_HTML_RENDER,
+  RECTANGLE_NODE_TYPE,
+  STEP_INDEX_ATTR_NAME,
+  STEP_INDEX_HIGHLIGHT,
+} from './commons/configs/constants';
 
 export class FlowChart {
   /** stage element  */
@@ -132,9 +60,9 @@ export class FlowChart {
     [EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
   };
 
-  private readonly options: Required<IOptions>;
+  private readonly options: Required<IFcOptions>;
 
-  constructor(el: HTMLElement, options?: IOptions) {
+  constructor(el: HTMLElement, options?: IFcOptions) {
     this.el = el;
 
     this.options = lodashMerge({}, DEFAULT_OPTIONS, options);
@@ -228,8 +156,6 @@ export class FlowChart {
     const debouncedMousedownHandler = throttle((event: JQuery.TriggeredEvent) => {
       const { target } = event;
 
-      // console.log(EVENTS.MOUSEDOWN, target);
-
       this.removeSelectedCssClass();
 
       const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
@@ -257,8 +183,6 @@ export class FlowChart {
 
     const dblclickHandler = (event: JQuery.TriggeredEvent) => {
       const { target } = event;
-
-      // console.log(EVENTS.DBLCLICK, target);
 
       const $fcNode = check(target, FC_CSS_CLASS_NAMES.Node);
 
@@ -804,7 +728,7 @@ export class FlowChart {
     this.updateHighlights();
   }
 
-  setHighlightType(type: IOptions['highlight']['type']) {
+  setHighlightType(type: IFcOptions['highlight']['type']) {
     this.options.highlight.type = type;
 
     this.updateHighlights();
@@ -890,61 +814,4 @@ export class FlowChart {
   getStageElement() {
     return this.el;
   }
-}
-
-// --
-
-type IFcNodeType = keyof typeof FC_NODE_TYPES;
-
-type IFcAnchor = keyof typeof FC_NODE_ANCHORS;
-
-interface IFcNode {
-  stepIndex: number,
-  id: string, // managedId
-  type: IFcNodeType,
-  content: string,
-  text: string,
-  position: { x: number, y: number },
-}
-
-interface IFcConnection {
-  type: string, // 'Flowchart'
-
-  sourceId: string,
-  sourceAnchor: IFcAnchor,
-
-  targetId: string,
-  targetAnchor: IFcAnchor,
-
-  label?: string,
-}
-
-interface IFcConfig {
-  nodes: IFcNode[],
-  connections: IFcConnection[],
-}
-
-interface IOptions {
-  highlight: {
-    type: typeof BIZ_IDS_HIGHLIGHT | typeof STEP_INDEX_HIGHLIGHT,
-    value: string[] | number,
-  },
-
-  node: {
-    endpoint: {
-      show: boolean,
-    }
-  },
-
-  stage: {
-    scale: {
-      value: number,
-      step: number,
-      min: number,
-      max: number,
-    },
-    offset: { x: number, y: number }
-  },
-
-  config?: IFcConfig,
 }
