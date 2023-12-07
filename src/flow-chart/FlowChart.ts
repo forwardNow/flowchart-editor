@@ -78,10 +78,6 @@ export class FlowChart {
     this.updateStageScaleAndOffset();
   }
 
-  getOptions() {
-    return this.options;
-  }
-
   private createJsPlumbInstance() {
     const jsPlumbInstance = newInstance({
       container: this.el,
@@ -511,6 +507,14 @@ export class FlowChart {
     return this.jsPlumbInstance;
   }
 
+  getOptions() {
+    return this.options;
+  }
+
+  getStageElement() {
+    return this.el;
+  }
+
   getFlowChartConfig() {
     const config: IFcConfig = this.buildConfig();
 
@@ -784,8 +788,4 @@ export class FlowChart {
     this.updateVisibleOfEndpoints();
   }
 
-
-  getStageElement() {
-    return this.el;
-  }
 }
