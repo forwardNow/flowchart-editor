@@ -49,29 +49,29 @@
 
     <div class="fc-options fc-item-info">
       <div class="fc-ii-item">
-        <span class="fc-ii-label">currentStepIndex:</span>
+        <span class="fc-ii-label">highlight.value:</span>
         <input class="fc-ii-cont fc-ii-input"
                type="number"
-               v-model.trim.number="options.currentStepIndex"
-               @input="changeCurrentStepIndex(options.currentStepIndex)" />
+               v-model.trim.number="options.highlight.value"
+               @input="changeEndStepIndex(options.highlight.value)" />
       </div>
       <div class="fc-ii-item">
-        <span class="fc-ii-label">visibleOfEndpoints:</span>
+        <span class="fc-ii-label">node.endpoint.show:</span>
         <input class="fc-ii-cont" type="checkbox"
-               v-model="options.visibleOfEndpoints"
-               @change="changeVisibleOfEndpoints(options.visibleOfEndpoints)">
+               v-model="options.node.endpoint.show"
+               @change="changeVisibleOfEndpoints(options.node.endpoint.show)">
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">scale:</span>
-        <span class="fc-ii-cont">{{ options.scale }}</span>
+        <span class="fc-ii-cont">{{ options.stage.scale.value }}</span>
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">offset:</span>
         <span class="fc-ii-cont">
           (
-          <span class="fc-ii-position">{{ options.offset?.x }}</span>
+          <span class="fc-ii-position">{{ options.stage.offset.x }}</span>
           ,
-          <span class="fc-ii-position">{{ options.offset?.y }}</span>
+          <span class="fc-ii-position">{{ options.stage.offset.y }}</span>
           )
         </span>
       </div>
@@ -112,9 +112,10 @@ import IconSave from '@/flow-chart/commons/components/IconSave.vue';
 import { STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
 import { showAlert, showSuccessToast } from '@/flow-chart/commons/utils/popup';
 import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
-import { EVENTS } from '@/flow-chart/FlowChart';
+import { DEFAULT_OPTIONS, EVENTS } from '@/flow-chart/FlowChart';
 import IconResetSettings from '@/flow-chart/commons/components/IconResetSettings.vue';
 import IconDownload from '@/flow-chart/commons/components/IconDownload.vue';
+import { merge } from '@jsplumb/browser-ui';
 
 export default {
   name: 'FcToolbox',
@@ -130,12 +131,8 @@ export default {
 
   data() {
     return {
-      options: {
-        currentStepIndex: -1,
-        config: null,
-        visibleOfEndpoints: false,
-        scale: 1,
-      },
+      /** @type {IOptions}  */
+      options: merge({}, DEFAULT_OPTIONS),
 
       nodeInfo: {
         visible: false,
@@ -208,11 +205,11 @@ export default {
       });
 
       fc.on(EVENTS.WHEEL, (scale) => {
-        this.options.scale = scale;
+        this.options.stage.scale.value = scale;
       });
 
       fc.on(EVENTS.STAGE_MOVE, (offset) => {
-        this.options.offset = offset;
+        this.options.stage.offset = offset;
       });
     },
 
@@ -276,7 +273,7 @@ export default {
           return;
         }
 
-        const { scale } = this.options;
+        const scale = this.options.stage.scale.value;
 
         const { x: offsetX, y: offsetY } = this.flowChartRef.fc.getStageElement().getBoundingClientRect();
 
@@ -341,8 +338,8 @@ export default {
 
       const options = fc.getOptions();
 
-      options.scale = 1;
-      options.offset = { x: 0, y: 0 };
+      options.stage.scale.value = 1;
+      options.stage.offset = { x: 0, y: 0 };
 
       this.options = options;
 
@@ -377,10 +374,10 @@ export default {
       fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, label);
     },
 
-    changeCurrentStepIndex(currentStepIndex) {
+    changeEndStepIndex(endStepIndex) {
       const { fc } = this.flowChartRef;
 
-      fc.setCurrentStepIndex(currentStepIndex);
+      fc.setCurrentStepIndex(endStepIndex);
     },
 
     changeVisibleOfEndpoints(visibleOfEndpoints) {

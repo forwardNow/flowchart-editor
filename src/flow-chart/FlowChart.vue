@@ -29,17 +29,11 @@ export default {
   },
 
   mounted() {
-    this.getOptions();
+    const options = this.getOptions();
 
-    this.fc = new FlowChart(this.$refs.stage, this.options);
+    this.fc = new FlowChart(this.$refs.stage, options);
 
     this.$emit(EVENTS.READY, this.fc);
-  },
-
-  data() {
-    return {
-      options: {},
-    };
   },
 
   methods: {
@@ -50,9 +44,9 @@ export default {
         return DEFAULT_OPTIONS;
       }
 
-      const options = JSON.parse(optionsStr);
+      let options = JSON.parse(optionsStr);
 
-      this.options = lodashMerge({}, DEFAULT_OPTIONS, options);
+      options = lodashMerge({}, DEFAULT_OPTIONS, options);
 
       return options;
     },

@@ -20,13 +20,30 @@ import { toFixedNumber } from '@/flow-chart/commons/utils/number';
 import interact from 'interactjs';
 
 export const DEFAULT_OPTIONS: Required<IOptions> = {
-  currentStepIndex: -1,
-  visibleOfEndpoints: false,
-  scale: 1,
-  scaleStep: 0.1,
-  minScale: 0.5,
-  maxScale: 2,
-  offset: { x: 0, y: 0 },
+  node: {
+    endpoint: {
+      show: true,
+    },
+  },
+
+  highlight: {
+    type: 'STEP_INDEX',
+    value: -1,
+  },
+
+  stage: {
+    scale: {
+      value: 1,
+      step: 0.1,
+      min: 0.5,
+      max: 2,
+    },
+    offset: {
+      x: 0,
+      y: 0,
+    },
+  },
+
   config: { nodes: [], connections: [] },
 };
 
@@ -127,6 +144,14 @@ export class FlowChart {
       container: this.el,
     });
 
+    const {
+      node: {
+        endpoint: {
+          show: visibleOfEndpoints,
+        },
+      },
+    } = this.options;
+
     jsPlumbInstance.importDefaults({
       connectionsDetachable: false,
 
@@ -138,7 +163,7 @@ export class FlowChart {
       },
 
       endpoint: {
-        type: this.options.visibleOfEndpoints ? DotEndpoint.type : BlankEndpoint.type,
+        type: visibleOfEndpoints ? DotEndpoint.type : BlankEndpoint.type,
         options: {
           radius: 4,
         },
@@ -243,7 +268,7 @@ export class FlowChart {
         this.increaseScale();
       }
 
-      this.emit(EVENTS.WHEEL, this.options.scale);
+      this.emit(EVENTS.WHEEL, this.options.stage.scale.value);
     };
 
     jQuery(this.el)
@@ -294,10 +319,10 @@ export class FlowChart {
               return;
             }
 
-            this.options.offset.x += dx;
-            this.options.offset.y += dy;
+            this.options.stage.offset.x += dx;
+            this.options.stage.offset.y += dy;
 
-            this.emit(EVENTS.STAGE_MOVE, this.options.offset);
+            this.emit(EVENTS.STAGE_MOVE, this.options.stage.offset);
 
             this.updateStageTransform();
           },
@@ -306,26 +331,35 @@ export class FlowChart {
   }
 
   updateHighlights() {
-    const { currentStepIndex } = this.options;
+    const {
+      highlight: {
+        type,
+        value,
+      },
+    } = this.options;
     const $node = this.getJqOfAllFcNodes();
 
-    $node.each((index, element) => {
-      const $el = jQuery(element);
+    if (type === 'STEP_INDEX') {
+      const endStepIndex = value as number;
 
-      if (currentStepIndex === -1) {
-        $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
-        return;
-      }
+      $node.each((index, element) => {
+        const $el = jQuery(element);
 
-      const stepIndex = this.getStepIndexOfFcNode(element);
+        if (endStepIndex === -1) {
+          $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
+          return;
+        }
 
-      if (stepIndex <= currentStepIndex) {
-        $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
-        return;
-      }
+        const stepIndex = this.getStepIndexOfFcNode(element);
 
-      $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
-    });
+        if (stepIndex <= endStepIndex) {
+          $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
+          return;
+        }
+
+        $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
+      });
+    }
   }
 
   private onClickNode($fcNode: JQuery<HTMLElement>) {
@@ -754,19 +788,25 @@ export class FlowChart {
     jQuery(el).attr('data-step-index', stepIndex);
   }
 
-  setCurrentStepIndex(currentStepIndex: number | string) {
-    this.options.currentStepIndex = Number(currentStepIndex);
+  setCurrentStepIndex(endStepIndex: number | string) {
+    this.options.highlight.value = Number(endStepIndex);
     this.updateHighlights();
   }
 
   setVisibleOfEndpoints(visible: boolean) {
-    this.options.visibleOfEndpoints = visible;
+    this.options.node.endpoint.show = visible;
 
     this.updateVisibleOfEndpoints();
   }
 
   updateVisibleOfEndpoints() {
-    const { visibleOfEndpoints = false } = this.options;
+    const {
+      node: {
+        endpoint: {
+          show: visibleOfEndpoints,
+        },
+      },
+    } = this.options;
 
     this.jsPlumbInstance.selectEndpoints().each((endpoint) => {
       this.jsPlumbInstance.setEndpointVisible(endpoint, visibleOfEndpoints);
@@ -778,31 +818,52 @@ export class FlowChart {
   }
 
   decreaseScale() {
-    const { scale, scaleStep, minScale } = this.options;
+    const {
+      stage: {
+        scale: {
+          value: scale,
+          step: scaleStep,
+          min: minScale,
+        },
+      },
+    } = this.options;
 
     if (scale <= minScale) {
       return;
     }
 
-    this.options.scale = toFixedNumber(scale - scaleStep);
+    this.options.stage.scale.value = toFixedNumber(scale - scaleStep);
 
     this.updateStageTransform();
   }
 
   increaseScale() {
-    const { scale, scaleStep, maxScale } = this.options;
+    const {
+      stage: {
+        scale: {
+          value: scale,
+          step: scaleStep,
+          max: maxScale,
+        },
+      },
+    } = this.options;
 
     if (scale >= maxScale) {
       return;
     }
 
-    this.options.scale = toFixedNumber(scale + scaleStep);
+    this.options.stage.scale.value = toFixedNumber(scale + scaleStep);
 
     this.updateStageTransform();
   }
 
   updateStageTransform() {
-    const { scale, offset: { x, y } } = this.options;
+    const {
+      stage: {
+        scale: { value: scale },
+        offset: { x, y },
+      },
+    } = this.options;
 
     this.el.style.transform = `scale(${scale}) translateX(${x}px) translateY(${y}px)`;
 
@@ -847,14 +908,26 @@ interface IFcConfig {
 }
 
 interface IOptions {
-  currentStepIndex: number,
-  visibleOfEndpoints?: boolean,
+  highlight: {
+    type: 'BIZ_IDS' | 'STEP_INDEX',
+    value: string[] | number,
+  },
 
-  scale?: number,
-  scaleStep?: number,
-  minScale?: number,
-  maxScale?: number,
-  offset?: { x: number, y: number },
+  node: {
+    endpoint: {
+      show: boolean,
+    }
+  },
+
+  stage: {
+    scale: {
+      value: number,
+      step: number,
+      min: number,
+      max: number,
+    },
+    offset: { x: number, y: number }
+  },
 
   config?: IFcConfig,
 }
