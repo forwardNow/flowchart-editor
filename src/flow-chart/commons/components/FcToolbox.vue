@@ -66,7 +66,7 @@
         <span class="fc-ii-label">node.endpoint.show:</span>
         <input class="fc-ii-cont" type="checkbox"
                v-model="options.node.endpoint.show"
-               @change="changeVisibleOfEndpoints(options.node.endpoint.show)">
+               @change="changeVisibleOfEndpoints">
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">stage.scale.value:</span>
@@ -78,23 +78,27 @@
       </div>
     </div>
 
-    <template >
-      <div class="tool-divider" v-if="nodeInfo.visible || connectionInfo.visible"/>
+    <div class="tool-divider" v-if="nodeInfo.visible || connectionInfo.visible"/>
 
-      <div class="node-info fc-item-info" v-show="nodeInfo.visible">
-        <div class="fc-ii-item">
-          <span class="fc-ii-label">stepIndex:</span>
-          <input class="fc-ii-cont fc-ii-input"
-                 type="number"
-                 v-model.trim.number="nodeInfo.stepIndex"
-                 @input="changeNodeStepIndex(nodeInfo.stepIndex)" />
-        </div>
-        <div class="fc-ii-item">
-          <span class="fc-ii-label">text:</span>
-          <span class="fc-ii-cont">{{ nodeInfo.text }}</span>
-        </div>
+    <div class="node-info fc-item-info" v-show="nodeInfo.visible">
+      <div class="fc-ii-item">
+        <span class="fc-ii-label">bizId:</span>
+        <input class="fc-ii-cont fc-ii-input"
+               v-model.trim="nodeInfo.bizId"
+               @input="changeNodeBizId" />
       </div>
-    </template>
+      <div class="fc-ii-item">
+        <span class="fc-ii-label">stepIndex:</span>
+        <input class="fc-ii-cont fc-ii-input"
+               type="number"
+               v-model.trim.number="nodeInfo.stepIndex"
+               @input="changeNodeStepIndex(nodeInfo.stepIndex)" />
+      </div>
+      <div class="fc-ii-item">
+        <span class="fc-ii-label">text:</span>
+        <span class="fc-ii-cont">{{ nodeInfo.text }}</span>
+      </div>
+    </div>
 
     <div class="connection-info fc-item-info" v-show="connectionInfo.visible">
       <div class="fc-ii-item">
@@ -143,11 +147,12 @@ export default {
       nodeInfo: {
         visible: false,
 
-        stepIndex: 0,
         id: '',
+        bizId: '',
         type: '',
         text: '',
         position: { x: 0, y: 0 },
+        stepIndex: 0,
       },
 
       connectionInfo: {
@@ -372,12 +377,22 @@ export default {
       download(filename, content);
     },
 
-    changeNodeStepIndex(stepIndex) {
+    changeNodeStepIndex() {
       const { fc } = this.flowChartRef;
+      const { stepIndex } = this.nodeInfo;
 
       const selectedNode = fc.getSelectedFcNode();
 
-      fc.changeFcNodeStepIndex(selectedNode, stepIndex);
+      fc.setStepIndexOfFcElement(selectedNode, stepIndex);
+    },
+
+    changeNodeBizId() {
+      const { fc } = this.flowChartRef;
+      const { bizId } = this.nodeInfo;
+
+      const selectedNode = fc.getSelectedFcNode();
+
+      fc.setBizIdOfFcElement(selectedNode, bizId);
     },
 
     changeConnectionLabel: lodashDebounce(function f() {
@@ -408,14 +423,13 @@ export default {
       } = this.options;
 
       if (type === STEP_INDEX_HIGHLIGHT) {
-        fc.setValueOfStepIndexHighlight(Number(value));
+        fc.setCurrentStepIndex(Number(value));
       }
     },
 
-    changeVisibleOfEndpoints(visibleOfEndpoints) {
+    changeVisibleOfEndpoints() {
       const { fc } = this.flowChartRef;
-
-      fc.setVisibleOfEndpoints(visibleOfEndpoints);
+      fc.setVisibleOfEndpoints(this.options.node.endpoint.show);
     },
   },
 };

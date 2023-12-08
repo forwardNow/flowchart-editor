@@ -1,5 +1,14 @@
 /* eslint-disable class-methods-use-this, @typescript-eslint/no-explicit-any */
-import type { Connection as IJsPlumbConnection } from '@jsplumb/browser-ui/types/core/connector/connection-impl';
+
+/**
+ * FcNode 流程图节点，逻辑概念 IFcNode
+ *
+ * FcElement 流程图节点元素，HTMLElement
+ */
+
+import type {
+  Connection as IJsPlumbConnection,
+} from '@jsplumb/browser-ui/types/core/connector/connection-impl';
 
 import interact from 'interactjs';
 import lodashGet from 'lodash.get';
@@ -21,7 +30,8 @@ import {
   IFcAnchor,
   IFcConfig,
   IFcConnection,
-  IFcNode, IFcNodeType,
+  IFcNode,
+  IFcNodeType,
   IFcOptions,
 } from '@/flow-chart/commons/configs/types';
 
@@ -35,9 +45,12 @@ import {
 import { toFixedNumber } from './commons/utils/number';
 
 import {
+  BIZ_ID_ATTR_NAME,
+  DEFAULT_BIZ_ID_ATTR_VALUE,
   DEFAULT_OPTIONS,
   DEFAULT_STEP_INDEX_ATTR_VALUE,
-  EVENTS, FC_CONNECTION_TYPE,
+  EVENTS,
+  FC_CONNECTION_TYPE,
   FC_CSS_CLASS_NAMES,
   JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
@@ -128,7 +141,7 @@ export class FlowChart {
       type: type.toLowerCase(),
     });
 
-    const el = jQuery(html).get(0) as HTMLElement;
+    const el = this.getElementFromJqueryObject(jQuery(html));
 
     this.createFcNodeWithElement(el, id);
   }
@@ -223,7 +236,7 @@ export class FlowChart {
 
       if ($fcNode) {
         this.onClickNode($fcNode);
-        this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqObject($fcNode)));
+        this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqueryObject($fcNode)));
         return;
       }
 
@@ -271,7 +284,7 @@ export class FlowChart {
     return jqObject.length > 0;
   }
 
-  private getElementFromJqObject(jqObject: IJQuery) {
+  private getElementFromJqueryObject(jqObject: IJQuery) {
     return jqObject.get(0) as HTMLElement;
   }
 
@@ -448,18 +461,12 @@ export class FlowChart {
         const node = nodes[i];
 
         if (currentStepIndex === -1) {
-          this.setHighlightOfFcNode(node, false);
-          return;
+          this.setHighlightOfFcNode(node, true);
+        } else {
+          const stepIndex = this.getStepIndexOfFcElement(node);
+
+          this.setHighlightOfFcNode(node, stepIndex <= currentStepIndex);
         }
-
-        const stepIndex = this.getStepIndexOfFcNode(node);
-
-        if (stepIndex <= currentStepIndex) {
-          this.setHighlightOfFcNode(node, false);
-          return;
-        }
-
-        this.setHighlightOfFcNode(node, true);
       }
     }
   }
@@ -468,11 +475,11 @@ export class FlowChart {
     const $el = el instanceof HTMLElement ? jQuery(el) : el;
 
     if (isHighlight) {
-      $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
+      $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
       return;
     }
 
-    $el.removeClass(FC_CSS_CLASS_NAMES.Disabled);
+    $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
   }
 
   showLineBalls($fcNode: IJQuery) {
@@ -601,13 +608,14 @@ export class FlowChart {
 
   getFcNodeConfig(el: HTMLElement): IFcNode {
     const id = this.jsPlumbInstance.getId(el);
-    const type = this.getTypeOfFcNode(el);
-    const { html: content, text } = this.getContentOfFcNode(el);
-    const position = this.getPositionOfFcNode(el);
-    const stepIndex = this.getStepIndexOfFcNode(el);
+    const bizId = this.getBizIdOfFcElement(el);
+    const type = this.getTypeOfFcElement(el);
+    const { html: content, text } = this.getContentOfFcElement(el);
+    const position = this.getPositionOfFcElement(el);
+    const stepIndex = this.getStepIndexOfFcElement(el);
 
     return {
-      id, type, content, text, position, stepIndex,
+      id, bizId, type, content, text, position, stepIndex,
     };
   }
 
@@ -631,7 +639,7 @@ export class FlowChart {
     }
   }
 
-  private getTypeOfFcNode(el: HTMLElement): IFcNodeType {
+  private getTypeOfFcElement(el: HTMLElement): IFcNodeType {
     if (el.classList.contains(FC_CSS_CLASS_NAMES.Circle)) {
       return CIRCLE_NODE_TYPE;
     }
@@ -643,20 +651,24 @@ export class FlowChart {
     return RECTANGLE_NODE_TYPE;
   }
 
-  private getStepIndexOfFcNode(el: HTMLElement) {
+  private getBizIdOfFcElement(el: HTMLElement) {
+    return jQuery(el).attr(BIZ_ID_ATTR_NAME) || DEFAULT_BIZ_ID_ATTR_VALUE;
+  }
+
+  private getStepIndexOfFcElement(el: HTMLElement) {
     const stepIndexStr = jQuery(el).attr(STEP_INDEX_ATTR_NAME) || DEFAULT_STEP_INDEX_ATTR_VALUE;
 
     return Number(stepIndexStr);
   }
 
-  private getPositionOfFcNode(el: HTMLElement) {
+  private getPositionOfFcElement(el: HTMLElement) {
     const x = parseFloat(el.style.left);
     const y = parseFloat(el.style.top);
 
     return { x, y };
   }
 
-  private getContentOfFcNode(fcNode: HTMLElement | IJQuery) {
+  private getContentOfFcElement(fcNode: HTMLElement | IJQuery) {
     let $fcNode: IJQuery;
 
     if (fcNode instanceof HTMLElement) {
@@ -692,7 +704,7 @@ export class FlowChart {
 
     const $node = this.$stage.find(selector);
 
-    return this.getElementFromJqObject($node);
+    return this.getElementFromJqueryObject($node);
   }
 
   getSelectedJsPlumbConnection() {
@@ -767,11 +779,19 @@ export class FlowChart {
     eventHandler.push(callback);
   }
 
-  changeFcNodeStepIndex(el: HTMLElement, stepIndex: number) {
+  setStepIndexOfFcElement(el: HTMLElement, stepIndex: number) {
     jQuery(el).attr(STEP_INDEX_ATTR_NAME, stepIndex);
   }
 
-  setValueOfStepIndexHighlight(currentStepIndex: number | string) {
+  setBizIdOfFcElement(el: HTMLElement, bizId: string) {
+    jQuery(el).attr(BIZ_ID_ATTR_NAME, bizId);
+  }
+
+  setCurrentStepIndex(currentStepIndex: number | string) {
+    if (this.options.highlight.type !== STEP_INDEX_HIGHLIGHT) {
+      return;
+    }
+
     this.options.highlight.value = Number(currentStepIndex);
 
     this.updateHighlights();

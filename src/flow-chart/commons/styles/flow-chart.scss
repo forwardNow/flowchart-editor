@@ -165,10 +165,11 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 48px;
+  min-height: 48px;
 
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 16px;
 
   padding: 0 16px;
