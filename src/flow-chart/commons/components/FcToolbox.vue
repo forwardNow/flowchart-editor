@@ -56,7 +56,8 @@
             @wheel.stop
           >
             <input class="fc-ii-input" :value="JSON.stringify(options.highlight.value)" readonly
-                   @click="handleClickBizIdsInput"/>
+                   @click="handleClickBizIdsInput"
+            />
 
             <div class="dropdown-menu-biz-ids" v-show="bizIdsDropdownMenu.visible">
               <div
@@ -188,8 +189,6 @@ export default {
         this.initDnd();
         this.bindListeners();
         this.options = this.flowChartRef.getOptions();
-
-        this.handleClickBizIdsInput();
       });
     },
 
@@ -473,6 +472,7 @@ export default {
     },
 
     handleClickBizIdMenuItem(fcNode) {
+      const { fc } = this.flowChartRef;
       const bizIds = this.options.highlight.value || [];
 
       const index = bizIds.findIndex((item) => item === fcNode.bizId);
@@ -483,6 +483,10 @@ export default {
       } else {
         bizIds.splice(index, 1);
       }
+
+      fc.getOptions().highlight.value = bizIds;
+
+      fc.updateHighlights();
     },
 
   },
