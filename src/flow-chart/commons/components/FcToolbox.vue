@@ -394,6 +394,8 @@ export default {
       const { type } = this.options.highlight;
 
       fc.updateHighlightType(type);
+
+      this.options = fc.getOptions();
     },
 
     changeHighlightValue() {
