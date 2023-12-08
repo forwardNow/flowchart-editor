@@ -282,8 +282,8 @@ export class FlowChart {
     return cssClassName.startsWith('.') ? cssClassName : `.${cssClassName}`;
   }
 
-  private isExistElement(jqObject: IJQuery) {
-    return jqObject.length > 0;
+  private isExistElement(jqueryObject: IJQuery) {
+    return jqueryObject.length > 0;
   }
 
   private getElementFromJqueryObject(jqObject: IJQuery) {
@@ -809,7 +809,23 @@ export class FlowChart {
   }
 
   setBizIdOfFcElement(el: HTMLElement, bizId: string) {
+    const target = this.getFcElementByBizId(bizId);
+
+    if (target && target !== el) {
+      const { text } = this.getContentOfFcElement(target);
+      throw new Error(`bizId="${bizId}" is exist in node[${text}]`);
+    }
     jQuery(el).attr(BIZ_ID_ATTR_NAME, bizId);
+  }
+
+  getFcElementByBizId(bizId: string) {
+    const $node = this.$stage.find(`.${FC_CSS_CLASS_NAMES.Node}[data-biz-id=${bizId}]`);
+
+    if (!this.isExistElement($node)) {
+      return null;
+    }
+
+    return this.getElementFromJqueryObject($node);
   }
 
   setCurrentStepIndex(currentStepIndex: number | string) {
