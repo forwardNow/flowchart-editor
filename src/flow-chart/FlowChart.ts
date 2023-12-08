@@ -50,14 +50,14 @@ import {
   BIZ_ID_ATTR_NAME,
   DEFAULT_BIZ_ID_ATTR_VALUE,
   DEFAULT_OPTIONS,
-  DEFAULT_STEP_INDEX_ATTR_VALUE,
+  DEFAULT_STEP_INDEX_ATTR_VALUE, DEFAULT_SORT_ATTR_VALUE,
   EVENTS,
   FC_CONNECTION_TYPE,
   FC_CSS_CLASS_NAMES,
   JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
-  STEP_INDEX_ATTR_NAME,
+  STEP_INDEX_ATTR_NAME, SORT_ATTR_NAME,
 } from './commons/configs/constants';
 
 export type IJQuery = JQuery<HTMLElement>;
@@ -136,11 +136,23 @@ export class FlowChart {
   }
 
   private createFcNode(fcNode: IFcNode) {
-    const { id, type } = fcNode;
+    const {
+      id,
+      type,
+      bizId,
+      stepIndex = DEFAULT_STEP_INDEX_ATTR_VALUE,
+      sort = DEFAULT_SORT_ATTR_VALUE,
+      content,
+      position,
+    } = fcNode;
 
     const html = NODE_HTML_RENDER({
-      ...fcNode,
       type: type.toLowerCase(),
+      bizId,
+      stepIndex,
+      sort,
+      content,
+      position,
     });
 
     const el = this.getElementFromJqueryObject(jQuery(html));
@@ -404,22 +416,34 @@ export class FlowChart {
   }
 
   private bindDragStage() {
-    const stageContainerElement = this.el.parentElement as HTMLElement;
+    const stageElement = this.el;
+    const stageContainerElement = stageElement.parentElement as HTMLElement;
 
     let isStageMovable = false;
-    let isMouseOverStage = false;
 
-    this.$stage
+    const status = {
+      mouseoverStage: false,
+      mouseoverContainer: false,
+    };
+
+    jQuery(stageContainerElement)
       .on(EVENTS.MOUSEOVER, (event: JQuery.TriggeredEvent) => {
-        isMouseOverStage = event.target === this.el;
-
-        if (isMouseOverStage) {
-        // console.log('mouse over stage');
+        if (event.target === stageElement) {
+          status.mouseoverStage = true;
+          status.mouseoverContainer = false;
+        } else if (event.target === stageContainerElement) {
+          status.mouseoverStage = false;
+          status.mouseoverContainer = true;
+        } else {
+          status.mouseoverStage = false;
+          status.mouseoverContainer = false;
         }
       })
       .on(EVENTS.MOUSELEAVE, (event: JQuery.TriggeredEvent) => {
-        if (event.target === this.el) {
-          isMouseOverStage = false;
+        if (event.target === stageElement) {
+          status.mouseoverStage = false;
+        } else if (event.target === stageContainerElement) {
+          status.mouseoverContainer = false;
         }
       });
 
@@ -429,7 +453,7 @@ export class FlowChart {
         cursorChecker: () => 'default',
         listeners: {
           start: () => {
-            isStageMovable = isMouseOverStage;
+            isStageMovable = status.mouseoverStage || status.mouseoverContainer;
           },
           move: (event) => {
             const { dx, dy } = event;
@@ -552,17 +576,14 @@ export class FlowChart {
     return this.el;
   }
 
-  getFlowChartConfig() {
-    const fcConfig: IFcConfig = { connections: [], nodes: [] };
+  getFlowChartConfig(): IFcConfig {
+    const nodes = this.getFcNodeConfigs();
+    const connections = this.getFcConnectionConfigs();
 
-    this.buildNodesConfig(fcConfig);
-
-    this.buildConnectionsConfig(fcConfig);
-
-    return fcConfig;
+    return { nodes, connections };
   }
 
-  private buildNodesConfig(fcConfig: IFcConfig) {
+  private getFcNodeConfigs() {
     const nodes = this.getAllFcNodes();
 
     const fcNodes: IFcNode[] = [];
@@ -571,7 +592,9 @@ export class FlowChart {
       fcNodes.push(this.getFcNodeConfig(el));
     });
 
-    this.addFcNodesToConfig(fcNodes, fcConfig);
+    fcNodes.sort((prev, curr) => prev.sort - curr.sort);
+
+    return fcNodes;
   }
 
   private getAllFcNodes() {
@@ -579,16 +602,16 @@ export class FlowChart {
     return Array.from($nodes);
   }
 
-  private buildConnectionsConfig(config: IFcConfig) {
+  private getFcConnectionConfigs() {
+    const fcConnections: IFcConnection[] = [];
     const jsPlumbConnections = this.jsPlumbInstance.getConnections() as IJsPlumbConnection[];
 
     for (let i = 0, len = jsPlumbConnections.length; i < len; i += 1) {
       const jsPlumbConnection = jsPlumbConnections[i];
-
-      const fcConnection = this.getFcConnectionConfig(jsPlumbConnection);
-
-      this.addFcConnectionsToConfig([fcConnection], config);
+      fcConnections.push(this.getFcConnectionConfig(jsPlumbConnection));
     }
+
+    return fcConnections;
   }
 
   private getFcConnectionConfig(jsPlumbConnection: IJsPlumbConnection) {
@@ -638,30 +661,11 @@ export class FlowChart {
     const { html: content, text } = this.getContentOfFcElement(el);
     const position = this.getPositionOfFcElement(el);
     const stepIndex = this.getStepIndexOfFcElement(el);
+    const sort = this.getSortOfFcElement(el);
 
     return {
-      id, bizId, type, content, text, position, stepIndex,
+      id, bizId, type, content, text, position, stepIndex, sort,
     };
-  }
-
-  private addFcConnectionsToConfig(connections: IFcConnection[], config: IFcConfig) {
-    for (let i = 0; i < connections.length; i += 1) {
-      config.connections.push(connections[i]);
-    }
-  }
-
-  private addFcNodesToConfig(nodes: IFcNode[], config: IFcConfig) {
-    for (let i = 0; i < nodes.length; i += 1) {
-      const node = nodes[i];
-
-      const isExist = config.nodes.findIndex((item) => item.id === node.id) !== -1;
-
-      if (isExist) {
-        return;
-      }
-
-      config.nodes.push(node);
-    }
   }
 
   private getTypeOfFcElement(el: HTMLElement): IFcNodeType {
@@ -684,6 +688,12 @@ export class FlowChart {
     const stepIndexStr = jQuery(el).attr(STEP_INDEX_ATTR_NAME) || DEFAULT_STEP_INDEX_ATTR_VALUE;
 
     return Number(stepIndexStr);
+  }
+
+  private getSortOfFcElement(el: HTMLElement) {
+    const sortStr = jQuery(el).attr(SORT_ATTR_NAME) || DEFAULT_SORT_ATTR_VALUE;
+
+    return Number(sortStr);
   }
 
   private getPositionOfFcElement(el: HTMLElement) {
@@ -806,6 +816,10 @@ export class FlowChart {
 
   setStepIndexOfFcElement(el: HTMLElement, stepIndex: number) {
     jQuery(el).attr(STEP_INDEX_ATTR_NAME, stepIndex);
+  }
+
+  setSortOfFcElement(el: HTMLElement, sort: number) {
+    jQuery(el).attr(SORT_ATTR_NAME, sort);
   }
 
   setBizIdOfFcElement(el: HTMLElement, bizId: string) {

@@ -10,9 +10,10 @@ export type IFcAnchor = keyof typeof FC_NODE_ANCHORS;
 
 export interface IFcNode {
   id: string, // managedId
+  type: IFcNodeType,
   bizId: string,
   stepIndex: number,
-  type: IFcNodeType,
+  sort: number,
   content: string,
   text: string,
   position: { x: number, y: number },

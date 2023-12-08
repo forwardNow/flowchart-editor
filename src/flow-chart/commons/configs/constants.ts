@@ -21,6 +21,8 @@ export const STEP_INDEX_ATTR_NAME = 'data-step-index';
 export const DEFAULT_STEP_INDEX_ATTR_VALUE = '0';
 export const BIZ_ID_ATTR_NAME = 'data-biz-id';
 export const DEFAULT_BIZ_ID_ATTR_VALUE = '';
+export const SORT_ATTR_NAME = 'data-sort';
+export const DEFAULT_SORT_ATTR_VALUE = '1';
 export const FC_CONNECTION_TYPE = FlowchartConnector.type;
 export const EVENT_NAMESPACE = 'fc';
 export const DEFAULT_OPTIONS: Required<IFcOptions> = {
@@ -73,8 +75,9 @@ export const FC_CSS_CLASS_NAMES = {
 export const NODE_HTML_RENDER = lodashTemplate(`
   <div
     class="fc-node fc-node-<%= type %>"
-    data-biz-id="<%= bizId %>"
-    data-step-index="<%= stepIndex %>"
+    ${BIZ_ID_ATTR_NAME}="<%= bizId %>"
+    ${STEP_INDEX_ATTR_NAME}="<%= stepIndex %>"
+    ${SORT_ATTR_NAME}="<%= sort %>"
     style="left: <%= position.x %>px; top: <%= position.y %>px;"
   >
     <div class="fc-node-inner">
