@@ -19,7 +19,6 @@ import {
 export const STORE_KEY_OPTIONS = 'FC_OPTIONS';
 export const STEP_INDEX_ATTR_NAME = 'data-step-index';
 export const DEFAULT_STEP_INDEX_ATTR_VALUE = '0';
-
 export const BIZ_ID_ATTR_NAME = 'data-biz-id';
 export const DEFAULT_BIZ_ID_ATTR_VALUE = '';
 export const FC_CONNECTION_TYPE = FlowchartConnector.type;

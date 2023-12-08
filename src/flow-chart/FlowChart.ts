@@ -36,11 +36,12 @@ import {
 } from '@/flow-chart/commons/configs/types';
 
 import {
-  BIZ_IDS_HIGHLIGHT,
+  BIZ_IDS_HIGHLIGHT, BIZ_IDS_HIGHLIGHT_DEFAULT_VALUE,
   CIRCLE_NODE_TYPE,
   DIAMOND_NODE_TYPE,
   RECTANGLE_NODE_TYPE,
   STEP_INDEX_HIGHLIGHT,
+  STEP_INDEX_HIGHLIGHT_DEFAULT_VALUE,
 } from '@/flow-chart/commons/configs/commons';
 
 import { toFixedNumber } from './commons/utils/number';
@@ -469,7 +470,7 @@ export class FlowChart {
     for (let i = 0; i < nodes.length; i += 1) {
       const node = nodes[i];
 
-      if (currentStepIndex === -1) {
+      if (currentStepIndex === STEP_INDEX_HIGHLIGHT_DEFAULT_VALUE) {
         this.setHighlightOfFcNode(node, true);
       } else {
         const stepIndex = this.getStepIndexOfFcElement(node);
@@ -821,8 +822,14 @@ export class FlowChart {
     this.updateHighlights();
   }
 
-  setHighlightType(type: IFcOptions['highlight']['type']) {
+  updateHighlightType(type: IFcOptions['highlight']['type']) {
     this.options.highlight.type = type;
+
+    if (type === STEP_INDEX_HIGHLIGHT) {
+      this.options.highlight.value = STEP_INDEX_HIGHLIGHT_DEFAULT_VALUE;
+    } else if (type === BIZ_IDS_HIGHLIGHT) {
+      this.options.highlight.value = BIZ_IDS_HIGHLIGHT_DEFAULT_VALUE();
+    }
 
     this.updateHighlights();
   }

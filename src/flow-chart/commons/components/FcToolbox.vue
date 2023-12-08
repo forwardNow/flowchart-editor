@@ -393,7 +393,7 @@ export default {
       const { fc } = this.flowChartRef;
       const { type } = this.options.highlight;
 
-      fc.setHighlightType(type);
+      fc.updateHighlightType(type);
     },
 
     changeHighlightValue() {
