@@ -36,6 +36,7 @@ import {
 } from '@/flow-chart/commons/configs/types';
 
 import {
+  BIZ_IDS_HIGHLIGHT,
   CIRCLE_NODE_TYPE,
   DIAMOND_NODE_TYPE,
   RECTANGLE_NODE_TYPE,
@@ -448,26 +449,49 @@ export class FlowChart {
   }
 
   updateHighlights() {
-    const {
-      highlight: { type, value },
-    } = this.options;
-
-    const nodes = this.getAllFcNodes();
+    const { type } = this.options.highlight;
 
     if (type === STEP_INDEX_HIGHLIGHT) {
-      const currentStepIndex = value as number;
+      this.updateStepIndexHighlights();
+      return;
+    }
 
-      for (let i = 0; i < nodes.length; i += 1) {
-        const node = nodes[i];
+    if (type === BIZ_IDS_HIGHLIGHT) {
+      this.updateBizIdsHighlights();
+    }
+  }
 
-        if (currentStepIndex === -1) {
-          this.setHighlightOfFcNode(node, true);
-        } else {
-          const stepIndex = this.getStepIndexOfFcElement(node);
+  updateStepIndexHighlights() {
+    const { value } = this.options.highlight;
+    const nodes = this.getAllFcNodes();
+    const currentStepIndex = value as number;
 
-          this.setHighlightOfFcNode(node, stepIndex <= currentStepIndex);
-        }
+    for (let i = 0; i < nodes.length; i += 1) {
+      const node = nodes[i];
+
+      if (currentStepIndex === -1) {
+        this.setHighlightOfFcNode(node, true);
+      } else {
+        const stepIndex = this.getStepIndexOfFcElement(node);
+        const isHighlight = stepIndex <= currentStepIndex;
+
+        this.setHighlightOfFcNode(node, isHighlight);
       }
+    }
+  }
+
+  updateBizIdsHighlights() {
+    const { value } = this.options.highlight;
+    const nodes = this.getAllFcNodes();
+    const bizIds = value as string[];
+
+    for (let i = 0; i < nodes.length; i += 1) {
+      const node = nodes[i];
+
+      const bizId = this.getBizIdOfFcElement(node);
+      const isHighlight = bizIds.includes(bizId);
+
+      this.setHighlightOfFcNode(node, isHighlight);
     }
   }
 

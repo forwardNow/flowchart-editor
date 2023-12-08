@@ -50,23 +50,17 @@
     <div class="fc-options fc-item-info">
       <div class="fc-ii-item">
         <span class="fc-ii-label">highlight.type:</span>
-        <input class="fc-ii-cont" type="checkbox"
-               v-model="options.highlight.type"
-               @change="changeHighlightType()">
+        <input class="fc-ii-cont" type="radio" v-model="options.highlight.type" value="STEP_INDEX" @change="changeHighlightType"> STEP_INDEX
+        <input class="fc-ii-cont" type="radio" v-model="options.highlight.type" value="BIZ_IDS" @change="changeHighlightType"> BIZ_IDS
       </div>
 
       <div class="fc-ii-item">
         <span class="fc-ii-label">highlight.value:</span>
-        <input class="fc-ii-cont fc-ii-input"
-               type="number"
-               v-model.trim.number="options.highlight.value"
-               @input="changeHighlightValue" />
+        <input class="fc-ii-cont fc-ii-input" type="number" v-model.trim.number="options.highlight.value" @input="changeHighlightValue" />
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">node.endpoint.show:</span>
-        <input class="fc-ii-cont" type="checkbox"
-               v-model="options.node.endpoint.show"
-               @change="changeVisibleOfEndpoints">
+        <input class="fc-ii-cont" type="checkbox" v-model="options.node.endpoint.show" @change="changeVisibleOfEndpoints">
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">stage.scale.value:</span>
@@ -83,16 +77,11 @@
     <div class="node-info fc-item-info" v-show="nodeInfo.visible">
       <div class="fc-ii-item">
         <span class="fc-ii-label">bizId:</span>
-        <input class="fc-ii-cont fc-ii-input"
-               v-model.trim="nodeInfo.bizId"
-               @input="changeNodeBizId" />
+        <input class="fc-ii-cont fc-ii-input" v-model.trim="nodeInfo.bizId" @input="changeNodeBizId" />
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">stepIndex:</span>
-        <input class="fc-ii-cont fc-ii-input"
-               type="number"
-               v-model.trim.number="nodeInfo.stepIndex"
-               @input="changeNodeStepIndex(nodeInfo.stepIndex)" />
+        <input class="fc-ii-cont fc-ii-input" type="number" v-model.trim.number="nodeInfo.stepIndex" @input="changeNodeStepIndex" />
       </div>
       <div class="fc-ii-item">
         <span class="fc-ii-label">text:</span>
@@ -103,9 +92,7 @@
     <div class="connection-info fc-item-info" v-show="connectionInfo.visible">
       <div class="fc-ii-item">
         <span class="fc-ii-label">label:</span>
-        <input class="fc-ii-cont fc-ii-input"
-               v-model.trim="connectionInfo.label"
-               @input="changeConnectionLabel" />
+        <input class="fc-ii-cont fc-ii-input" v-model.trim="connectionInfo.label" @input="changeConnectionLabel" />
       </div>
     </div>
 
@@ -354,7 +341,6 @@ export default {
 
     resetSetting() {
       const { fc } = this.flowChartRef;
-
       const options = fc.getOptions();
 
       options.stage.scale.value = 1;
@@ -405,14 +391,9 @@ export default {
 
     changeHighlightType() {
       const { fc } = this.flowChartRef;
+      const { type } = this.options.highlight;
 
-      const {
-        highlight: { type },
-      } = this.options;
-
-      if (type === STEP_INDEX_HIGHLIGHT) {
-        fc.setHighlightType(type);
-      }
+      fc.setHighlightType(type);
     },
 
     changeHighlightValue() {
