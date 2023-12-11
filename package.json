@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "interactjs": "^1.10.23",
     "jquery": "^3.7.1",
+    "lodash.clonedeep": "^4.5.0",
     "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@types/jquery": "^3.5.29",
+    "@types/lodash.clonedeep": "^4.5.9",
     "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.get": "^4.4.9",
     "@types/lodash.merge": "^4.6.9",

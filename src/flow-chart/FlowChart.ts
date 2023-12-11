@@ -1,4 +1,4 @@
-/* eslint-disable class-methods-use-this, @typescript-eslint/no-explicit-any */
+/* eslint-disable class-methods-use-this, @typescript-eslint/no-explicit-any,@typescript-eslint/ban-ts-comment */
 
 /**
  * FcNode 流程图节点，逻辑概念 IFcNode
@@ -17,11 +17,9 @@ import jQuery from 'jquery';
 import throttle from 'lodash.throttle';
 
 import {
-  AnchorLocations,
-  BlankEndpoint,
+  AnchorLocations, BlankEndpoint,
   BrowserJsPlumbInstance,
-  Connection as JsPlumbConnection,
-  DotEndpoint,
+  Connection as JsPlumbConnection, DotEndpoint,
   LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
@@ -36,7 +34,8 @@ import {
 } from '@/flow-chart/commons/configs/types';
 
 import {
-  BIZ_IDS_HIGHLIGHT, BIZ_IDS_HIGHLIGHT_DEFAULT_VALUE,
+  BIZ_IDS_HIGHLIGHT,
+  BIZ_IDS_HIGHLIGHT_DEFAULT_VALUE,
   CIRCLE_NODE_TYPE,
   DIAMOND_NODE_TYPE,
   RECTANGLE_NODE_TYPE,
@@ -50,25 +49,27 @@ import {
   BIZ_ID_ATTR_NAME,
   DEFAULT_BIZ_ID_ATTR_VALUE,
   DEFAULT_OPTIONS,
-  DEFAULT_STEP_INDEX_ATTR_VALUE, DEFAULT_SORT_ATTR_VALUE,
+  DEFAULT_SORT_ATTR_VALUE,
+  DEFAULT_STEP_INDEX_ATTR_VALUE,
+  EVENT_NAMESPACE,
   EVENTS,
   FC_CONNECTION_TYPE,
-  FC_CSS_CLASS_NAMES,
-  JS_PLUMB_DEFAULTS,
+  FC_CSS_CLASS_NAMES, JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
-  STEP_INDEX_ATTR_NAME, SORT_ATTR_NAME,
+  SORT_ATTR_NAME,
+  STEP_INDEX_ATTR_NAME,
 } from './commons/configs/constants';
 
 export type IJQuery = JQuery<HTMLElement>;
 
 export class FlowChart {
   /** stage element  */
-  private readonly el: HTMLElement;
+  private el: HTMLElement;
 
-  private readonly $stage: IJQuery;
+  private $stage: IJQuery;
 
-  private readonly jsPlumbInstance: BrowserJsPlumbInstance;
+  private jsPlumbInstance: BrowserJsPlumbInstance;
 
   private eventHandlers = {
     [EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
@@ -78,7 +79,7 @@ export class FlowChart {
     [EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
   };
 
-  private readonly options: Required<IFcOptions>;
+  private options: Required<IFcOptions>;
 
   constructor(el: HTMLElement, options?: IFcOptions) {
     this.el = el;
@@ -89,6 +90,20 @@ export class FlowChart {
 
     this.jsPlumbInstance = this.createJsPlumbInstance();
 
+    this.init();
+  }
+
+  private createJsPlumbInstance() {
+    return newInstance({
+      container: this.el,
+    });
+  }
+
+  init(options?: IFcOptions) {
+    this.options = lodashMerge({}, this.options, options);
+
+    this.importDefaults();
+
     this.buildFlowChart();
 
     this.bindListeners();
@@ -98,18 +113,12 @@ export class FlowChart {
     this.updateStageScaleAndOffset();
   }
 
-  private createJsPlumbInstance() {
-    const jsPlumbInstance = newInstance({
-      container: this.el,
-    });
+  private importDefaults() {
+    const options = JS_PLUMB_DEFAULTS();
 
-    const defaults = JS_PLUMB_DEFAULTS();
+    options.endpoint.type = this.options.node.endpoint.show ? DotEndpoint.type : BlankEndpoint.type;
 
-    defaults.endpoint.type = this.options.node.endpoint.show ? DotEndpoint.type : BlankEndpoint.type;
-
-    jsPlumbInstance.importDefaults(defaults);
-
-    return jsPlumbInstance;
+    this.jsPlumbInstance.importDefaults(options);
   }
 
   private buildFlowChart() {
@@ -868,5 +877,31 @@ export class FlowChart {
     this.options.node.endpoint.show = visible;
 
     this.updateVisibleOfEndpoints();
+  }
+
+  destroy() {
+    this.jsPlumbInstance.destroy();
+
+    this.getAllFcNodes().forEach((element) => {
+      element.parentNode?.removeChild(element);
+    });
+
+    const events = `.${EVENT_NAMESPACE}`;
+    const stageParentElement = this.el.parentElement as HTMLElement;
+
+    this.$stage.off(events);
+    jQuery(stageParentElement).off(events);
+
+    interact(stageParentElement).unset();
+
+    // @ts-ignore
+    this.eventHandlers = null;
+
+    // @ts-ignore
+    this.el = null;
+    // @ts-ignore
+    this.$stage = null;
+    // @ts-ignore
+    this.jsPlumbInstance = null;
   }
 }

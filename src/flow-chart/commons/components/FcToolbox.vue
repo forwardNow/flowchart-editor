@@ -5,6 +5,10 @@
         <div class="feature-item tl-item" title="保存" @click="save">
           <IconSave />
         </div>
+        <label class="feature-item tl-item" title="导入" >
+          <IconImport />
+          <input type="file" v-show="false" @change="importConfigFile($event)" />
+        </label>
         <div class="feature-item tl-item" title="下载" @click="downloadConfigFile">
           <IconDownload />
         </div>
@@ -135,17 +139,22 @@ import IconResetSettings from '@/flow-chart/commons/components/IconResetSettings
 import IconDownload from '@/flow-chart/commons/components/IconDownload.vue';
 import { merge } from '@jsplumb/browser-ui';
 import { STEP_INDEX_HIGHLIGHT } from '@/flow-chart/commons/configs/commons';
+import IconImport from '@/flow-chart/commons/components/IconImport.vue';
 
 export default {
   name: 'FcToolbox',
   components: {
-    IconDownload, IconResetSettings, IconDelete, IconSave,
+    IconImport,
+    IconDownload,
+    IconResetSettings,
+    IconDelete,
+    IconSave,
   },
 
   inject: ['flowChartRef'],
 
   mounted() {
-    this.init();
+    this.initDnd();
   },
 
   data() {
@@ -184,38 +193,32 @@ export default {
   },
 
   methods: {
-    init() {
-      this.onFcReady(() => {
-        this.initDnd();
-        this.bindListeners();
-        this.options = this.flowChartRef.getOptions();
-      });
-    },
-
-    onFcReady(callback = () => ({})) {
-      this.flowChartRef.$on('ready', () => {
-        callback();
-      });
+    init(options) {
+      this.options = options;
+      this.bindListeners();
     },
 
     bindListeners() {
       const bizIdsBoxSelector = '.biz-ids-box';
 
       // click outside .biz-ids-box
-      window.addEventListener('click', (event) => {
-        const { target } = event;
-        const $target = jQuery(target);
+      const CLICK_EVENT = 'click.toolbox';
+      jQuery(window)
+        .off(CLICK_EVENT)
+        .on(CLICK_EVENT, (event) => {
+          const { target } = event;
+          const $target = jQuery(target);
 
-        if ($target.closest(bizIdsBoxSelector).length > 0) {
-          return;
-        }
+          if ($target.closest(bizIdsBoxSelector).length > 0) {
+            return;
+          }
 
-        if ($target.is(bizIdsBoxSelector)) {
-          return;
-        }
+          if ($target.is(bizIdsBoxSelector)) {
+            return;
+          }
 
-        this.bizIdsDropdownMenu.visible = false;
-      });
+          this.bizIdsDropdownMenu.visible = false;
+        });
 
       const { fc } = this.flowChartRef;
 
@@ -401,6 +404,23 @@ export default {
       const content = JSON.stringify(options, null, 2);
 
       download(filename, content);
+    },
+
+    importConfigFile(event) {
+      const [file] = event.target.files;
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const fileContent = reader.result;
+
+        const config = JSON.parse(fileContent);
+
+        this.flowChartRef.reset(config);
+      };
+
+      if (file) {
+        reader.readAsText(file);
+      }
     },
 
     changeNodeStepIndex() {

@@ -1,6 +1,6 @@
 <template>
   <div class="flow-chart-box">
-    <FcToolbox ref="toolbox" />
+    <FcToolbox ref="toolbox" v-if="toolbox" />
     <div class="flow-chart" ref="stage">
       <!--
        <div class="fc-line-ball"></div>
@@ -9,14 +9,9 @@
   </div>
 </template>
 <script>
+import clonedeep from 'lodash.clonedeep';
 import FcToolbox from '@/flow-chart/commons/components/FcToolbox.vue';
-import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/flow-chart/commons/configs/constants';
-import lodashMerge from 'lodash.merge';
 import { FlowChart } from './FlowChart';
-
-const EVENTS = {
-  READY: 'ready',
-};
 
 export default {
   name: 'FlowChart',
@@ -28,27 +23,61 @@ export default {
     };
   },
 
-  mounted() {
-    const options = this.getOptions();
+  props: {
+    options: {
+      required: true,
+    },
 
-    this.fc = new FlowChart(this.$refs.stage, options);
+    toolbox: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
-    this.$emit(EVENTS.READY, this.fc);
+  data() {
+    return {
+      fcOptions: {},
+    };
+  },
+
+  watch: {
+    options: {
+      immediate: true,
+      handler(options) {
+        if (options == null) {
+          return;
+        }
+
+        this.fcOptions = clonedeep(this.options);
+
+        this.destroy();
+
+        this.init();
+      },
+    },
   },
 
   methods: {
-    getOptions() {
-      const optionsStr = localStorage.getItem(STORE_KEY_OPTIONS);
+    init() {
+      this.fc = new FlowChart(this.$refs.stage, this.fcOptions);
 
-      if (!optionsStr) {
-        return DEFAULT_OPTIONS;
+      this.$refs.toolbox?.init(this.fc.getOptions());
+    },
+
+    destroy() {
+      if (!this.fc) {
+        return;
       }
 
-      let options = JSON.parse(optionsStr);
+      this.fc.destroy();
+    },
 
-      options = lodashMerge({}, DEFAULT_OPTIONS, options);
+    reset(options) {
+      this.destroy();
 
-      return options;
+      this.fcOptions = options;
+
+      this.init();
     },
   },
 };
