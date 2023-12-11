@@ -15,7 +15,11 @@ export default {
   },
 
   mounted() {
-    this.options = this.getOptions();
+    const options = this.getOptions();
+
+    options.highlight.value = -1;
+
+    this.options = options;
   },
 
   data() {

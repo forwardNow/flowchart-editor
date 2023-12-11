@@ -12,6 +12,7 @@
 import clonedeep from 'lodash.clonedeep';
 import FcToolbox from '@/flow-chart/commons/components/FcToolbox.vue';
 import { FlowChart } from './FlowChart';
+import './commons/styles/flow-chart.scss';
 
 export default {
   name: 'FlowChart',
