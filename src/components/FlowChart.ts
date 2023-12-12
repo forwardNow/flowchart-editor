@@ -144,7 +144,7 @@ export class FlowChart {
     }
   }
 
-  private createFcNode(fcNode: IFcNode) {
+  createFcNode(fcNode: IFcNode) {
     const {
       id,
       type,

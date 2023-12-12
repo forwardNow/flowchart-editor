@@ -130,7 +130,7 @@ import interact from 'interactjs';
 import IconSave from '@/commons/components/IconSave.vue';
 import {
   DEFAULT_OPTIONS,
-  EVENTS,
+  EVENTS, FC_CSS_CLASS_NAMES,
   STORE_KEY_OPTIONS,
 } from '@/commons/configs/constants';
 import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
@@ -138,7 +138,15 @@ import IconDelete from '@/commons/components/IconDelete.vue';
 import IconResetSettings from '@/commons/components/IconResetSettings.vue';
 import IconDownload from '@/commons/components/IconDownload.vue';
 import { merge } from '@jsplumb/browser-ui';
-import { STEP_INDEX_HIGHLIGHT } from '@/commons/configs/commons';
+import {
+  CIRCLE_NODE_TYPE,
+  DEFAULT_CIRCLE_NODE_CONTENT,
+  DEFAULT_DIAMOND_NODE_CONTENT,
+  DEFAULT_RECTANGLE_NODE_CONTENT,
+  DIAMOND_NODE_TYPE,
+  RECTANGLE_NODE_TYPE,
+  STEP_INDEX_HIGHLIGHT,
+} from '@/commons/configs/commons';
 import IconImport from '@/commons/components/IconImport.vue';
 
 export default {
@@ -280,6 +288,29 @@ export default {
           this.el.style.left = `${this.x}px`;
           this.el.style.top = `${this.y}px`;
         },
+        getFcNode() {
+          const { classList } = this.el;
+
+          let type = RECTANGLE_NODE_TYPE;
+          let content = DEFAULT_RECTANGLE_NODE_CONTENT;
+          const position = { x: this.x, y: this.y };
+
+          if (classList.contains(FC_CSS_CLASS_NAMES[CIRCLE_NODE_TYPE])) {
+            type = CIRCLE_NODE_TYPE;
+            content = DEFAULT_CIRCLE_NODE_CONTENT;
+          }
+
+          if (classList.contains(FC_CSS_CLASS_NAMES[DIAMOND_NODE_TYPE])) {
+            type = DIAMOND_NODE_TYPE;
+            content = DEFAULT_DIAMOND_NODE_CONTENT;
+          }
+
+          return { type, content, position };
+        },
+        destroy() {
+          toolbox.el.removeChild(this.el);
+          this.el = null;
+        },
       };
 
       const onStart = (event) => {
@@ -310,7 +341,7 @@ export default {
 
       const onEnd = () => {
         if (mirror.y < toolbox.height) {
-          toolbox.el.removeChild(mirror.el);
+          mirror.destroy();
           return;
         }
 
@@ -324,9 +355,9 @@ export default {
         mirror.x /= scale;
         mirror.y /= scale;
 
-        mirror.updatePosition();
+        this.flowChartRef.fc.createFcNode(mirror.getFcNode());
 
-        this.flowChartRef.fc.createFcNodeWithElement(mirror.el);
+        mirror.destroy();
       };
 
       interact('.fc-toolbox .fc-node')
