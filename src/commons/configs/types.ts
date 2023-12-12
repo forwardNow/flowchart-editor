@@ -3,7 +3,7 @@ import {
   FC_NODE_ANCHORS,
   FC_NODE_TYPES,
   STEP_INDEX_HIGHLIGHT,
-} from '@/flow-chart/commons/configs/commons';
+} from '@/commons/configs/commons';
 
 export type IFcNodeType = keyof typeof FC_NODE_TYPES;
 export type IFcAnchor = keyof typeof FC_NODE_ANCHORS;

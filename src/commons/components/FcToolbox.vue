@@ -127,19 +127,19 @@
 import jQuery from 'jquery';
 import lodashDebounce from 'lodash.debounce';
 import interact from 'interactjs';
-import IconSave from '@/flow-chart/commons/components/IconSave.vue';
+import IconSave from '@/commons/components/IconSave.vue';
 import {
   DEFAULT_OPTIONS,
   EVENTS,
   STORE_KEY_OPTIONS,
-} from '@/flow-chart/commons/configs/constants';
-import { showAlert, showConfirm, showSuccessToast } from '@/flow-chart/commons/utils/popup';
-import IconDelete from '@/flow-chart/commons/components/IconDelete.vue';
-import IconResetSettings from '@/flow-chart/commons/components/IconResetSettings.vue';
-import IconDownload from '@/flow-chart/commons/components/IconDownload.vue';
+} from '@/commons/configs/constants';
+import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
+import IconDelete from '@/commons/components/IconDelete.vue';
+import IconResetSettings from '@/commons/components/IconResetSettings.vue';
+import IconDownload from '@/commons/components/IconDownload.vue';
 import { merge } from '@jsplumb/browser-ui';
-import { STEP_INDEX_HIGHLIGHT } from '@/flow-chart/commons/configs/commons';
-import IconImport from '@/flow-chart/commons/components/IconImport.vue';
+import { STEP_INDEX_HIGHLIGHT } from '@/commons/configs/commons';
+import IconImport from '@/commons/components/IconImport.vue';
 
 export default {
   name: 'FcToolbox',
