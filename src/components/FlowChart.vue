@@ -10,9 +10,9 @@
 </template>
 <script>
 import clonedeep from 'lodash.clonedeep';
-import FcToolbox from '@/flow-chart/commons/components/FcToolbox.vue';
+import FcToolbox from '@/commons/components/FcToolbox.vue';
 import { FlowChart } from './FlowChart';
-import './commons/styles/flow-chart.scss';
+import '@/commons/styles/flow-chart.scss';
 
 export default {
   name: 'FlowChart',
@@ -33,6 +33,10 @@ export default {
       type: Boolean,
       default: false,
     },
+  },
+
+  beforeDestroy() {
+    this.destroy();
   },
 
   data() {

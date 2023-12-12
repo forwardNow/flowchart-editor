@@ -7,14 +7,14 @@ import {
   FlowchartConnector,
 } from '@jsplumb/browser-ui';
 
-import { IFcOptions } from '@/flow-chart/commons/configs/types';
+import { IFcOptions } from '@/commons/configs/types';
 
 import {
   CIRCLE_NODE_TYPE,
   DIAMOND_NODE_TYPE,
   RECTANGLE_NODE_TYPE,
   STEP_INDEX_HIGHLIGHT,
-} from '@/flow-chart/commons/configs/commons';
+} from '@/commons/configs/commons';
 
 export const STORE_KEY_OPTIONS = 'FC_OPTIONS';
 export const STEP_INDEX_ATTR_NAME = 'data-step-index';

@@ -31,7 +31,7 @@ import {
   IFcNode,
   IFcNodeType,
   IFcOptions,
-} from '@/flow-chart/commons/configs/types';
+} from '@/commons/configs/types';
 
 import {
   BIZ_IDS_HIGHLIGHT,
@@ -41,9 +41,9 @@ import {
   RECTANGLE_NODE_TYPE,
   STEP_INDEX_HIGHLIGHT,
   STEP_INDEX_HIGHLIGHT_DEFAULT_VALUE,
-} from '@/flow-chart/commons/configs/commons';
+} from '@/commons/configs/commons';
 
-import { toFixedNumber } from './commons/utils/number';
+import { toFixedNumber } from '@/commons/utils/number';
 
 import {
   BIZ_ID_ATTR_NAME,
@@ -59,7 +59,7 @@ import {
   NODE_SKELETON_HTML_RENDER,
   SORT_ATTR_NAME,
   STEP_INDEX_ATTR_NAME,
-} from './commons/configs/constants';
+} from '@/commons/configs/constants';
 
 export type IJQuery = JQuery<HTMLElement>;
 
