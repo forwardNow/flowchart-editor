@@ -1,13 +1,11 @@
 <template>
   <div class="page-editor">
-    <FlowChart :options="options" toolbox />
+    <FlowChart :options="options" toolbox ref="flowchart"/>
   </div>
 </template>
 <script>
 /* eslint-disable object-curly-newline */
 import FlowChart from '@/components/FlowChart.vue';
-import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
-import lodashMerge from 'lodash.merge';
 
 export default {
   components: {
@@ -26,17 +24,7 @@ export default {
 
   methods: {
     getOptions() {
-      const optionsStr = localStorage.getItem(STORE_KEY_OPTIONS);
-
-      if (!optionsStr) {
-        return DEFAULT_OPTIONS;
-      }
-
-      let options = JSON.parse(optionsStr);
-
-      options = lodashMerge({}, DEFAULT_OPTIONS, options);
-
-      return options;
+      return this.$refs.flowchart.getOptionsInLocalStorage();
     },
   },
 };
