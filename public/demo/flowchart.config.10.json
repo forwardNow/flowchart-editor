@@ -1,0 +1,497 @@
+{
+  "node": {
+    "endpoint": {
+      "show": false
+    }
+  },
+  "highlight": {
+    "type": "STEP_INDEX",
+    "value": 4
+  },
+  "stage": {
+    "scale": {
+      "value": 0.7,
+      "step": 0.1,
+      "min": 0.5,
+      "max": 2
+    },
+    "offset": {
+      "x": -660.5,
+      "y": 239.5
+    }
+  },
+  "config": {
+    "nodes": [
+      {
+        "id": "89892986-f61e-46f6-bfae-a40f8495373b",
+        "bizId": "01",
+        "type": "Circle",
+        "content": "开始",
+        "text": "开始",
+        "position": {
+          "x": 630,
+          "y": -158
+        },
+        "stepIndex": 0,
+        "sort": 1
+      },
+      {
+        "id": "25f3232b-ad55-4946-af41-758e42c35369",
+        "bizId": "02",
+        "type": "Rectangle",
+        "content": "函证登记",
+        "text": "函证登记",
+        "position": {
+          "x": 763,
+          "y": -158
+        },
+        "stepIndex": 0,
+        "sort": 2
+      },
+      {
+        "id": "09e8e42a-366c-4fde-a802-6dc0c71139fa",
+        "bizId": "03",
+        "type": "Rectangle",
+        "content": "影像上传<div>（状态：影像扫描）</div>",
+        "text": "影像上传（状态：影像扫描）",
+        "position": {
+          "x": 763,
+          "y": -61
+        },
+        "stepIndex": 1,
+        "sort": 3
+      },
+      {
+        "id": "fe956d8b-b545-46b7-9db3-3bf375e82b7f",
+        "bizId": "04",
+        "type": "Rectangle",
+        "content": "验证<div>（状态：验证）</div>",
+        "text": "验证（状态：验证）",
+        "position": {
+          "x": 763,
+          "y": 26
+        },
+        "stepIndex": 2,
+        "sort": 3
+      },
+      {
+        "id": "e3aa8a27-f08a-463e-966a-667278c588f0",
+        "bizId": "05",
+        "type": "Rectangle",
+        "content": "缴费<div>（状态：缴费）</div>",
+        "text": "缴费（状态：缴费）",
+        "position": {
+          "x": 763,
+          "y": 106
+        },
+        "stepIndex": 3,
+        "sort": 5
+      },
+      {
+        "id": "bde910ca-a586-4486-b35a-fb552aef3c46",
+        "bizId": "06",
+        "type": "Rectangle",
+        "content": "分发<div>（状态：分发）</div>",
+        "text": "分发（状态：分发）",
+        "position": {
+          "x": 763,
+          "y": 191
+        },
+        "stepIndex": 4,
+        "sort": 6
+      },
+      {
+        "id": "6218f40b-4f1b-45f5-96c4-59b5a715f093",
+        "bizId": "07",
+        "type": "Diamond",
+        "content": "是否分发",
+        "text": "是否分发",
+        "position": {
+          "x": 931,
+          "y": 170
+        },
+        "stepIndex": 4,
+        "sort": 7
+      },
+      {
+        "id": "d1080442-9fd0-41aa-8138-bc895bcd1f8d",
+        "bizId": "08",
+        "type": "Rectangle",
+        "content": "生成回函文件<div>（状态：分发）</div>",
+        "text": "生成回函文件（状态：分发）",
+        "position": {
+          "x": 1139,
+          "y": 192
+        },
+        "stepIndex": 4,
+        "sort": 8
+      },
+      {
+        "id": "ab5645a8-1a74-438a-bd00-437d7e70cbc8",
+        "bizId": "09",
+        "type": "Rectangle",
+        "content": "文档复核<div>（状态：文档复核）</div>",
+        "text": "文档复核（状态：文档复核）",
+        "position": {
+          "x": 1369,
+          "y": 192
+        },
+        "stepIndex": 5,
+        "sort": 9
+      },
+      {
+        "id": "6b3f971d-185c-4ab3-b0fd-803685b2f6c6",
+        "bizId": "10",
+        "type": "Diamond",
+        "content": "复核操作",
+        "text": "复核操作",
+        "position": {
+          "x": 1535,
+          "y": 171
+        },
+        "stepIndex": 5,
+        "sort": 10
+      },
+      {
+        "id": "37114de2-7706-4744-ab3a-37f039dc19a9",
+        "bizId": "11",
+        "type": "Rectangle",
+        "content": "分发审核<div>(状态：分发)</div>",
+        "text": "分发审核(状态：分发)",
+        "position": {
+          "x": 1013,
+          "y": -158
+        },
+        "stepIndex": 4,
+        "sort": 11
+      },
+      {
+        "id": "0c173988-a946-43ae-ad79-a6b169d58bab",
+        "bizId": "12",
+        "type": "Diamond",
+        "content": "审核操作",
+        "text": "审核操作",
+        "position": {
+          "x": 1183,
+          "y": -179
+        },
+        "stepIndex": 4,
+        "sort": 12
+      },
+      {
+        "id": "804d5a99-37bc-4ec6-9c85-81b1e8cf6383",
+        "bizId": "13",
+        "type": "Rectangle",
+        "content": "分发复核<div>（状态：分发）</div>",
+        "text": "分发复核（状态：分发）",
+        "position": {
+          "x": 1338,
+          "y": -158
+        },
+        "stepIndex": 4,
+        "sort": 13
+      },
+      {
+        "id": "eb01071a-8d96-4a22-9ecb-c7f73269fd4c",
+        "bizId": "14",
+        "type": "Diamond",
+        "content": "复核操作",
+        "text": "复核操作",
+        "position": {
+          "x": 1647.75,
+          "y": -179.25
+        },
+        "stepIndex": 0,
+        "sort": 14
+      },
+      {
+        "id": "cbdd3f6c-a869-43d1-a427-8d6f2c812828",
+        "bizId": "15",
+        "type": "Rectangle",
+        "content": "用印<div>(状态：用印)</div>",
+        "text": "用印(状态：用印)",
+        "position": {
+          "x": 1675,
+          "y": 192
+        },
+        "stepIndex": 6,
+        "sort": 15
+      },
+      {
+        "id": "7a606095-5831-40f7-a779-869697a705ad",
+        "bizId": "16",
+        "type": "Rectangle",
+        "content": "回函<div>(状态：回函)</div>",
+        "text": "回函(状态：回函)",
+        "position": {
+          "x": 1833,
+          "y": 192
+        },
+        "stepIndex": 7,
+        "sort": 16
+      },
+      {
+        "id": "10dfd099-7b61-4364-b6e6-a7868c0422a4",
+        "bizId": "17",
+        "type": "Diamond",
+        "content": "回函操作",
+        "text": "回函操作",
+        "position": {
+          "x": 1992,
+          "y": 171
+        },
+        "stepIndex": 7,
+        "sort": 17
+      },
+      {
+        "id": "87ada6b6-3792-4fcb-8264-943c2ab9b662",
+        "bizId": "18",
+        "type": "Rectangle",
+        "content": "正常回函<div>(状态：已回函)</div>",
+        "text": "正常回函(状态：已回函)",
+        "position": {
+          "x": 2138,
+          "y": 192
+        },
+        "stepIndex": 8,
+        "sort": 18
+      },
+      {
+        "id": "1a92866f-58b1-4ccc-8fd7-2c2489be22ad",
+        "bizId": "19",
+        "type": "Rectangle",
+        "content": "异常回函<div>(状态：已回函)</div>",
+        "text": "异常回函(状态：已回函)",
+        "position": {
+          "x": 1972,
+          "y": 392
+        },
+        "stepIndex": 8,
+        "sort": 19
+      },
+      {
+        "id": "a4ba4df4-92b1-4d93-813e-f0664dd865d2",
+        "bizId": "20",
+        "type": "Circle",
+        "content": "结束",
+        "text": "结束",
+        "position": {
+          "x": 2313,
+          "y": 192
+        },
+        "stepIndex": 8,
+        "sort": 20
+      }
+    ],
+    "connections": [
+      {
+        "type": "Flowchart",
+        "sourceId": "bde910ca-a586-4486-b35a-fb552aef3c46",
+        "sourceAnchor": "Right",
+        "targetId": "6218f40b-4f1b-45f5-96c4-59b5a715f093",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "d1080442-9fd0-41aa-8138-bc895bcd1f8d",
+        "sourceAnchor": "Right",
+        "targetId": "ab5645a8-1a74-438a-bd00-437d7e70cbc8",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "ab5645a8-1a74-438a-bd00-437d7e70cbc8",
+        "sourceAnchor": "Right",
+        "targetId": "6b3f971d-185c-4ab3-b0fd-803685b2f6c6",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "6b3f971d-185c-4ab3-b0fd-803685b2f6c6",
+        "sourceAnchor": "Right",
+        "targetId": "cbdd3f6c-a869-43d1-a427-8d6f2c812828",
+        "targetAnchor": "Left",
+        "label": "通过"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "cbdd3f6c-a869-43d1-a427-8d6f2c812828",
+        "sourceAnchor": "Right",
+        "targetId": "7a606095-5831-40f7-a779-869697a705ad",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "7a606095-5831-40f7-a779-869697a705ad",
+        "sourceAnchor": "Right",
+        "targetId": "10dfd099-7b61-4364-b6e6-a7868c0422a4",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "87ada6b6-3792-4fcb-8264-943c2ab9b662",
+        "sourceAnchor": "Right",
+        "targetId": "a4ba4df4-92b1-4d93-813e-f0664dd865d2",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "6218f40b-4f1b-45f5-96c4-59b5a715f093",
+        "sourceAnchor": "Top",
+        "targetId": "37114de2-7706-4744-ab3a-37f039dc19a9",
+        "targetAnchor": "Left",
+        "label": "分发"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "37114de2-7706-4744-ab3a-37f039dc19a9",
+        "sourceAnchor": "Right",
+        "targetId": "0c173988-a946-43ae-ad79-a6b169d58bab",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "0c173988-a946-43ae-ad79-a6b169d58bab",
+        "sourceAnchor": "Right",
+        "targetId": "804d5a99-37bc-4ec6-9c85-81b1e8cf6383",
+        "targetAnchor": "Left",
+        "label": "是"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "804d5a99-37bc-4ec6-9c85-81b1e8cf6383",
+        "sourceAnchor": "Right",
+        "targetId": "eb01071a-8d96-4a22-9ecb-c7f73269fd4c",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "6b3f971d-185c-4ab3-b0fd-803685b2f6c6",
+        "sourceAnchor": "Bottom",
+        "targetId": "d1080442-9fd0-41aa-8138-bc895bcd1f8d",
+        "targetAnchor": "Bottom",
+        "label": "不通过"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "10dfd099-7b61-4364-b6e6-a7868c0422a4",
+        "sourceAnchor": "Right",
+        "targetId": "87ada6b6-3792-4fcb-8264-943c2ab9b662",
+        "targetAnchor": "Left",
+        "label": "正常回函"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "1a92866f-58b1-4ccc-8fd7-2c2489be22ad",
+        "sourceAnchor": "Right",
+        "targetId": "a4ba4df4-92b1-4d93-813e-f0664dd865d2",
+        "targetAnchor": "Bottom",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "eb01071a-8d96-4a22-9ecb-c7f73269fd4c",
+        "sourceAnchor": "Bottom",
+        "targetId": "37114de2-7706-4744-ab3a-37f039dc19a9",
+        "targetAnchor": "Bottom",
+        "label": "复核不通过"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "eb01071a-8d96-4a22-9ecb-c7f73269fd4c",
+        "sourceAnchor": "Right",
+        "targetId": "d1080442-9fd0-41aa-8138-bc895bcd1f8d",
+        "targetAnchor": "Top",
+        "label": "通过"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "6218f40b-4f1b-45f5-96c4-59b5a715f093",
+        "sourceAnchor": "Right",
+        "targetId": "d1080442-9fd0-41aa-8138-bc895bcd1f8d",
+        "targetAnchor": "Left",
+        "label": "不分发"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "10dfd099-7b61-4364-b6e6-a7868c0422a4",
+        "sourceAnchor": "Bottom",
+        "targetId": "1a92866f-58b1-4ccc-8fd7-2c2489be22ad",
+        "targetAnchor": "Top",
+        "label": "异常回函"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "25f3232b-ad55-4946-af41-758e42c35369",
+        "sourceAnchor": "Bottom",
+        "targetId": "09e8e42a-366c-4fde-a802-6dc0c71139fa",
+        "targetAnchor": "Top",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "89892986-f61e-46f6-bfae-a40f8495373b",
+        "sourceAnchor": "Right",
+        "targetId": "25f3232b-ad55-4946-af41-758e42c35369",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "09e8e42a-366c-4fde-a802-6dc0c71139fa",
+        "sourceAnchor": "Bottom",
+        "targetId": "fe956d8b-b545-46b7-9db3-3bf375e82b7f",
+        "targetAnchor": "Top",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "fe956d8b-b545-46b7-9db3-3bf375e82b7f",
+        "sourceAnchor": "Bottom",
+        "targetId": "e3aa8a27-f08a-463e-966a-667278c588f0",
+        "targetAnchor": "Top",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "e3aa8a27-f08a-463e-966a-667278c588f0",
+        "sourceAnchor": "Bottom",
+        "targetId": "bde910ca-a586-4486-b35a-fb552aef3c46",
+        "targetAnchor": "Top",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "09e8e42a-366c-4fde-a802-6dc0c71139fa",
+        "sourceAnchor": "Left",
+        "targetId": "1a92866f-58b1-4ccc-8fd7-2c2489be22ad",
+        "targetAnchor": "Left",
+        "label": "异常回函"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "fe956d8b-b545-46b7-9db3-3bf375e82b7f",
+        "sourceAnchor": "Left",
+        "targetId": "1a92866f-58b1-4ccc-8fd7-2c2489be22ad",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "e3aa8a27-f08a-463e-966a-667278c588f0",
+        "sourceAnchor": "Left",
+        "targetId": "1a92866f-58b1-4ccc-8fd7-2c2489be22ad",
+        "targetAnchor": "Left",
+        "label": ""
+      }
+    ]
+  }
+}
