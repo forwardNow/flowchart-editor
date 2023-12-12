@@ -382,7 +382,7 @@ export default {
 
       localStorage.setItem(STORE_KEY_OPTIONS, JSON.stringify(options));
 
-      showSuccessToast('保存成功!');
+      showSuccessToast(`保存成功! 查看 localStorage.getItem("${STORE_KEY_OPTIONS}")`);
     },
 
     remove() {
