@@ -35,6 +35,10 @@ export default {
     },
   },
 
+  beforeDestroy() {
+    this.destroy();
+  },
+
   data() {
     return {
       fcOptions: {},
