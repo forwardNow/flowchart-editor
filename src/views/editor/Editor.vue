@@ -17,8 +17,6 @@ export default {
   mounted() {
     const options = this.getOptions();
 
-    options.highlight.value = -1;
-
     this.options = options;
   },
 

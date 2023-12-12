@@ -62,7 +62,9 @@ export default {
     init() {
       this.fc = new FlowChart(this.$refs.stage, this.fcOptions);
 
-      this.$refs.toolbox?.init(this.fc.getOptions());
+      if (this.$refs.toolbox) {
+        this.$refs.toolbox.init(this.fc.getOptions());
+      }
     },
 
     destroy() {
