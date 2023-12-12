@@ -11,7 +11,7 @@ module.exports = defineConfig({
     plugins: [
       IS_PROD ? new CopyPlugin({
         patterns: [
-          'public/demo',
+          { from: 'public/demo', to: 'demo' },
         ],
       }) : null,
     ].filter(Boolean),
