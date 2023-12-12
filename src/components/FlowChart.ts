@@ -17,9 +17,11 @@ import jQuery from 'jquery';
 import throttle from 'lodash.throttle';
 
 import {
-  AnchorLocations, BlankEndpoint,
+  AnchorLocations,
+  BlankEndpoint,
   BrowserJsPlumbInstance,
-  Connection as JsPlumbConnection, DotEndpoint,
+  Connection as JsPlumbConnection,
+  DotEndpoint,
   LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
@@ -54,7 +56,8 @@ import {
   EVENT_NAMESPACE,
   EVENTS,
   FC_CONNECTION_TYPE,
-  FC_CSS_CLASS_NAMES, JS_PLUMB_DEFAULTS,
+  FC_CSS_CLASS_NAMES,
+  JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
   SORT_ATTR_NAME,
@@ -144,7 +147,7 @@ export class FlowChart {
     }
   }
 
-  private createFcNode(fcNode: IFcNode) {
+  createFcNode(fcNode: IFcNode) {
     const {
       id,
       type,

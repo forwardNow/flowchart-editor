@@ -11,8 +11,10 @@
 <script>
 import clonedeep from 'lodash.clonedeep';
 import FcToolbox from '@/commons/components/FcToolbox.vue';
-import { FlowChart } from './FlowChart';
 import '@/commons/styles/flow-chart.scss';
+import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
+import lodashMerge from 'lodash.merge';
+import { FlowChart } from '@/components/FlowChart';
 
 export default {
   name: 'FlowChart',
@@ -85,6 +87,20 @@ export default {
       this.fcOptions = options;
 
       this.init();
+    },
+
+    getOptionsInLocalStorage() {
+      const optionsStr = localStorage.getItem(STORE_KEY_OPTIONS);
+
+      if (!optionsStr) {
+        return DEFAULT_OPTIONS;
+      }
+
+      let options = JSON.parse(optionsStr);
+
+      options = lodashMerge({}, DEFAULT_OPTIONS, options);
+
+      return options;
     },
   },
 };

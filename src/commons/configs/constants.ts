@@ -17,14 +17,20 @@ import {
 } from '@/commons/configs/commons';
 
 export const STORE_KEY_OPTIONS = 'FC_OPTIONS';
+
 export const STEP_INDEX_ATTR_NAME = 'data-step-index';
-export const DEFAULT_STEP_INDEX_ATTR_VALUE = '0';
+export const DEFAULT_STEP_INDEX_ATTR_VALUE = 0;
+
 export const BIZ_ID_ATTR_NAME = 'data-biz-id';
 export const DEFAULT_BIZ_ID_ATTR_VALUE = '';
+
 export const SORT_ATTR_NAME = 'data-sort';
-export const DEFAULT_SORT_ATTR_VALUE = '1';
+export const DEFAULT_SORT_ATTR_VALUE = 1;
+
 export const FC_CONNECTION_TYPE = FlowchartConnector.type;
+
 export const EVENT_NAMESPACE = 'fc';
+
 export const DEFAULT_OPTIONS: Required<IFcOptions> = {
   node: {
     endpoint: {
