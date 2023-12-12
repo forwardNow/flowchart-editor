@@ -12,7 +12,16 @@ node.js 16.x
 
 ## 3. 使用
 
-### 3.1. 编译打包
+### 3.1. 安装
+
+```shell
+# switch to project root directory
+cd flowchart-editor
+
+npm i
+```
+
+### 3.2. 编译打包
 
 命令：
 
@@ -36,7 +45,7 @@ flowchart-editor/
 ```
 
 
-### 3.2. 在浏览器中使用
+### 3.3. 在浏览器中使用
 
 参考: [public/demo/index.html](./public/demo/index.html) 
 
@@ -83,7 +92,7 @@ flowchart-editor/
 </script>
 ```
 
-### 3.3. 在 webpack 中使用
+### 3.4. 在 webpack 中使用
 
 目录：
 
