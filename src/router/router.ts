@@ -8,17 +8,17 @@ export const routes: Array<RouteConfig> = [
   {
     path: '/',
     redirect: '/home',
-    meta: { display: false, title: '', description: '' },
+    meta: { display: false },
   },
   {
     path: '/home',
     component: () => import('../views/home/Home.vue'),
-    meta: { display: false, title: '首页', description: '卡片列表' },
+    meta: { display: false },
   },
   {
     path: '/ui',
     component: UI,
-    meta: { title: 'UI设计', description: '界面样式，包括舞台样式、节点样式' },
+    meta: { title: 'UI设计', description: '节点样式设计' },
   },
 ];
 

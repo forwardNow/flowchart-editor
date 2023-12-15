@@ -12,18 +12,11 @@
   </div>
 </template>
 <script>
-import { routes } from '@/router/router';
-
 export default {
-  data() {
-    return {
-      routes,
-    };
-  },
 
   computed: {
     cards() {
-      return this.routes
+      return this.$router.getRoutes()
         .map((route) => {
           const { path, meta: { title, description, display } } = route;
           return {
@@ -53,7 +46,7 @@ export default {
     height: 120px;
 
     border: solid 1px #ddd;
-    border-radius: 6px;
+    border-radius: 4px;
 
     text-decoration: none;
   }
