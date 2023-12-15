@@ -20,6 +20,11 @@ export const routes: Array<RouteConfig> = [
     component: UI,
     meta: { title: 'UI设计', description: '节点样式设计' },
   },
+  {
+    path: '/node/manage',
+    component: () => import('../views/node/NodeManage.vue'),
+    meta: { title: 'node-注册节点', description: '将节点纳入 jsPlumb 管理' },
+  },
 ];
 
 const router = new VueRouter({

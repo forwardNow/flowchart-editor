@@ -158,11 +158,15 @@ $fc-node-base-border-width: 1px;
 .stage-demo {
   position: relative;
   margin: 20px;
-  width: 600px;
+  width: 800px;
   height: 400px;
   border: 1px solid #a2a2a2;
-  border-radius: 4px;
+  border-radius: 3px;
   background-color: #f5f5f5;
   overflow: hidden;
+
+  .fc-node {
+    position: absolute;
+  }
 }
 </style>
