@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
+import UI from '../views/ui/UI.vue';
 
 Vue.use(VueRouter);
 
@@ -16,38 +17,8 @@ export const routes: Array<RouteConfig> = [
   },
   {
     path: '/ui',
-    component: () => import('../views/ui/UI.vue'),
+    component: UI,
     meta: { title: 'UI设计', description: '界面样式，包括舞台样式、节点样式' },
-  },
-  {
-    path: '/dnd/basic',
-    component: () => import('../views/dnd/DndBasic.vue'),
-    meta: { title: 'DND-基础', description: '使用 interactjs 完成拖拽组件到画布上' },
-  },
-  {
-    path: '/basic/register',
-    component: () => import('../views/basic/Register.vue'),
-    meta: { title: '注册元素', description: '将元素纳入 jsPlumb 管理' },
-  },
-  {
-    path: '/basic/connector',
-    component: () => import('../views/basic/Connector.vue'),
-    meta: { title: '连接元素', description: '连接两个元素' },
-  },
-  {
-    path: '/basic/select',
-    component: () => import('../views/basic/Select.vue'),
-    meta: { title: '查询元素', description: '查询所有的连接线' },
-  },
-  {
-    path: '/editor/simple',
-    component: () => import('../views/editor/SimpleEditor.vue'),
-    meta: { title: '简单编辑器', description: '通过拖拽完成界面。无法保存数据' },
-  },
-  {
-    path: '/editor/editor',
-    component: () => import('../views/editor/Editor.vue'),
-    meta: { title: '编辑器', description: '通过拖拽完成界面。可保存数据' },
   },
 ];
 

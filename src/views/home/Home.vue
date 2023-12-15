@@ -12,7 +12,7 @@
   </div>
 </template>
 <script>
-import { routes } from '../../router/router';
+import { routes } from '@/router/router';
 
 export default {
   data() {
