@@ -31,6 +31,8 @@
 
   </div>
 </template>
+
+<!-- fc-ui -->
 <style lang="scss">
 .fc-ui {
   display: flex;
@@ -48,6 +50,8 @@
   }
 }
 </style>
+
+<!-- fc-node -->
 <style lang="scss">
 $color-primary: #026dff;
 
@@ -115,6 +119,8 @@ $fc-node-base-border-width: 1px;
   }
 }
 </style>
+
+<!-- fc-node-plain -->
 <style lang="scss">
 .fc-node-plain {
   display: flex;
@@ -144,5 +150,19 @@ $fc-node-base-border-width: 1px;
     width: 16px;
     transform: rotate(45deg);
   }
+}
+</style>
+
+<!-- stage-demo -->
+<style lang="scss">
+.stage-demo {
+  position: relative;
+  margin: 20px;
+  width: 600px;
+  height: 400px;
+  border: 1px solid #a2a2a2;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  overflow: hidden;
 }
 </style>
