@@ -130,7 +130,7 @@ import interact from 'interactjs';
 import IconSave from '@/components/icons/IconSave.vue';
 import {
   DEFAULT_OPTIONS,
-  EVENTS, FC_CSS_CLASS_NAMES,
+  EVENTS, EXPORTED_FILE_NAME, FC_CSS_CLASS_NAMES,
   STORE_KEY_OPTIONS,
 } from '@/commons/configs/constants';
 import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
@@ -194,7 +194,7 @@ export default {
       },
 
       bizIdsDropdownMenu: {
-        visible: true,
+        visible: false,
         fcNodes: [],
       },
     };
@@ -431,10 +431,9 @@ export default {
 
       options.config = fc.getFlowChartConfig();
 
-      const filename = 'flowchart.config.json';
       const content = JSON.stringify(options, null, 2);
 
-      download(filename, content);
+      download(EXPORTED_FILE_NAME, content);
     },
 
     importConfigFile(event) {
@@ -499,20 +498,17 @@ export default {
     },
 
     changeHighlightValue() {
-      const { fc } = this.flowChartRef;
-
       const {
         highlight: { type, value },
       } = this.options;
 
       if (type === STEP_INDEX_HIGHLIGHT) {
-        fc.setCurrentStepIndex(Number(value));
+        this.flowChartRef.fc.setCurrentStepIndex(Number(value));
       }
     },
 
     changeVisibleOfEndpoints() {
-      const { fc } = this.flowChartRef;
-      fc.setVisibleOfEndpoints(this.options.node.endpoint.show);
+      this.flowChartRef.fc.setVisibleOfEndpoints(this.options.node.endpoint.show);
     },
 
     handleClickBizIdsInput() {

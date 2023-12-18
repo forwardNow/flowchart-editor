@@ -33,6 +33,8 @@ export const EVENT_NAMESPACE = 'fc';
 
 export const CONTENT_EDITABLE_ATTR_NAME = 'contenteditable';
 
+export const EXPORTED_FILE_NAME = 'flowchart.config.json';
+
 export const DEFAULT_OPTIONS: Required<IFcOptions> = {
   node: {
     endpoint: {
