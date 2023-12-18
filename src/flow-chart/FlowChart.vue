@@ -1,8 +1,8 @@
 <template>
   <div class="flow-chart-box">
-    <FcToolbox ref="toolbox" v-if="toolbox" />
+    <FcToolbox v-if="toolbox" ref="toolbox" />
 
-    <FcControls />
+    <FcControls v-if="controls" ref="controls" />
 
     <div class="flow-chart" ref="stage">
       <!--
@@ -18,10 +18,11 @@ import '@/commons/styles/flow-chart.scss';
 import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
 import lodashMerge from 'lodash.merge';
 import { FlowChart } from '@/flow-chart/FlowChart';
+import FcControls from '@/components/FcControls.vue';
 
 export default {
   name: 'FlowChart',
-  components: { FcToolbox },
+  components: { FcControls, FcToolbox },
 
   provide() {
     return {
@@ -37,6 +38,11 @@ export default {
     toolbox: {
       type: Boolean,
       default: false,
+    },
+
+    controls: {
+      type: Boolean,
+      default: true,
     },
   },
 
@@ -70,7 +76,16 @@ export default {
   methods: {
     init() {
       this.fc = new FlowChart(this.$refs.stage, this.fcOptions);
-      this.$refs.toolbox?.init(this.fc.getOptions());
+
+      const options = this.fc.getOptions();
+
+      if (this.toolbox) {
+        this.$refs.toolbox?.init(options);
+      }
+
+      if (this.controls) {
+        this.$refs.controls?.init(options);
+      }
     },
 
     destroy() {

@@ -1,10 +1,13 @@
 <template>
   <div class="page-editor">
-    <FlowChart :options="options" toolbox ref="flowchart"/>
+    <FlowChart
+      :options="options"
+      :toolbox="false"
+      ref="flowchart"
+    />
   </div>
 </template>
 <script>
-/* eslint-disable object-curly-newline */
 import FlowChart from '@/flow-chart/FlowChart.vue';
 
 export default {
@@ -32,6 +35,7 @@ export default {
 <style lang="scss">
 .page-editor {
   height: 200vh;
+
   .flow-chart-box {
     width: 100vw;
     height: 100vh;

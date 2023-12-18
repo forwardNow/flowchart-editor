@@ -55,7 +55,7 @@ export interface IFcOptions {
       min: number,
       max: number,
 
-      // `滚轮 + Alt` 触发缩放
+      // 鼠标滚轮滚动时，是否需要按住 Alt 键
       wheelWithAlt: boolean,
     },
     offset: { x: number, y: number }

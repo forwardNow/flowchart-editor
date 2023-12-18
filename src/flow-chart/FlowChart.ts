@@ -325,8 +325,6 @@ export class FlowChart {
   private onClickNode($fcNode: IJQuery) {
     this.addSelectedCssClass($fcNode);
 
-    // this.showLineBalls($fcNode);
-
     // add skeleton element
     const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
 
@@ -547,31 +545,6 @@ export class FlowChart {
     }
 
     $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
-  }
-
-  showLineBalls($fcNode: IJQuery) {
-    const el = $fcNode.get(0) as HTMLElement;
-
-    const jsplumbConnections = this.jsPlumbInstance.getConnections({ source: el }) as IJsPlumbConnection[];
-
-    for (let i = 0, len = jsplumbConnections.length; i < len; i += 1) {
-      const jsplumbConnection = jsplumbConnections[i];
-
-      const { connector } = jsplumbConnection;
-      const svgElement = (connector as any).canvas as SVGElement;
-
-      const path = this.jsPlumbInstance.getPathData(connector);
-      const position: JQuery.Coordinates = jQuery(svgElement).position();
-
-      this.$stage
-        .find('.fc-line-ball')
-        .show()
-        .css({
-          left: position.left,
-          top: position.top,
-          'offset-path': `path('${path}')`,
-        });
-    }
   }
 
   private addSelectedCssClass($el: IJQuery) {

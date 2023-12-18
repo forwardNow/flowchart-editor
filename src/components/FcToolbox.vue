@@ -201,6 +201,7 @@ export default {
   },
 
   methods: {
+    // invoke by FlowChart.vue
     init(options) {
       this.options = options;
       this.bindListeners();
