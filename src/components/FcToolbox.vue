@@ -127,16 +127,16 @@
 import jQuery from 'jquery';
 import lodashDebounce from 'lodash.debounce';
 import interact from 'interactjs';
-import IconSave from '@/components/IconSave.vue';
+import IconSave from '@/components/icons/IconSave.vue';
 import {
   DEFAULT_OPTIONS,
   EVENTS, FC_CSS_CLASS_NAMES,
   STORE_KEY_OPTIONS,
 } from '@/commons/configs/constants';
 import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
-import IconDelete from '@/components/IconDelete.vue';
-import IconResetSettings from '@/components/IconResetSettings.vue';
-import IconDownload from '@/components/IconDownload.vue';
+import IconDelete from '@/components/icons/IconDelete.vue';
+import IconResetSettings from '@/components/icons/IconResetSettings.vue';
+import IconDownload from '@/components/icons/IconDownload.vue';
 import { merge } from '@jsplumb/browser-ui';
 import {
   CIRCLE_NODE_TYPE,
@@ -147,7 +147,7 @@ import {
   RECTANGLE_NODE_TYPE,
   STEP_INDEX_HIGHLIGHT,
 } from '@/commons/configs/commons';
-import IconImport from '@/components/IconImport.vue';
+import IconImport from '@/components/icons/IconImport.vue';
 
 export default {
   name: 'FcToolbox',

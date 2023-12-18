@@ -1,6 +1,9 @@
 <template>
   <div class="flow-chart-box">
     <FcToolbox ref="toolbox" v-if="toolbox" />
+
+    <FcControls />
+
     <div class="flow-chart" ref="stage">
       <!--
        <div class="fc-line-ball"></div>
