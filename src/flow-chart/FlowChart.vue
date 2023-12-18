@@ -10,11 +10,11 @@
 </template>
 <script>
 import clonedeep from 'lodash.clonedeep';
-import FcToolbox from '@/commons/components/FcToolbox.vue';
+import FcToolbox from '@/components/FcToolbox.vue';
 import '@/commons/styles/flow-chart.scss';
 import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
 import lodashMerge from 'lodash.merge';
-import { FlowChart } from '@/components/FlowChart';
+import { FlowChart } from '@/flow-chart/FlowChart';
 
 export default {
   name: 'FlowChart',

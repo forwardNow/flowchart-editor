@@ -5,7 +5,7 @@
 </template>
 <script>
 /* eslint-disable object-curly-newline */
-import FlowChart from '@/components/FlowChart.vue';
+import FlowChart from '@/flow-chart/FlowChart.vue';
 
 export default {
   components: {
