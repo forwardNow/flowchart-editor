@@ -49,6 +49,7 @@ export const DEFAULT_OPTIONS: Required<IFcOptions> = {
       step: 0.1,
       min: 0.5,
       max: 2,
+      wheelWithAlt: true,
     },
     offset: {
       x: 0,

@@ -368,6 +368,12 @@ export class FlowChart {
     const mousewheelHandler = (event: JQuery.TriggeredEvent) => {
       event.stopPropagation();
 
+      if (this.options.stage.scale.wheelWithAlt && !event.altKey) {
+        return;
+      }
+
+      event.preventDefault();
+
       const wheelEvent = event.originalEvent as WheelEvent;
       const { deltaY } = wheelEvent;
 

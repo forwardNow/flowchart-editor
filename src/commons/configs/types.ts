@@ -54,6 +54,8 @@ export interface IFcOptions {
       step: number,
       min: number,
       max: number,
+      // `滚轮 + Alt` 触发缩放
+      wheelWithAlt: boolean,
     },
     offset: { x: number, y: number }
   },
