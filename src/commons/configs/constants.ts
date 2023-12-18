@@ -31,6 +31,8 @@ export const FC_CONNECTION_TYPE = FlowchartConnector.type;
 
 export const EVENT_NAMESPACE = 'fc';
 
+export const CONTENT_EDITABLE_ATTR_NAME = 'contenteditable';
+
 export const DEFAULT_OPTIONS: Required<IFcOptions> = {
   node: {
     endpoint: {
@@ -101,6 +103,7 @@ export const EVENTS = {
   MOUSEDOWN: `mousedown.${EVENT_NAMESPACE}`,
   DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
   BLUR: `blur.${EVENT_NAMESPACE}`,
+  FOCUS: `focus.${EVENT_NAMESPACE}`,
   WHEEL: `wheel.${EVENT_NAMESPACE}`,
   MOUSEOVER: `mouseover.${EVENT_NAMESPACE}`,
   MOUSELEAVE: `mouseleave.${EVENT_NAMESPACE}`,

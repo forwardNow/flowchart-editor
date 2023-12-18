@@ -48,7 +48,7 @@ import {
 import { toFixedNumber } from '@/commons/utils/number';
 
 import {
-  BIZ_ID_ATTR_NAME,
+  BIZ_ID_ATTR_NAME, CONTENT_EDITABLE_ATTR_NAME,
   DEFAULT_BIZ_ID_ATTR_VALUE,
   DEFAULT_OPTIONS,
   DEFAULT_SORT_ATTR_VALUE,
@@ -356,11 +356,11 @@ export class FlowChart {
     const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
 
     $nodeText
-      .prop('contenteditable', 'true')
-      .trigger('focus')
+      .prop(CONTENT_EDITABLE_ATTR_NAME, 'true')
+      .trigger(EVENTS.FOCUS)
       .one(EVENTS.BLUR, () => {
         console.log(EVENTS.BLUR);
-        $nodeText.removeAttr('contenteditable');
+        $nodeText.removeAttr(CONTENT_EDITABLE_ATTR_NAME);
       });
   }
 
