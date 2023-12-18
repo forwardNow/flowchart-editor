@@ -4,14 +4,12 @@
 
     <FcControls v-if="controls" ref="controls" />
 
-    <div class="flow-chart" ref="stage">
-      <!--
-       <div class="fc-line-ball"></div>
-      -->
-    </div>
+    <div class="flow-chart" ref="stage" />
   </div>
 </template>
-<script>
+<script lang="js">
+import Vue from 'vue';
+
 import clonedeep from 'lodash.clonedeep';
 import FcToolbox from '@/components/FcToolbox.vue';
 import '@/commons/styles/flow-chart.scss';
@@ -20,8 +18,9 @@ import lodashMerge from 'lodash.merge';
 import { FlowChart } from '@/flow-chart/FlowChart';
 import FcControls from '@/components/FcControls.vue';
 
-export default {
+export default Vue.extend({
   name: 'FlowChart',
+
   components: { FcControls, FcToolbox },
 
   provide() {
@@ -43,6 +42,10 @@ export default {
     controls: {
       type: Boolean,
       default: true,
+    },
+
+    controlsOptions: {
+      type: Object,
     },
   },
 
@@ -118,5 +121,5 @@ export default {
       return options;
     },
   },
-};
+});
 </script>
