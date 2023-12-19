@@ -1,40 +1,42 @@
-const { resolve } = require('path');
-
 const isProd = process.env.NODE_ENV === 'production';
 
 module.exports = {
   root: true,
   env: {
     node: true,
+    browser: true,
   },
   extends: [
-    'plugin:vue/essential',
-    '@vue/airbnb',
-    '@vue/typescript/recommended',
+    'plugin:vue/recommended',
+    'airbnb-base',
+    'airbnb-typescript/base',
   ],
+
+  parser: 'vue-eslint-parser', // 解析 vue
   parserOptions: {
+    parser: '@typescript-eslint/parser', // 解析 ts
+    extraFileExtensions: ['.vue'],
     ecmaVersion: 2020,
+    sourceType: 'module',
+    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.json'],
   },
 
   settings: {
-    // #region 解决 “.ts 文件 import/extensions import/no-unresolved” 报错的问题
-    // 参考：https://qa.1r1g.com/sf/ask/4556640931/
-    // 'import/extensions': ['.js', '.jsx', '.mjs', '.ts', '.tsx'],
     'import/resolver': {
-      webpack: {
-        config: {
-          resolve: {
-            extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
-
-            // 解决 “.vue 文件 @ 不识别” 报错的问题
-            alias: {
-              '@': resolve('./src'),
-            },
-          },
-        },
+      // https://github.com/benmosher/eslint-plugin-import/issues/1396
+      [require.resolve('eslint-import-resolver-node')]: {},
+      [require.resolve('eslint-import-resolver-webpack')]: {
+        config: require.resolve('./webpack.config.js'),
       },
     },
-    // #endregion
+    'import/extensions': [
+      '.js',
+      '.jsx',
+      '.mjs',
+      '.ts',
+      '.tsx',
+    ],
   },
 
   rules: {
@@ -53,7 +55,5 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'vuejs-accessibility/form-control-has-label': 'off',
     'vue/multi-word-component-names': 'warn',
-
-    'vuejs-accessibility/label-has-for': 'warn',
   },
 };

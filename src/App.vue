@@ -2,7 +2,7 @@
   <div class="page-editor">
     <FlowChart
       :options="options"
-      :toolbox="false"
+      :toolbox="true"
       ref="flowchart"
     />
   </div>

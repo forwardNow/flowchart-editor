@@ -34,6 +34,8 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
+    "./*.js", // 匹配不到 `.eslintrc.js`，但可以匹配到 `webpack.config.js`
+    "./.eslintrc.js", // 重点，缺少它会报如下错误
   ],
   "exclude": [
     "node_modules"
