@@ -54,6 +54,6 @@ module.exports = {
     'vuejs-accessibility/form-control-has-label': 'off',
     'vue/multi-word-component-names': 'warn',
 
-    'vuejs-accessibility/label-has-for': 'warn'
+    'vuejs-accessibility/label-has-for': 'warn',
   },
 };

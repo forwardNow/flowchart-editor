@@ -7,7 +7,7 @@
     <div class="flow-chart" ref="stage" />
   </div>
 </template>
-<script lang="js">
+<script>
 import Vue from 'vue';
 
 import clonedeep from 'lodash.clonedeep';
@@ -44,8 +44,9 @@ export default Vue.extend({
       default: true,
     },
 
-    controlsOptions: {
-      type: Object,
+    controlsPosition: {
+      type: String,
+      default: 'top-left',
     },
   },
 

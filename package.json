@@ -2,14 +2,23 @@
   "name": "flowchart-editor",
   "version": "1.0.1",
   "private": true,
+  "main": "./dist/flowchart-editor.common.js",
+  "types": "./types/flowchart-editor.d.ts",
+  "web-types": "./highlight/web-types.json",
+  "vetur": {
+    "tags": "highlight/tags.json",
+    "attributes": "highlight/attributes.json"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name FlowChart src/flow-chart/FlowChart.vue",
     "lint": "vue-cli-service lint"
   },
+  "peerDependencies": {
+    "vue": "^2.6.14"
+  },
   "dependencies": {
     "@jsplumb/browser-ui": "^6.2.10",
-    "core-js": "^3.8.3",
     "interactjs": "^1.10.23",
     "jquery": "^3.7.1",
     "lodash.clonedeep": "^4.5.0",
@@ -17,10 +26,10 @@
     "lodash.get": "^4.4.2",
     "lodash.merge": "^4.6.2",
     "lodash.template": "^4.5.0",
-    "lodash.throttle": "^4.1.1",
-    "vue": "^2.6.14"
+    "lodash.throttle": "^4.1.1"
   },
   "devDependencies": {
+    "core-js": "^3.8.3",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@types/jquery": "^3.5.29",
     "@types/lodash.clonedeep": "^4.5.9",
