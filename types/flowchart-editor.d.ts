@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/extensions,import/no-unresolved
 import Vue from 'vue';
 import { IFcOptions } from '../src/commons/configs/types';
 
