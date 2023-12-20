@@ -15,7 +15,7 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 
 module.exports = {
   mode: IS_PROD ? 'production' : 'development',
-  devtool: IS_PROD ? 'source-map' : 'cheap-module-source-map',
+  devtool: IS_PROD ? false : 'cheap-module-source-map',
 
   devServer: {
     host: 'localhost',
@@ -25,14 +25,35 @@ module.exports = {
     historyApiFallback: true,
   },
 
-  entry: path.resolve(__dirname, './src/main.ts'),
+  entry: IS_PROD ? './src/flow-chart/FlowChart.vue' : './src/main.ts',
 
-  output: {
-    path: IS_PROD ? path.resolve(__dirname, './dist') : undefined,
-    filename: IS_PROD ? 'js/[name].[contenthash:8].js' : 'js/[name].js',
-    chunkFilename: IS_PROD ? 'js/[name].[contenthash:8].chunk.js' : 'js/[name].chunk.js',
-    assetModuleFilename: 'media/[name].[hash][ext][query]',
-    clean: IS_PROD,
+  externals: IS_PROD ? {
+    vue: 'vue',
+    '@jsplumb/browser-ui': '@jsplumb/browser-ui',
+    interactjs: 'interactjs',
+    jquery: 'jquery',
+    'lodash.clonedeep': 'lodash.clonedeep',
+    'lodash.debounce': 'lodash.debounce',
+    'lodash.get': 'lodash.get',
+    'lodash.merge': 'lodash.merge',
+    'lodash.template': 'lodash.template',
+    'lodash.throttle': 'lodash.throttle',
+  } : {},
+
+  output: IS_PROD ? {
+    path: path.resolve(__dirname, './dist'),
+    filename: 'flowchart-editor.js',
+    assetModuleFilename: 'media/[name].[ext][query]',
+
+    library: {
+      type: 'commonjs2',
+    },
+
+    clean: true,
+  } : {
+    filename: 'js/[name].js',
+    chunkFilename: 'js/[name].chunk.js',
+    assetModuleFilename: 'media/[name].[ext][query]',
   },
 
   resolve: {
@@ -97,28 +118,12 @@ module.exports = {
       context: path.resolve(__dirname, './src'),
     }),
 
-    new HtmlWebpackPlugin({
+    !IS_PROD && new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './public/index.html'),
     }),
 
     IS_PROD && new MiniCssExtractPlugin({
-      filename: 'css/[name].[contenthash:8].css',
-      chunkFilename: 'css/[name].[contenthash:8].chunk.css',
-    }),
-
-    IS_PROD && new CopyPlugin({
-      patterns: [
-        {
-          from: path.resolve(__dirname, './public'),
-          to: path.resolve(__dirname, './dist'),
-          globOptions: {
-            ignore: [
-              // 不拷贝 index.html, 避免与 HtmlWebpackPlugin 冲突
-              '**/index.html',
-            ],
-          },
-        },
-      ],
+      filename: 'flowchart-editor.css',
     }),
 
     new VueLoaderPlugin(),
@@ -129,19 +134,7 @@ module.exports = {
   ].filter(Boolean),
 
   optimization: {
-    splitChunks: {
-      chunks: 'all',
-    },
-    runtimeChunk: {
-      name: (entrypoint) => `runtime~${entrypoint.name}.js`,
-    },
-
-    minimize: IS_PROD,
-    minimizer: [
-      new CssMinimizerPlugin(),
-      new TerserPlugin(),
-
-    ],
+    minimize: false,
   },
 };
 
