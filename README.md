@@ -20,3 +20,6 @@ cd flowchart-editor
 
 npm i
 ```
+
+
+npm i flowchart-editor --registry=http://39.100.38.119:10000/repository/primeton-npm-product-repository/
