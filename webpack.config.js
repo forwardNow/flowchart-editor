@@ -29,17 +29,13 @@ module.exports = {
 
   externals: IS_PROD ? config.externals : {},
 
-  experiments: {
-    outputModule: true,
-  },
-
   output: IS_PROD ? {
     path: path.resolve(__dirname, './dist'),
     filename: config.javaScriptFile,
     assetModuleFilename: 'media/[name].[ext][query]',
 
     library: {
-      type: 'module',
+      type: 'commonjs2',
     },
 
     clean: true,
