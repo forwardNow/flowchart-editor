@@ -2,20 +2,43 @@
   <div class="fc-toolbox">
     <div class="fc-toolbox-top">
       <div class="feature-list">
-        <div class="feature-item tl-item" title="保存" @click="save">
+        <div
+          class="feature-item tl-item"
+          title="保存"
+          @click="save"
+        >
           <IconSave />
         </div>
-        <label class="feature-item tl-item" title="导入" >
+        <label
+          class="feature-item tl-item"
+          title="导入"
+        >
           <IconImport />
-          <input type="file" v-show="false" @change="importConfigFile($event)" />
+          <input
+            v-show="false"
+            type="file"
+            @change="importConfigFile($event)"
+          >
         </label>
-        <div class="feature-item tl-item" title="下载" @click="downloadConfigFile">
+        <div
+          class="feature-item tl-item"
+          title="下载"
+          @click="downloadConfigFile"
+        >
           <IconDownload />
         </div>
-        <div class="feature-item tl-item" title="删除" @click="remove">
+        <div
+          class="feature-item tl-item"
+          title="删除"
+          @click="remove"
+        >
           <IconDelete />
         </div>
-        <div class="feature-item tl-item" title="重置" @click="resetSetting">
+        <div
+          class="feature-item tl-item"
+          title="重置"
+          @click="resetSetting"
+        >
           <IconResetSettings />
         </div>
       </div>
@@ -23,19 +46,26 @@
       <div class="tool-divider" />
 
       <div class="shape-list">
-
-        <div class="shape-item tl-item" title="开始/结束">
+        <div
+          class="shape-item tl-item"
+          title="开始/结束"
+        >
           <div class="fc-node fc-node-circle" />
         </div>
 
-        <div class="shape-item tl-item" title="流程">
+        <div
+          class="shape-item tl-item"
+          title="流程"
+        >
           <div class="fc-node fc-node-rectangle" />
         </div>
 
-        <div class="shape-item tl-item" title="判定">
+        <div
+          class="shape-item tl-item"
+          title="判定"
+        >
           <div class="fc-node fc-node-diamond" />
         </div>
-
       </div>
 
       <div class="tool-divider" />
@@ -43,43 +73,77 @@
       <div class="fc-options fc-item-info">
         <div class="fc-ii-item">
           <span class="fc-ii-label">highlight.type:</span>
-          <input class="fc-ii-cont" type="radio" v-model="options.highlight.type" value="STEP_INDEX" @change="changeHighlightType"> STEP_INDEX
-          <input class="fc-ii-cont" type="radio" v-model="options.highlight.type" value="BIZ_IDS" @change="changeHighlightType"> BIZ_IDS
+          <input
+            v-model="options.highlight.type"
+            class="fc-ii-cont"
+            type="radio"
+            value="STEP_INDEX"
+            @change="changeHighlightType"
+          > STEP_INDEX
+          <input
+            v-model="options.highlight.type"
+            class="fc-ii-cont"
+            type="radio"
+            value="BIZ_IDS"
+            @change="changeHighlightType"
+          > BIZ_IDS
         </div>
 
         <div class="fc-ii-item">
           <span class="fc-ii-label">highlight.value:</span>
           <input
             v-if="options.highlight.type === 'STEP_INDEX'"
-            class="fc-ii-cont fc-ii-input" type="number"
-            v-model.trim.number="options.highlight.value" @input="changeHighlightValue"
-          />
+            v-model.trim.number="options.highlight.value"
+            class="fc-ii-cont fc-ii-input"
+            type="number"
+            @input="changeHighlightValue"
+          >
           <div
             v-if="options.highlight.type === 'BIZ_IDS'"
             class="fc-ii-cont biz-ids-box"
             @wheel.stop
           >
-            <input class="fc-ii-input" :value="JSON.stringify(options.highlight.value)" readonly
-                   @click="handleClickBizIdsInput"
-            />
+            <input
+              class="fc-ii-input"
+              :value="JSON.stringify(options.highlight.value)"
+              readonly
+              @click="handleClickBizIdsInput"
+            >
 
-            <div class="dropdown-menu-biz-ids" v-show="bizIdsDropdownMenu.visible">
+            <div
+              v-show="bizIdsDropdownMenu.visible"
+              class="dropdown-menu-biz-ids"
+            >
               <div
-                v-for="(item, i) in bizIdsDropdownMenu.fcNodes" :key="i"
+                v-for="(item, i) in bizIdsDropdownMenu.fcNodes"
+                :key="i"
                 class="biz-id-menu-item"
                 @click="handleClickBizIdMenuItem(item)"
               >
-                <input class="menu-item-checkbox" type="checkbox" :checked="options.highlight.value.includes(item.bizId)"/>
-                <div class="menu-item-icon" :class="`fc-node fc-node-${item.type.toLowerCase()}`" />
-                <div class="menu-item-text">{{ item.text }}</div>
+                <input
+                  class="menu-item-checkbox"
+                  type="checkbox"
+                  :checked="options.highlight.value.includes(item.bizId)"
+                >
+                <div
+                  class="menu-item-icon"
+                  :class="`fc-node fc-node-${item.type.toLowerCase()}`"
+                />
+                <div class="menu-item-text">
+                  {{ item.text }}
+                </div>
               </div>
             </div>
-
           </div>
         </div>
         <div class="fc-ii-item">
           <span class="fc-ii-label">node.endpoint.show:</span>
-          <input class="fc-ii-cont" type="checkbox" v-model="options.node.endpoint.show" @change="changeVisibleOfEndpoints">
+          <input
+            v-model="options.node.endpoint.show"
+            class="fc-ii-cont"
+            type="checkbox"
+            @change="changeVisibleOfEndpoints"
+          >
         </div>
         <div class="fc-ii-item">
           <span class="fc-ii-label">stage.scale.value:</span>
@@ -90,22 +154,41 @@
           <span class="fc-ii-cont fc-ii-position">{{ options.stage.offset }}</span>
         </div>
       </div>
-
     </div>
 
-    <div class="fc-toolbox-bottom" v-show="nodeInfo.visible || connectionInfo.visible">
-      <div class="node-info fc-item-info" v-show="nodeInfo.visible">
+    <div
+      v-show="nodeInfo.visible || connectionInfo.visible"
+      class="fc-toolbox-bottom"
+    >
+      <div
+        v-show="nodeInfo.visible"
+        class="node-info fc-item-info"
+      >
         <div class="fc-ii-item">
           <span class="fc-ii-label">bizId:</span>
-          <input class="fc-ii-cont fc-ii-input" v-model.trim="nodeInfo.bizId" @input="changeNodeBizId" />
+          <input
+            v-model.trim="nodeInfo.bizId"
+            class="fc-ii-cont fc-ii-input"
+            @input="changeNodeBizId"
+          >
         </div>
         <div class="fc-ii-item">
           <span class="fc-ii-label">stepIndex:</span>
-          <input class="fc-ii-cont fc-ii-input" type="number" v-model.trim.number="nodeInfo.stepIndex" @input="changeNodeStepIndex" />
+          <input
+            v-model.trim.number="nodeInfo.stepIndex"
+            class="fc-ii-cont fc-ii-input"
+            type="number"
+            @input="changeNodeStepIndex"
+          >
         </div>
         <div class="fc-ii-item">
           <span class="fc-ii-label">sort:</span>
-          <input class="fc-ii-cont fc-ii-input" type="number" v-model.trim.number="nodeInfo.sort" @input="changeNodeSort" />
+          <input
+            v-model.trim.number="nodeInfo.sort"
+            class="fc-ii-cont fc-ii-input"
+            type="number"
+            @input="changeNodeSort"
+          >
         </div>
         <div class="fc-ii-item">
           <span class="fc-ii-label">text:</span>
@@ -113,17 +196,24 @@
         </div>
       </div>
 
-      <div class="connection-info fc-item-info" v-show="connectionInfo.visible">
+      <div
+        v-show="connectionInfo.visible"
+        class="connection-info fc-item-info"
+      >
         <div class="fc-ii-item">
           <span class="fc-ii-label">label:</span>
-          <input class="fc-ii-cont fc-ii-input" v-model.trim="connectionInfo.label" @input="changeConnectionLabel" />
+          <input
+            v-model.trim="connectionInfo.label"
+            class="fc-ii-cont fc-ii-input"
+            @input="changeConnectionLabel"
+          >
         </div>
       </div>
     </div>
   </div>
-
 </template>
 <script>
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import jQuery from 'jquery';
 import lodashDebounce from 'lodash.debounce';
 import interact from 'interactjs';
@@ -161,10 +251,6 @@ export default {
 
   inject: ['flowChartRef'],
 
-  mounted() {
-    this.initDnd();
-  },
-
   data() {
     return {
       /** @type {IFcOptions}  */
@@ -198,6 +284,10 @@ export default {
         fcNodes: [],
       },
     };
+  },
+
+  mounted() {
+    this.initDnd();
   },
 
   methods: {
@@ -444,7 +534,7 @@ export default {
       reader.onload = () => {
         const fileContent = reader.result;
 
-        const config = JSON.parse(fileContent);
+        const config = JSON.parse(String(fileContent));
 
         this.flowChartRef.reset(config);
       };
