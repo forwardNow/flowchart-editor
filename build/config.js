@@ -1,7 +1,8 @@
 module.exports = {
-  cssFile: 'flowchart-editor.css',
-  javaScriptFile: 'flowchart-editor.js',
+  cssFile: 'index.css',
+  javaScriptFile: 'index.js',
 
+  // 排除掉 package.json 中 dependencies 中的所有依赖
   externals: {
     vue: 'vue',
     '@jsplumb/browser-ui': '@jsplumb/browser-ui',
