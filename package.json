@@ -1,5 +1,5 @@
 {
-  "name": "flowchart-editor",
+  "name": "@fe/flowchart-editor",
   "version": "1.0.3",
   "main": "./dist/index.js",
   "types": "./types/index.d.ts",
