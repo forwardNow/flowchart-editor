@@ -1,8 +1,8 @@
 {
   "name": "flowchart-editor",
   "version": "1.0.3",
-  "main": "./dist/flowchart-editor.js",
-  "types": "./types/flowchart-editor.d.ts",
+  "main": "./dist/index.js",
+  "types": "./types/index.d.ts",
   "web-types": "./highlight/web-types.json",
   "vetur": {
     "tags": "highlight/tags.json",
@@ -11,7 +11,8 @@
   "scripts": {
     "start": "npm run serve",
     "serve": "cross-env NODE_ENV=development webpack serve",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=production webpack",
+    "pack": "npm pack --pack-destination dist-zip"
   },
   "files": [
     "dist",
