@@ -118,6 +118,8 @@ export const EVENTS = {
   UNSELECT_ALL: `unselect-all.${EVENT_NAMESPACE}`,
 
   STAGE_MOVE: `stage-move.${EVENT_NAMESPACE}`,
+
+  FLOWCHART_READY: 'flowchart-ready',
 };
 
 export const JS_PLUMB_DEFAULTS = () => ({

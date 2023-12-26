@@ -804,6 +804,22 @@ export class FlowChart {
     eventHandler.push(callback);
   }
 
+  off(eventName: string, callback: (payload: any) => void) {
+    const handlers = this.eventHandlers[eventName];
+
+    if (!handlers) {
+      throw new Error(`FlowChart.eventHandlers.${eventName} is None`);
+    }
+
+    const targetIndex = handlers.findIndex((item) => item === callback);
+
+    if (targetIndex === -1) {
+      throw new Error(`unbind ${eventName} fail`);
+    }
+
+    handlers.splice(targetIndex, 1);
+  }
+
   setStepIndexOfFcElement(el: HTMLElement, stepIndex: number) {
     jQuery(el).attr(STEP_INDEX_ATTR_NAME, stepIndex);
   }

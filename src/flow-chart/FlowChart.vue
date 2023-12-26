@@ -21,7 +21,7 @@ import Vue from 'vue';
 import clonedeep from 'lodash.clonedeep';
 import lodashMerge from 'lodash.merge';
 import FcToolbox from '@/components/toolbox/FcToolbox.vue';
-import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
+import { DEFAULT_OPTIONS, EVENTS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
 import { FlowChart } from '@/flow-chart/FlowChart';
 import FcControls from '@/components/FcControls.vue';
 
@@ -89,15 +89,7 @@ export default Vue.extend({
     init() {
       this.fc = new FlowChart(this.$refs.stage, this.fcOptions);
 
-      const options = this.fc.getOptions();
-
-      if (this.toolbox) {
-        this.$refs.toolbox?.init(options);
-      }
-
-      if (this.controls) {
-        this.$refs.controls?.init(options);
-      }
+      this.$emit(EVENTS.FLOWCHART_READY);
     },
 
     destroy() {

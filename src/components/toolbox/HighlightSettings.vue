@@ -73,6 +73,8 @@
 import jQuery from 'jquery';
 import { BIZ_IDS_HIGHLIGHT, STEP_INDEX_HIGHLIGHT } from '@/commons/configs/commons';
 
+const CLICK_EVENT = 'click.highlight-settings';
+
 export default {
   inject: ['toolboxRef', 'flowChartRef'],
 
@@ -108,13 +110,15 @@ export default {
     this.bindEvents();
   },
 
+  beforeDestroy() {
+    this.unbindEvents();
+  },
+
   methods: {
     bindEvents() {
       const bizIdsBoxSelector = '.fc-biz-ids-box';
 
       // click outside .fc-biz-ids-box
-      const CLICK_EVENT = 'click.toolbox';
-
       jQuery(window)
         .off(CLICK_EVENT)
         .on(CLICK_EVENT, (event) => {
@@ -131,6 +135,10 @@ export default {
 
           this.dropdownMenu.visible = false;
         });
+    },
+
+    unbindEvents() {
+      jQuery(window).off(CLICK_EVENT);
     },
 
     changeHighlightType(type) {

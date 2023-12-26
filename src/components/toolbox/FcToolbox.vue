@@ -16,78 +16,28 @@
       <StageSettings />
     </div>
 
-    <div
-      v-show="nodeInfo.visible || connectionInfo.visible"
-      class="fc-toolbox-bottom"
-    >
-      <div
-        v-show="nodeInfo.visible"
-        class="fc-toolbox-list fc-info-list"
-      >
-        <div class="fc-info-item">
-          <span class="fc-info-item-label" title="bizId">ID:</span>
-          <input
-            v-model.trim="nodeInfo.bizId"
-            class="fc-info-item-cont fc-info-item-input"
-            @input="changeNodeBizId"
-          >
-        </div>
-        <div class="fc-info-item">
-          <span class="fc-info-item-label" title="stepIndex">步骤索引:</span>
-          <input
-            v-model.trim.number="nodeInfo.stepIndex"
-            class="fc-info-item-cont fc-info-item-input"
-            type="number"
-            @input="changeNodeStepIndex"
-          >
-        </div>
-        <div class="fc-info-item">
-          <span class="fc-info-item-label" title="sort">排序:</span>
-          <input
-            v-model.trim.number="nodeInfo.sort"
-            class="fc-info-item-cont fc-info-item-input"
-            type="number"
-            @input="changeNodeSort"
-          >
-        </div>
-        <div class="fc-info-item">
-          <span class="fc-info-item-label" title="text">节点内容:</span>
-          <span class="fc-info-item-cont">{{ nodeInfo.text }}</span>
-        </div>
-      </div>
-
-      <div
-        v-show="connectionInfo.visible"
-        class="connection-info fc-info"
-      >
-        <div class="fc-info-item">
-          <span class="fc-info-item-label" title="label">连线标签:</span>
-          <input
-            v-model.trim="connectionInfo.label"
-            class="fc-info-item-cont fc-info-item-input"
-            @input="changeConnectionLabel"
-          >
-        </div>
-      </div>
+    <div v-show="visibleOfBottom" class="fc-toolbox-bottom">
+      <NodeInfo :visible.sync="visibleOfNodeInfo" />
+      <ConnectionInfo :visible.sync="visibleOfConnectionInfo" />
     </div>
   </div>
 </template>
 <script>
-import lodashDebounce from 'lodash.debounce';
 import lodashMerge from 'lodash.merge';
-import {
-  DEFAULT_OPTIONS,
-  EVENTS,
-} from '@/commons/configs/constants';
+import { DEFAULT_OPTIONS, EVENTS } from '@/commons/configs/constants';
 import ToolButtons from '@/components/toolbox/ToolButtons.vue';
 import FcDivider from '@/components/toolbox/FcDivider.vue';
 import ShapeList from '@/components/toolbox/ShapeList.vue';
 import HighlightSettings from '@/components/toolbox/HighlightSettings.vue';
 import StageSettings from '@/components/toolbox/StageSettings.vue';
+import NodeInfo from '@/components/toolbox/NodeInfo.vue';
+import ConnectionInfo from '@/components/toolbox/ConnectionInfo.vue';
 
 export default {
   name: 'FcToolbox',
   components: {
+    ConnectionInfo,
+    NodeInfo,
     StageSettings,
     HighlightSettings,
     ShapeList,
@@ -108,63 +58,36 @@ export default {
       /** @type {IFcOptions}  */
       options: lodashMerge({}, DEFAULT_OPTIONS),
 
-      nodeInfo: {
-        visible: false,
-
-        id: '',
-        bizId: '',
-        type: '',
-        text: '',
-        position: { x: 0, y: 0 },
-        stepIndex: 0,
-        sort: 0,
-      },
-
-      connectionInfo: {
-        visible: false,
-
-        type: '',
-        sourceId: '',
-        sourceAnchor: '',
-        targetId: '',
-        targetAnchor: '',
-        label: '',
-      },
-
+      visibleOfNodeInfo: false,
+      visibleOfConnectionInfo: false,
     };
   },
 
+  computed: {
+    visibleOfBottom() {
+      return this.visibleOfNodeInfo || this.visibleOfConnectionInfo;
+    },
+  },
+
+  created() {
+    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+  },
+
   methods: {
-    // invoke by FlowChart.vue
-    init(options) {
-      this.options = options;
+    onFlowchartReady() {
+      const options = this.flowChartRef.fc.getOptions();
+
+      this.options = lodashMerge({}, options);
+
       this.bindListeners();
     },
 
     bindListeners() {
       const { fc } = this.flowChartRef;
 
-      fc.on(EVENTS.SELECT_NODE, (fcNode) => {
-        if (!fcNode) {
-          return;
-        }
-
-        this.connectionInfo.visible = false;
-        this.nodeInfo = { visible: true, ...fcNode };
-      });
-
-      fc.on(EVENTS.SELECT_CONNECTION, (fcConnection) => {
-        if (!fcConnection) {
-          return;
-        }
-
-        this.nodeInfo.visible = false;
-        this.connectionInfo = { visible: true, ...fcConnection };
-      });
-
       fc.on(EVENTS.UNSELECT_ALL, () => {
-        this.connectionInfo.visible = false;
-        this.nodeInfo.visible = false;
+        this.visibleOfNodeInfo = false;
+        this.visibleOfConnectionInfo = false;
       });
 
       fc.on(EVENTS.WHEEL, (scale) => {
@@ -175,41 +98,6 @@ export default {
         this.options.stage.offset = offset;
       });
     },
-
-    changeNodeStepIndex() {
-      const { fc } = this.flowChartRef;
-      const { stepIndex } = this.nodeInfo;
-
-      const selectedNode = fc.getSelectedFcNode();
-
-      fc.setStepIndexOfFcElement(selectedNode, stepIndex);
-    },
-
-    changeNodeSort() {
-      const { fc } = this.flowChartRef;
-      const { sort } = this.nodeInfo;
-
-      const selectedNode = fc.getSelectedFcNode();
-
-      fc.setSortOfFcElement(selectedNode, sort);
-    },
-
-    changeNodeBizId() {
-      const { fc } = this.flowChartRef;
-      const { bizId } = this.nodeInfo;
-
-      const selectedNode = fc.getSelectedFcNode();
-
-      fc.setBizIdOfFcElement(selectedNode, bizId);
-    },
-
-    changeConnectionLabel: lodashDebounce(function f() {
-      const { fc } = this.flowChartRef;
-
-      const selectedJsPlumbConnection = fc.getSelectedJsPlumbConnection();
-
-      fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, this.connectionInfo.label);
-    }, 300),
 
   },
 };
