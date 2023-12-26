@@ -9,99 +9,7 @@
 
       <FcDivider />
 
-      <div class="fc-toolbox-list fc-info-list">
-        <div class="fc-info-item">
-          <span
-            class="fc-ii-label"
-            title="highlight.type"
-          >
-            高亮类型:
-          </span>
-          <label title="'STEP_INDEX'">
-            <input
-              v-model="options.highlight.type"
-              class="fc-ii-cont"
-              type="radio"
-              value="STEP_INDEX"
-              @change="changeHighlightType"
-            > 步骤
-          </label>
-          <label title="'BIZ_IDS'">
-            <input
-              v-model="options.highlight.type"
-              class="fc-ii-cont"
-              type="radio"
-              value="BIZ_IDS"
-              @change="changeHighlightType"
-            > 单独指定
-          </label>
-        </div>
-
-        <div class="fc-info-item">
-          <template v-if="options.highlight.type === 'STEP_INDEX'">
-            <span
-              class="fc-ii-label"
-              title="highlight.value"
-            >
-              当前步骤:
-            </span>
-            <input
-              v-model.trim.number="options.highlight.value"
-              class="fc-ii-cont fc-ii-input"
-              type="number"
-              title="-1, 全部高亮"
-              @input="changeHighlightValue"
-            >
-          </template>
-
-          <template v-if="options.highlight.type === 'BIZ_IDS'">
-            <span
-              class="fc-ii-label"
-              title="highlight.value"
-            >
-              ID集合:
-            </span>
-
-            <div
-              class="fc-ii-cont biz-ids-box"
-              @wheel.stop
-            >
-              <input
-                class="fc-ii-input"
-                :value="JSON.stringify(options.highlight.value)"
-                readonly
-                title="ID 数组"
-                @click="handleClickBizIdsInput"
-              >
-
-              <div
-                v-show="bizIdsDropdownMenu.visible"
-                class="dropdown-menu-biz-ids"
-              >
-                <div
-                  v-for="(item, i) in bizIdsDropdownMenu.fcNodes"
-                  :key="i"
-                  class="biz-id-menu-item"
-                  @click="handleClickBizIdMenuItem(item)"
-                >
-                  <input
-                    class="menu-item-checkbox"
-                    type="checkbox"
-                    :checked="options.highlight.value.includes(item.bizId)"
-                  >
-                  <div
-                    class="menu-item-icon"
-                    :class="`fc-node fc-node-${item.type.toLowerCase()}`"
-                  />
-                  <div class="menu-item-text">
-                    {{ item.text }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
+      <HighlightSettings />
 
       <FcDivider />
 
@@ -218,23 +126,22 @@
 </template>
 <script>
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import jQuery from 'jquery';
 import lodashDebounce from 'lodash.debounce';
+import lodashMerge from 'lodash.merge';
 import {
   DEFAULT_OPTIONS,
   EVENTS,
 } from '@/commons/configs/constants';
-import { merge } from '@jsplumb/browser-ui';
-import {
-  STEP_INDEX_HIGHLIGHT,
-} from '@/commons/configs/commons';
 import ToolButtons from '@/components/toolbox/ToolButtons.vue';
 import FcDivider from '@/components/toolbox/FcDivider.vue';
 import ShapeList from '@/components/toolbox/ShapeList.vue';
+import HighlightSettings from '@/components/toolbox/HighlightSettings.vue';
 
 export default {
   name: 'FcToolbox',
-  components: { ShapeList, FcDivider, ToolButtons },
+  components: {
+    HighlightSettings, ShapeList, FcDivider, ToolButtons,
+  },
 
   inject: ['flowChartRef'],
 
@@ -247,7 +154,7 @@ export default {
   data() {
     return {
       /** @type {IFcOptions}  */
-      options: merge({}, DEFAULT_OPTIONS),
+      options: lodashMerge({}, DEFAULT_OPTIONS),
 
       nodeInfo: {
         visible: false,
@@ -272,10 +179,6 @@ export default {
         label: '',
       },
 
-      bizIdsDropdownMenu: {
-        visible: false,
-        fcNodes: [],
-      },
     };
   },
 
@@ -287,27 +190,6 @@ export default {
     },
 
     bindListeners() {
-      const bizIdsBoxSelector = '.biz-ids-box';
-
-      // click outside .biz-ids-box
-      const CLICK_EVENT = 'click.toolbox';
-      jQuery(window)
-        .off(CLICK_EVENT)
-        .on(CLICK_EVENT, (event) => {
-          const { target } = event;
-          const $target = jQuery(target);
-
-          if ($target.closest(bizIdsBoxSelector).length > 0) {
-            return;
-          }
-
-          if ($target.is(bizIdsBoxSelector)) {
-            return;
-          }
-
-          this.bizIdsDropdownMenu.visible = false;
-        });
-
       const { fc } = this.flowChartRef;
 
       fc.on(EVENTS.SELECT_NODE, (fcNode) => {
@@ -377,52 +259,8 @@ export default {
       fc.setLabelOfJsPlumbConnection(selectedJsPlumbConnection, this.connectionInfo.label);
     }, 300),
 
-    changeHighlightType() {
-      const { fc } = this.flowChartRef;
-      const { type } = this.options.highlight;
-
-      fc.updateHighlightType(type);
-
-      this.options = fc.getOptions();
-    },
-
-    changeHighlightValue() {
-      const {
-        highlight: { type, value },
-      } = this.options;
-
-      if (type === STEP_INDEX_HIGHLIGHT) {
-        this.flowChartRef.fc.setCurrentStepIndex(Number(value));
-      }
-    },
-
     changeVisibleOfEndpoints() {
       this.flowChartRef.fc.setVisibleOfEndpoints(this.options.node.endpoint.show);
-    },
-
-    handleClickBizIdsInput() {
-      const { fc } = this.flowChartRef;
-
-      this.bizIdsDropdownMenu.visible = true;
-      this.bizIdsDropdownMenu.fcNodes = fc.getFcNodeConfigs();
-    },
-
-    handleClickBizIdMenuItem(fcNode) {
-      const { fc } = this.flowChartRef;
-      const bizIds = this.options.highlight.value || [];
-
-      const index = bizIds.findIndex((item) => item === fcNode.bizId);
-
-      if (index === -1) {
-        bizIds.push(fcNode.bizId);
-        bizIds.sort();
-      } else {
-        bizIds.splice(index, 1);
-      }
-
-      fc.getOptions().highlight.value = bizIds;
-
-      fc.updateHighlights();
     },
 
   },
@@ -566,45 +404,5 @@ export default {
     }
   }
 
-  .biz-ids-box {
-    position: relative;
-    display: inline-block;
-  }
-
-  .dropdown-menu-biz-ids {
-    position: absolute;
-    left: 0;
-    top: 100%;
-
-    padding-top: 4px;
-    padding-bottom: 2px;
-    min-width: 320px;
-    max-height: 80vh;
-
-    color: #212930;
-    font-size: 13px;
-
-    overflow-y: auto;
-
-    border-radius: 4px;
-    border: #e9edf2;
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 10px 0 rgba(0,0,0,.1);
-
-    .biz-id-menu-item {
-      display: flex;
-      align-items: center;
-
-      padding: 8px 8px;
-
-      &:hover {
-        background: #f3f5f9;
-      }
-    }
-    .menu-item-icon {
-      margin-left: 4px;
-      color: #c4d0dc;
-    }
-  }
 }
 </style>
