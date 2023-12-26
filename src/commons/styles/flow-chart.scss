@@ -78,6 +78,7 @@
   .fc-toolbox + .fc-controls {
     margin-top: 40px;
   }
+
 }
 
 .flow-chart {
@@ -86,6 +87,16 @@
   min-height: 100%;
 
   overflow: visible;
+
+  .jtk-endpoint {
+    visibility: hidden;
+  }
+
+  &.fc-endpoint-visible {
+    .jtk-endpoint {
+      visibility: visible;
+    }
+  }
 
   .fc-node {
     position: absolute;

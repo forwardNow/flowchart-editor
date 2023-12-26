@@ -1,10 +1,19 @@
 <template>
   <div class="flow-chart-box">
-    <FcToolbox v-if="toolbox" ref="toolbox" />
+    <FcToolbox
+      v-if="toolbox"
+      ref="toolbox"
+    />
 
-    <FcControls v-if="controls" ref="controls" />
+    <FcControls
+      v-if="controls"
+      ref="controls"
+    />
 
-    <div class="flow-chart" ref="stage" />
+    <div
+      ref="stage"
+      class="flow-chart"
+    />
   </div>
 </template>
 <script>
@@ -50,10 +59,6 @@ export default Vue.extend({
     },
   },
 
-  beforeDestroy() {
-    this.destroy();
-  },
-
   data() {
     return {
       fcOptions: {},
@@ -75,6 +80,10 @@ export default Vue.extend({
         this.init();
       },
     },
+  },
+
+  beforeDestroy() {
+    this.destroy();
   },
 
   methods: {

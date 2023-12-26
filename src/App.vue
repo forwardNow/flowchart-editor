@@ -1,9 +1,10 @@
 <template>
   <div class="page-editor">
     <FlowChart
+      ref="flowchart"
       :options="options"
       :toolbox="true"
-      ref="flowchart"
+      :controls="false"
     />
   </div>
 </template>
@@ -15,14 +16,14 @@ export default {
     FlowChart,
   },
 
-  mounted() {
-    this.options = this.getOptions();
-  },
-
   data() {
     return {
       options: null,
     };
+  },
+
+  mounted() {
+    this.options = this.getOptions();
   },
 
   methods: {

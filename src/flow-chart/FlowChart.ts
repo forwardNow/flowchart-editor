@@ -18,10 +18,8 @@ import throttle from 'lodash.throttle';
 
 import {
   AnchorLocations,
-  BlankEndpoint,
   BrowserJsPlumbInstance,
   Connection as JsPlumbConnection,
-  DotEndpoint,
   LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
@@ -118,8 +116,6 @@ export class FlowChart {
 
   private importDefaults() {
     const options = JS_PLUMB_DEFAULTS();
-
-    options.endpoint.type = this.options.node.endpoint.show ? DotEndpoint.type : BlankEndpoint.type;
 
     this.jsPlumbInstance.importDefaults(options);
   }
@@ -234,9 +230,12 @@ export class FlowChart {
   updateVisibleOfEndpoints() {
     const { show } = this.options.node.endpoint;
 
-    this.jsPlumbInstance.selectEndpoints().each((endpoint) => {
-      this.jsPlumbInstance.setEndpointVisible(endpoint, show);
-    });
+    if (!show) {
+      this.$stage.removeClass(FC_CSS_CLASS_NAMES.EndpointVisible);
+      return;
+    }
+
+    this.$stage.addClass(FC_CSS_CLASS_NAMES.EndpointVisible);
   }
 
   private bindListeners() {

@@ -77,6 +77,9 @@ export const FC_CSS_CLASS_NAMES = {
   Disabled: 'fc-disabled',
 
   Connection: 'jtk-connector',
+  Endpoint: 'jtk-endpoint',
+
+  EndpointVisible: 'fc-endpoint-visible',
 
   [CIRCLE_NODE_TYPE]: 'fc-node-circle',
   [RECTANGLE_NODE_TYPE]: 'fc-node-rectangle',
