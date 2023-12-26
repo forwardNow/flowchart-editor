@@ -34,9 +34,11 @@ export default {
 };
 </script>
 <style lang="scss">
+body {
+  padding: 0;
+  margin: 0;
+}
 .page-editor {
-  height: 200vh;
-
   .flow-chart-box {
     width: 100vw;
     height: 100vh;

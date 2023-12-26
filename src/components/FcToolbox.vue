@@ -4,42 +4,42 @@
       <div class="feature-list">
         <div
           class="feature-item tl-item"
-          title="保存"
+          title="保存到 localStorage"
           @click="save"
         >
-          <IconSave />
+          保存
         </div>
         <label
           class="feature-item tl-item"
-          title="导入"
+          title="导入流程图配置文件"
         >
-          <IconImport />
           <input
             v-show="false"
             type="file"
             @change="importConfigFile($event)"
           >
+          导入
         </label>
         <div
           class="feature-item tl-item"
-          title="下载"
+          title="导出流程图配置文件"
           @click="downloadConfigFile"
         >
-          <IconDownload />
+          导出
         </div>
         <div
           class="feature-item tl-item"
-          title="删除"
+          title="删除节点或连线"
           @click="remove"
         >
-          <IconDelete />
+          删除
         </div>
         <div
           class="feature-item tl-item"
-          title="重置"
+          title="重置画布缩放和偏移"
           @click="resetSetting"
         >
-          <IconResetSettings />
+          重置
         </div>
       </div>
 
