@@ -1,49 +1,9 @@
 <template>
   <div class="fc-toolbox">
     <div class="fc-toolbox-top">
-      <div class="fc-toolbox-list">
-        <div
-          class="fc-toolbox-item"
-          title="保存到 localStorage"
-          @click="save"
-        >
-          保存
-        </div>
-        <label
-          class="fc-toolbox-item"
-          title="导入流程图配置文件"
-        >
-          <input
-            v-show="false"
-            type="file"
-            @change="importConfigFile($event)"
-          >
-          导入
-        </label>
-        <div
-          class="fc-toolbox-item"
-          title="导出流程图配置文件"
-          @click="downloadConfigFile"
-        >
-          导出
-        </div>
-        <div
-          class="fc-toolbox-item"
-          title="删除节点或连线"
-          @click="remove"
-        >
-          删除
-        </div>
-        <div
-          class="fc-toolbox-item"
-          title="重置画布缩放和偏移"
-          @click="resetSetting"
-        >
-          重置
-        </div>
-      </div>
+      <ToolButtons @reset="handleReset" />
 
-      <div class="fc-toolbox-divider" />
+      <FcDivider />
 
       <div class="fc-toolbox-list">
         <div
@@ -68,7 +28,7 @@
         </div>
       </div>
 
-      <div class="fc-toolbox-divider" />
+      <FcDivider />
 
       <div class="fc-toolbox-list fc-info-list">
         <div class="fc-info-item">
@@ -164,7 +124,7 @@
         </div>
       </div>
 
-      <div class="fc-toolbox-divider" />
+      <FcDivider />
 
       <div class="fc-toolbox-list fc-info-list">
         <div class="fc-info-item">
@@ -284,10 +244,9 @@ import lodashDebounce from 'lodash.debounce';
 import interact from 'interactjs';
 import {
   DEFAULT_OPTIONS,
-  EVENTS, EXPORTED_FILE_NAME, FC_CSS_CLASS_NAMES,
-  STORE_KEY_OPTIONS,
+  EVENTS,
+  FC_CSS_CLASS_NAMES,
 } from '@/commons/configs/constants';
-import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
 import { merge } from '@jsplumb/browser-ui';
 import {
   CIRCLE_NODE_TYPE,
@@ -298,9 +257,12 @@ import {
   RECTANGLE_NODE_TYPE,
   STEP_INDEX_HIGHLIGHT,
 } from '@/commons/configs/commons';
+import ToolButtons from '@/components/toolbox/ToolButtons.vue';
+import FcDivider from '@/components/toolbox/FcDivider.vue';
 
 export default {
   name: 'FcToolbox',
+  components: { FcDivider, ToolButtons },
 
   inject: ['flowChartRef'],
 
@@ -516,85 +478,8 @@ export default {
         });
     },
 
-    save() {
-      const { fc } = this.flowChartRef;
-      const options = fc.getOptions();
-
-      options.config = fc.getFlowChartConfig();
-
-      console.log('options', options);
-
-      localStorage.setItem(STORE_KEY_OPTIONS, JSON.stringify(options));
-
-      showSuccessToast(`保存成功! 查看 localStorage.getItem("${STORE_KEY_OPTIONS}")`);
-    },
-
-    remove() {
-      const { fc } = this.flowChartRef;
-
-      const selectedNode = fc.getSelectedFcNode();
-
-      if (selectedNode) {
-        showConfirm('确认删除选中的节点？')
-          .then(() => {
-            fc.removeFcNode(selectedNode);
-          })
-          .catch((e) => console.log(e));
-        return;
-      }
-
-      const selectedConnection = fc.getSelectedJsPlumbConnection();
-
-      if (!selectedConnection) {
-        showAlert('请选择要删除的节点或连线！');
-        return;
-      }
-
-      showConfirm('确认删除选中的连线？')
-        .then(() => {
-          fc.removeFcConnection(selectedConnection);
-        })
-        .catch((e) => console.log(e));
-    },
-
-    resetSetting() {
-      const { fc } = this.flowChartRef;
-      const options = fc.getOptions();
-
-      options.stage.scale.value = 1;
-      options.stage.offset = { x: 0, y: 0 };
-
+    handleReset(options) {
       this.options = options;
-
-      fc.updateStageScaleAndOffset();
-    },
-
-    downloadConfigFile() {
-      const { fc } = this.flowChartRef;
-      const options = fc.getOptions();
-
-      options.config = fc.getFlowChartConfig();
-
-      const content = JSON.stringify(options, null, 2);
-
-      download(EXPORTED_FILE_NAME, content);
-    },
-
-    importConfigFile(event) {
-      const [file] = event.target.files;
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        const fileContent = reader.result;
-
-        const config = JSON.parse(String(fileContent));
-
-        this.flowChartRef.reset(config);
-      };
-
-      if (file) {
-        reader.readAsText(file);
-      }
     },
 
     changeNodeStepIndex() {
@@ -682,19 +567,6 @@ export default {
 
   },
 };
-
-function download(filename, text) {
-  const element = document.createElement('a');
-  element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`);
-  element.setAttribute('download', filename);
-
-  element.style.display = 'none';
-  document.body.appendChild(element);
-
-  element.click();
-
-  document.body.removeChild(element);
-}
 </script>
 <style lang="scss">
 @import "@/commons/styles/vars";
@@ -758,12 +630,6 @@ function download(filename, text) {
     &:hover {
       background-color: #eaecee;
     }
-  }
-
-  .fc-toolbox-divider {
-    height: 28px;
-    width: 1px;
-    background-color: #dfe2e5;
   }
 
   .fc-info-list {

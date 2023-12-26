@@ -20,7 +20,7 @@
 import Vue from 'vue';
 import clonedeep from 'lodash.clonedeep';
 import lodashMerge from 'lodash.merge';
-import FcToolbox from '@/components/FcToolbox.vue';
+import FcToolbox from '@/components/toolbox/FcToolbox.vue';
 import { DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
 import { FlowChart } from '@/flow-chart/FlowChart';
 import FcControls from '@/components/FcControls.vue';
