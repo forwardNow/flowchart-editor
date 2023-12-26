@@ -1,52 +1,51 @@
 <template>
   <div class="fc-highlight-settings fc-toolbox-list fc-info-list">
     <div class="fc-info-item">
-      <span class="fc-ii-label" title="highlight.type">
+      <span class="fc-info-item-label" title="highlight.type">
         高亮类型:
       </span>
-      <label title="'STEP_INDEX'">
+      <label :title="STEP_INDEX_HIGHLIGHT">
         <input
-          class="fc-ii-cont"
+          class="fc-info-item-cont"
           type="radio"
-          :checked="options.highlight.type === 'STEP_INDEX'"
-          @change="changeHighlightType('STEP_INDEX')"
+          :checked="options.highlight.type === STEP_INDEX_HIGHLIGHT"
+          @change="changeHighlightType(STEP_INDEX_HIGHLIGHT)"
         >
         步骤
       </label>
-      <label title="'BIZ_IDS'">
+      <label :title="BIZ_IDS_HIGHLIGHT">
         <input
-          class="fc-ii-cont"
+          class="fc-info-item-cont"
           type="radio"
-          :checked="options.highlight.type === 'BIZ_IDS'"
-          @change="changeHighlightType('BIZ_IDS')"
+          :checked="options.highlight.type === BIZ_IDS_HIGHLIGHT"
+          @change="changeHighlightType(BIZ_IDS_HIGHLIGHT)"
         >
         单独指定
       </label>
     </div>
 
     <div class="fc-info-item">
-      <template v-if="options.highlight.type === 'STEP_INDEX'">
-        <span class="fc-ii-label" title="highlight.value">
+      <template v-if="options.highlight.type === STEP_INDEX_HIGHLIGHT">
+        <span class="fc-info-item-label" title="highlight.value">
           当前步骤:
         </span>
         <input
           :value="options.highlight.value"
-          class="fc-ii-cont fc-ii-input"
+          class="fc-info-item-cont fc-info-item-input"
           type="number"
-          title="-1, 全部高亮"
+          title="-1 表示 全部高亮"
           @input="changeCurrentStepIndex($event)"
         >
       </template>
 
-      <template v-if="options.highlight.type === 'BIZ_IDS'">
-        <span class="fc-ii-label" title="highlight.value">ID集合:</span>
+      <template v-if="options.highlight.type === BIZ_IDS_HIGHLIGHT">
+        <span class="fc-info-item-label" title="highlight.value">ID数组:</span>
 
-        <div class="fc-ii-cont fc-biz-ids-box" @wheel.stop>
+        <div class="fc-info-item-cont fc-biz-ids-box" @wheel.stop>
           <input
-            class="fc-ii-input"
-            :value="JSON.stringify(options.highlight.value)"
+            class="fc-info-item-input"
+            :value="serializedBizIds"
             readonly
-            title="ID 数组"
             @click="handleClickBizIdsInput"
           >
 
@@ -70,12 +69,16 @@
 </template>
 <script>
 import jQuery from 'jquery';
+import { BIZ_IDS_HIGHLIGHT, STEP_INDEX_HIGHLIGHT } from '@/commons/configs/commons';
 
 export default {
   inject: ['toolboxRef', 'flowChartRef'],
 
   data() {
     return {
+      STEP_INDEX_HIGHLIGHT,
+      BIZ_IDS_HIGHLIGHT,
+
       dropdownMenu: {
         visible: false,
         fcNodes: [],
@@ -86,6 +89,16 @@ export default {
   computed: {
     options() {
       return this.toolboxRef.options;
+    },
+
+    serializedBizIds() {
+      const bizIds = this.options.highlight.value;
+
+      if (!Array.isArray(bizIds)) {
+        return '';
+      }
+
+      return bizIds.map((item) => JSON.stringify(item)).join(', ');
     },
   },
 
