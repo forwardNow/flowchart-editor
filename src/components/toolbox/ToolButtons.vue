@@ -47,7 +47,7 @@ import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup'
 import { downloadPlainFile } from '@/commons/utils/download';
 
 export default {
-  inject: ['flowChartRef'],
+  inject: ['toolboxRef', 'flowChartRef'],
 
   methods: {
     save() {
@@ -98,7 +98,7 @@ export default {
       options.stage.scale.value = 1;
       options.stage.offset = { x: 0, y: 0 };
 
-      this.$emit('reset', options);
+      this.toolboxRef.options = options;
 
       fc.updateStageScaleAndOffset();
     },

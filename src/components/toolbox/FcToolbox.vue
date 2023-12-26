@@ -1,32 +1,11 @@
 <template>
   <div class="fc-toolbox">
     <div class="fc-toolbox-top">
-      <ToolButtons @reset="handleReset" />
+      <ToolButtons />
 
       <FcDivider />
 
-      <div class="fc-toolbox-list">
-        <div
-          class="fc-toolbox-item"
-          title="开始/结束"
-        >
-          <div class="fc-node fc-node-circle" />
-        </div>
-
-        <div
-          class="fc-toolbox-item"
-          title="流程"
-        >
-          <div class="fc-node fc-node-rectangle" />
-        </div>
-
-        <div
-          class="fc-toolbox-item"
-          title="判定"
-        >
-          <div class="fc-node fc-node-diamond" />
-        </div>
-      </div>
+      <ShapeList />
 
       <FcDivider />
 
@@ -241,30 +220,29 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import jQuery from 'jquery';
 import lodashDebounce from 'lodash.debounce';
-import interact from 'interactjs';
 import {
   DEFAULT_OPTIONS,
   EVENTS,
-  FC_CSS_CLASS_NAMES,
 } from '@/commons/configs/constants';
 import { merge } from '@jsplumb/browser-ui';
 import {
-  CIRCLE_NODE_TYPE,
-  DEFAULT_CIRCLE_NODE_CONTENT,
-  DEFAULT_DIAMOND_NODE_CONTENT,
-  DEFAULT_RECTANGLE_NODE_CONTENT,
-  DIAMOND_NODE_TYPE,
-  RECTANGLE_NODE_TYPE,
   STEP_INDEX_HIGHLIGHT,
 } from '@/commons/configs/commons';
 import ToolButtons from '@/components/toolbox/ToolButtons.vue';
 import FcDivider from '@/components/toolbox/FcDivider.vue';
+import ShapeList from '@/components/toolbox/ShapeList.vue';
 
 export default {
   name: 'FcToolbox',
-  components: { FcDivider, ToolButtons },
+  components: { ShapeList, FcDivider, ToolButtons },
 
   inject: ['flowChartRef'],
+
+  provide() {
+    return {
+      toolboxRef: this,
+    };
+  },
 
   data() {
     return {
@@ -299,10 +277,6 @@ export default {
         fcNodes: [],
       },
     };
-  },
-
-  mounted() {
-    this.initDnd();
   },
 
   methods: {
@@ -366,120 +340,6 @@ export default {
       fc.on(EVENTS.STAGE_MOVE, (offset) => {
         this.options.stage.offset = offset;
       });
-    },
-
-    initDnd() {
-      const toolbox = {
-        el: this.$el,
-        x: 0,
-        y: 0,
-        height: 0,
-      };
-
-      ({
-        x: toolbox.x,
-        y: toolbox.y,
-        height: toolbox.height,
-      } = toolbox.el.getBoundingClientRect());
-
-      const mirror = {
-        el: null,
-        x: 0,
-        y: 0,
-
-        setAbsolute() {
-          this.el.style.position = 'absolute';
-        },
-        updatePosition() {
-          this.el.style.left = `${this.x}px`;
-          this.el.style.top = `${this.y}px`;
-        },
-        getFcNode() {
-          const { classList } = this.el;
-
-          let type = RECTANGLE_NODE_TYPE;
-          let content = DEFAULT_RECTANGLE_NODE_CONTENT;
-          const position = { x: this.x, y: this.y };
-
-          if (classList.contains(FC_CSS_CLASS_NAMES[CIRCLE_NODE_TYPE])) {
-            type = CIRCLE_NODE_TYPE;
-            content = DEFAULT_CIRCLE_NODE_CONTENT;
-          }
-
-          if (classList.contains(FC_CSS_CLASS_NAMES[DIAMOND_NODE_TYPE])) {
-            type = DIAMOND_NODE_TYPE;
-            content = DEFAULT_DIAMOND_NODE_CONTENT;
-          }
-
-          return { type, content, position };
-        },
-        destroy() {
-          toolbox.el.removeChild(this.el);
-          this.el = null;
-        },
-      };
-
-      const onStart = (event) => {
-        const target = event.currentTarget;
-
-        mirror.el = target.cloneNode(true);
-        mirror.x = target.offsetLeft;
-        mirror.y = target.offsetTop;
-
-        mirror.setAbsolute();
-
-        mirror.updatePosition();
-
-        toolbox.el.appendChild(mirror.el);
-      };
-
-      const onMove = (event) => {
-        const {
-          dx,
-          dy,
-        } = event;
-
-        mirror.x += dx;
-        mirror.y += dy;
-
-        mirror.updatePosition();
-      };
-
-      const onEnd = () => {
-        if (mirror.y < toolbox.height) {
-          mirror.destroy();
-          return;
-        }
-
-        const scale = this.options.stage.scale.value;
-
-        const { x: offsetX, y: offsetY } = this.flowChartRef.fc.getStageElement().getBoundingClientRect();
-
-        mirror.x -= offsetX;
-        mirror.y -= offsetY;
-
-        mirror.x /= scale;
-        mirror.y /= scale;
-
-        this.flowChartRef.fc.createFcNode(mirror.getFcNode());
-
-        mirror.destroy();
-      };
-
-      interact('.fc-toolbox .fc-node')
-        .draggable({
-          autoScroll: true,
-          cursorChecker: () => 'default',
-          listeners: {
-            start: onStart,
-            move: onMove,
-            end: onEnd,
-          },
-        });
-    },
-
-    handleReset(options) {
-      this.options = options;
     },
 
     changeNodeStepIndex() {
