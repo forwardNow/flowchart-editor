@@ -6,18 +6,20 @@
       </span>
       <label :title="STEP_INDEX_HIGHLIGHT">
         <input
+          v-model="options.highlight.type"
           class="fc-info-item-cont"
           type="radio"
-          :checked="options.highlight.type === STEP_INDEX_HIGHLIGHT"
+          :value="STEP_INDEX_HIGHLIGHT"
           @change="changeHighlightType(STEP_INDEX_HIGHLIGHT)"
         >
         步骤
       </label>
       <label :title="BIZ_IDS_HIGHLIGHT">
         <input
+          v-model="options.highlight.type"
           class="fc-info-item-cont"
           type="radio"
-          :checked="options.highlight.type === BIZ_IDS_HIGHLIGHT"
+          :value="BIZ_IDS_HIGHLIGHT"
           @change="changeHighlightType(BIZ_IDS_HIGHLIGHT)"
         >
         单独指定
@@ -30,7 +32,7 @@
           当前步骤:
         </span>
         <input
-          :value="options.highlight.value"
+          v-model="options.highlight.value"
           class="fc-info-item-cont fc-info-item-input"
           type="number"
           title="-1 表示 全部高亮"
