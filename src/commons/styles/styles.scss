@@ -1,0 +1,37 @@
+@import "vars";
+@import "march-ants";
+
+// 线
+.jtk-connector {
+
+  // hover 样式
+  &.jtk-hover {
+    path {
+      stroke: $color-primary;
+    }
+  }
+}
+
+// 端点
+.jtk-endpoint {
+  &:hover {
+    circle {
+      fill: $color-primary;
+    }
+  }
+
+  // 开始端点
+  &.jtk-dragging {
+    circle {
+      fill: $color-primary;
+    }
+  }
+
+  // 目标端点
+  &.jtk-endpoint-drop-allowed {
+    circle {
+      fill: $color-primary;
+    }
+  }
+
+}
