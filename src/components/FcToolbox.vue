@@ -72,72 +72,103 @@
 
       <div class="fc-options fc-item-info">
         <div class="fc-ii-item">
-          <span class="fc-ii-label">highlight.type:</span>
-          <input
-            v-model="options.highlight.type"
-            class="fc-ii-cont"
-            type="radio"
-            value="STEP_INDEX"
-            @change="changeHighlightType"
-          > STEP_INDEX
-          <input
-            v-model="options.highlight.type"
-            class="fc-ii-cont"
-            type="radio"
-            value="BIZ_IDS"
-            @change="changeHighlightType"
-          > BIZ_IDS
+          <span
+            class="fc-ii-label"
+            title="highlight.type"
+          >
+            高亮类型:
+          </span>
+          <label title="'STEP_INDEX'">
+            <input
+              v-model="options.highlight.type"
+              class="fc-ii-cont"
+              type="radio"
+              value="STEP_INDEX"
+              @change="changeHighlightType"
+            > 步骤
+          </label>
+          <label title="'BIZ_IDS'">
+            <input
+              v-model="options.highlight.type"
+              class="fc-ii-cont"
+              type="radio"
+              value="BIZ_IDS"
+              @change="changeHighlightType"
+            > 单独指定
+          </label>
         </div>
 
         <div class="fc-ii-item">
-          <span class="fc-ii-label">highlight.value:</span>
-          <input
-            v-if="options.highlight.type === 'STEP_INDEX'"
-            v-model.trim.number="options.highlight.value"
-            class="fc-ii-cont fc-ii-input"
-            type="number"
-            @input="changeHighlightValue"
-          >
-          <div
-            v-if="options.highlight.type === 'BIZ_IDS'"
-            class="fc-ii-cont biz-ids-box"
-            @wheel.stop
-          >
-            <input
-              class="fc-ii-input"
-              :value="JSON.stringify(options.highlight.value)"
-              readonly
-              @click="handleClickBizIdsInput"
+          <template v-if="options.highlight.type === 'STEP_INDEX'">
+            <span
+              class="fc-ii-label"
+              title="highlight.value"
             >
+              当前步骤:
+            </span>
+            <input
+              v-model.trim.number="options.highlight.value"
+              class="fc-ii-cont fc-ii-input"
+              type="number"
+              title="-1, 全部高亮"
+              @input="changeHighlightValue"
+            >
+          </template>
+
+          <template v-if="options.highlight.type === 'BIZ_IDS'">
+            <span
+              class="fc-ii-label"
+              title="highlight.value"
+            >
+              ID集合:
+            </span>
 
             <div
-              v-show="bizIdsDropdownMenu.visible"
-              class="dropdown-menu-biz-ids"
+              class="fc-ii-cont biz-ids-box"
+              @wheel.stop
             >
-              <div
-                v-for="(item, i) in bizIdsDropdownMenu.fcNodes"
-                :key="i"
-                class="biz-id-menu-item"
-                @click="handleClickBizIdMenuItem(item)"
+              <input
+                class="fc-ii-input"
+                :value="JSON.stringify(options.highlight.value)"
+                readonly
+                title="ID 数组"
+                @click="handleClickBizIdsInput"
               >
-                <input
-                  class="menu-item-checkbox"
-                  type="checkbox"
-                  :checked="options.highlight.value.includes(item.bizId)"
-                >
+
+              <div
+                v-show="bizIdsDropdownMenu.visible"
+                class="dropdown-menu-biz-ids"
+              >
                 <div
-                  class="menu-item-icon"
-                  :class="`fc-node fc-node-${item.type.toLowerCase()}`"
-                />
-                <div class="menu-item-text">
-                  {{ item.text }}
+                  v-for="(item, i) in bizIdsDropdownMenu.fcNodes"
+                  :key="i"
+                  class="biz-id-menu-item"
+                  @click="handleClickBizIdMenuItem(item)"
+                >
+                  <input
+                    class="menu-item-checkbox"
+                    type="checkbox"
+                    :checked="options.highlight.value.includes(item.bizId)"
+                  >
+                  <div
+                    class="menu-item-icon"
+                    :class="`fc-node fc-node-${item.type.toLowerCase()}`"
+                  />
+                  <div class="menu-item-text">
+                    {{ item.text }}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
         <div class="fc-ii-item">
-          <span class="fc-ii-label">node.endpoint.show:</span>
+          <span
+            class="fc-ii-label"
+            title="node.endpoint.show"
+          >
+            节点的端点:
+          </span>
           <input
             v-model="options.node.endpoint.show"
             class="fc-ii-cont"
@@ -146,12 +177,24 @@
           >
         </div>
         <div class="fc-ii-item">
-          <span class="fc-ii-label">stage.scale.value:</span>
-          <span class="fc-ii-cont">{{ options.stage.scale.value }}</span>
+          <span
+            class="fc-ii-label"
+            title="stage.scale.value"
+          >画布缩放:</span>
+          <span
+            class="fc-ii-cont"
+            title="stage.scale.value"
+          >{{ options.stage.scale.value }}</span>
         </div>
         <div class="fc-ii-item">
-          <span class="fc-ii-label">stage.offset:</span>
-          <span class="fc-ii-cont fc-ii-position">{{ options.stage.offset }}</span>
+          <span
+            class="fc-ii-label"
+            title="stage.offset"
+          >画布偏移量:</span>
+          <span
+            class="fc-ii-cont fc-ii-position"
+            title="stage.offset"
+          >{{ options.stage.offset }}</span>
         </div>
       </div>
     </div>
@@ -217,16 +260,12 @@
 import jQuery from 'jquery';
 import lodashDebounce from 'lodash.debounce';
 import interact from 'interactjs';
-import IconSave from '@/components/icons/IconSave.vue';
 import {
   DEFAULT_OPTIONS,
   EVENTS, EXPORTED_FILE_NAME, FC_CSS_CLASS_NAMES,
   STORE_KEY_OPTIONS,
 } from '@/commons/configs/constants';
 import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
-import IconDelete from '@/components/icons/IconDelete.vue';
-import IconResetSettings from '@/components/icons/IconResetSettings.vue';
-import IconDownload from '@/components/icons/IconDownload.vue';
 import { merge } from '@jsplumb/browser-ui';
 import {
   CIRCLE_NODE_TYPE,
@@ -237,17 +276,9 @@ import {
   RECTANGLE_NODE_TYPE,
   STEP_INDEX_HIGHLIGHT,
 } from '@/commons/configs/commons';
-import IconImport from '@/components/icons/IconImport.vue';
 
 export default {
   name: 'FcToolbox',
-  components: {
-    IconImport,
-    IconDownload,
-    IconResetSettings,
-    IconDelete,
-    IconSave,
-  },
 
   inject: ['flowChartRef'],
 
