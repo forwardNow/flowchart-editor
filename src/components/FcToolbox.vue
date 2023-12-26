@@ -1,16 +1,16 @@
 <template>
   <div class="fc-toolbox">
     <div class="fc-toolbox-top">
-      <div class="feature-list">
+      <div class="fc-toolbox-list">
         <div
-          class="feature-item tl-item"
+          class="fc-toolbox-item"
           title="保存到 localStorage"
           @click="save"
         >
           保存
         </div>
         <label
-          class="feature-item tl-item"
+          class="fc-toolbox-item"
           title="导入流程图配置文件"
         >
           <input
@@ -21,21 +21,21 @@
           导入
         </label>
         <div
-          class="feature-item tl-item"
+          class="fc-toolbox-item"
           title="导出流程图配置文件"
           @click="downloadConfigFile"
         >
           导出
         </div>
         <div
-          class="feature-item tl-item"
+          class="fc-toolbox-item"
           title="删除节点或连线"
           @click="remove"
         >
           删除
         </div>
         <div
-          class="feature-item tl-item"
+          class="fc-toolbox-item"
           title="重置画布缩放和偏移"
           @click="resetSetting"
         >
@@ -43,35 +43,35 @@
         </div>
       </div>
 
-      <div class="tool-divider" />
+      <div class="fc-toolbox-divider" />
 
-      <div class="shape-list">
+      <div class="fc-toolbox-list">
         <div
-          class="shape-item tl-item"
+          class="fc-toolbox-item"
           title="开始/结束"
         >
           <div class="fc-node fc-node-circle" />
         </div>
 
         <div
-          class="shape-item tl-item"
+          class="fc-toolbox-item"
           title="流程"
         >
           <div class="fc-node fc-node-rectangle" />
         </div>
 
         <div
-          class="shape-item tl-item"
+          class="fc-toolbox-item"
           title="判定"
         >
           <div class="fc-node fc-node-diamond" />
         </div>
       </div>
 
-      <div class="tool-divider" />
+      <div class="fc-toolbox-divider" />
 
-      <div class="fc-options fc-item-info">
-        <div class="fc-ii-item">
+      <div class="fc-toolbox-list fc-info-list">
+        <div class="fc-info-item">
           <span
             class="fc-ii-label"
             title="highlight.type"
@@ -98,7 +98,7 @@
           </label>
         </div>
 
-        <div class="fc-ii-item">
+        <div class="fc-info-item">
           <template v-if="options.highlight.type === 'STEP_INDEX'">
             <span
               class="fc-ii-label"
@@ -162,12 +162,17 @@
             </div>
           </template>
         </div>
-        <div class="fc-ii-item">
+      </div>
+
+      <div class="fc-toolbox-divider" />
+
+      <div class="fc-toolbox-list fc-info-list">
+        <div class="fc-info-item">
           <span
             class="fc-ii-label"
             title="node.endpoint.show"
           >
-            节点的端点:
+            是否显示节点的端点:
           </span>
           <input
             v-model="options.node.endpoint.show"
@@ -176,7 +181,8 @@
             @change="changeVisibleOfEndpoints"
           >
         </div>
-        <div class="fc-ii-item">
+
+        <div class="fc-info-item">
           <span
             class="fc-ii-label"
             title="stage.scale.value"
@@ -186,7 +192,8 @@
             title="stage.scale.value"
           >{{ options.stage.scale.value }}</span>
         </div>
-        <div class="fc-ii-item">
+
+        <div class="fc-info-item">
           <span
             class="fc-ii-label"
             title="stage.offset"
@@ -205,9 +212,9 @@
     >
       <div
         v-show="nodeInfo.visible"
-        class="node-info fc-item-info"
+        class="node-info fc-info"
       >
-        <div class="fc-ii-item">
+        <div class="fc-info-item">
           <span class="fc-ii-label">bizId:</span>
           <input
             v-model.trim="nodeInfo.bizId"
@@ -215,7 +222,7 @@
             @input="changeNodeBizId"
           >
         </div>
-        <div class="fc-ii-item">
+        <div class="fc-info-item">
           <span class="fc-ii-label">stepIndex:</span>
           <input
             v-model.trim.number="nodeInfo.stepIndex"
@@ -224,7 +231,7 @@
             @input="changeNodeStepIndex"
           >
         </div>
-        <div class="fc-ii-item">
+        <div class="fc-info-item">
           <span class="fc-ii-label">sort:</span>
           <input
             v-model.trim.number="nodeInfo.sort"
@@ -233,7 +240,7 @@
             @input="changeNodeSort"
           >
         </div>
-        <div class="fc-ii-item">
+        <div class="fc-info-item">
           <span class="fc-ii-label">text:</span>
           <span class="fc-ii-cont">{{ nodeInfo.text }}</span>
         </div>
@@ -241,9 +248,9 @@
 
       <div
         v-show="connectionInfo.visible"
-        class="connection-info fc-item-info"
+        class="connection-info fc-info"
       >
-        <div class="fc-ii-item">
+        <div class="fc-info-item">
           <span class="fc-ii-label">label:</span>
           <input
             v-model.trim="connectionInfo.label"

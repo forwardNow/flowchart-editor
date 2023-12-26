@@ -262,21 +262,13 @@
     border: 1px solid #E9E9E9;
   }
 
-  .feature-list {
+  .fc-toolbox-list {
     display: flex;
     align-items: center;
     height: 100%;
   }
 
-  .shape-list {
-    display: flex;
-    align-items: center;
-
-    height: 100%;
-  }
-
-  .feature-item,
-  .shape-item {
+  .fc-toolbox-item {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -297,29 +289,29 @@
     }
   }
 
-  .tool-divider {
+  .fc-toolbox-divider {
     height: 28px;
     width: 1px;
     background-color: #dfe2e5;
   }
 
-  .node-info {}
-
-  .fc-item-info {
-    display: flex;
-    align-items: center;
+  .fc-info-list {
     font-size: 12px;
   }
 
-  .fc-ii-item {
+  .fc-info-item {
     margin-right: 24px;
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 
   .fc-ii-label {
     color: #999;
   }
   .fc-ii-cont {
-    margin: 0 0 0 8px;
+    margin: 0 0 0 4px;
     color: #333;
     vertical-align: middle;
   }
