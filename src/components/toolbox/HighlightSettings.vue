@@ -72,7 +72,7 @@
 <script>
 import jQuery from 'jquery';
 import { BIZ_IDS_HIGHLIGHT, STEP_INDEX_HIGHLIGHT } from '@/commons/configs/commons';
-import { EVENTS, GET_DEFAULT_OPTIONS } from '@/commons/configs/constants';
+import { CUSTOM_EVENTS, GET_DEFAULT_OPTIONS } from '@/commons/configs/constants';
 import lodashMerge from 'lodash.merge';
 import clonedeep from 'lodash.clonedeep';
 
@@ -108,8 +108,8 @@ export default {
   },
 
   created() {
-    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
-    this.flowChartRef.$on(EVENTS.FLOWCHART_OPTIONS_CHANGED, this.onFlowchartOptionsChange);
+    this.flowChartRef.$on(CUSTOM_EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+    this.flowChartRef.$on(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, this.onFlowchartOptionsChange);
   },
 
   mounted() {

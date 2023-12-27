@@ -34,7 +34,7 @@
 <script>
 import lodashMerge from 'lodash.merge';
 import clonedeep from 'lodash.clonedeep';
-import { EVENTS, GET_DEFAULT_OPTIONS } from '@/commons/configs/constants';
+import { CUSTOM_EVENTS, GET_DEFAULT_OPTIONS } from '@/commons/configs/constants';
 
 export default {
   inject: ['toolboxRef', 'flowChartRef'],
@@ -46,13 +46,21 @@ export default {
   },
 
   created() {
-    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
-    this.flowChartRef.$on(EVENTS.FLOWCHART_OPTIONS_CHANGED, this.onFlowchartOptionsChange);
+    this.flowChartRef.$on(CUSTOM_EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+    this.flowChartRef.$on(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, this.onFlowchartOptionsChange);
   },
 
   methods: {
     onFlowchartReady() {
       this.options = clonedeep(this.flowChartRef.fc.getOptions());
+
+      this.flowChartRef.fc.on(CUSTOM_EVENTS.STAGE_MOVE, (offset) => {
+        this.options.stage.offset = offset;
+      });
+
+      this.flowChartRef.fc.on(CUSTOM_EVENTS.STAGE_SCALE_CHANGED, (scale) => {
+        this.options.stage.scale.value = scale;
+      });
     },
 
     onFlowchartOptionsChange(options) {

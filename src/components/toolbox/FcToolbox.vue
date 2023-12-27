@@ -23,7 +23,7 @@
   </div>
 </template>
 <script>
-import { EVENTS } from '@/commons/configs/constants';
+import { CUSTOM_EVENTS } from '@/commons/configs/constants';
 import ToolButtons from '@/components/toolbox/ToolButtons.vue';
 import FcDivider from '@/components/toolbox/FcDivider.vue';
 import ShapeList from '@/components/toolbox/ShapeList.vue';
@@ -66,7 +66,7 @@ export default {
   },
 
   created() {
-    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+    this.flowChartRef.$on(CUSTOM_EVENTS.FLOWCHART_READY, this.onFlowchartReady);
   },
 
   methods: {

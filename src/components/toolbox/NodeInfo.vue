@@ -36,11 +36,9 @@
   </div>
 </template>
 <script>
-import { EVENTS } from '@/commons/configs/constants';
+import { CUSTOM_EVENTS } from '@/commons/configs/constants';
 
-const CUSTOM_EVENTS = {
-  UPDATE_VISIBLE: 'update:visible',
-};
+const UPDATE_VISIBLE = 'update:visible';
 
 export default {
   inject: ['toolboxRef', 'flowChartRef'],
@@ -67,7 +65,7 @@ export default {
   },
 
   created() {
-    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+    this.flowChartRef.$on(CUSTOM_EVENTS.FLOWCHART_READY, this.onFlowchartReady);
   },
 
   beforeDestroy() {
@@ -80,13 +78,13 @@ export default {
     },
 
     bindEvents() {
-      this.flowChartRef.fc.on(EVENTS.SELECT_NODE, this.onSelectNode);
-      this.flowChartRef.fc.on(EVENTS.UNSELECT_NODE, this.onUnselectNode);
+      this.flowChartRef.fc.on(CUSTOM_EVENTS.SELECT_NODE, this.onSelectNode);
+      this.flowChartRef.fc.on(CUSTOM_EVENTS.UNSELECT_NODE, this.onUnselectNode);
     },
 
     unbindEvents() {
-      this.flowChartRef.fc.off(EVENTS.SELECT_NODE, this.onSelectNode);
-      this.flowChartRef.fc.off(EVENTS.UNSELECT_NODE, this.onUnselectNode);
+      this.flowChartRef.fc.off(CUSTOM_EVENTS.SELECT_NODE, this.onSelectNode);
+      this.flowChartRef.fc.off(CUSTOM_EVENTS.UNSELECT_NODE, this.onUnselectNode);
     },
 
     onSelectNode(fcNode) {
@@ -95,11 +93,11 @@ export default {
       }
 
       this.nodeInfo = { ...fcNode };
-      this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, true);
+      this.$emit(UPDATE_VISIBLE, true);
     },
 
     onUnselectNode() {
-      this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, false);
+      this.$emit(UPDATE_VISIBLE, false);
     },
 
     changeNodeStepIndex() {

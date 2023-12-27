@@ -21,7 +21,7 @@ import Vue from 'vue';
 import clonedeep from 'lodash.clonedeep';
 import lodashMerge from 'lodash.merge';
 import FcToolbox from '@/components/toolbox/FcToolbox.vue';
-import { EVENTS, GET_DEFAULT_OPTIONS, STORE_KEY_OPTIONS, } from '@/commons/configs/constants';
+import { CUSTOM_EVENTS, GET_DEFAULT_OPTIONS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
 import { FlowChart } from '@/flow-chart/FlowChart';
 import FcControls from '@/components/FcControls.vue';
 
@@ -85,10 +85,10 @@ export default Vue.extend({
 
       this.fc = fc;
 
-      this.$emit(EVENTS.FLOWCHART_READY);
+      this.$emit(CUSTOM_EVENTS.FLOWCHART_READY);
 
-      fc.on(EVENTS.FLOWCHART_OPTIONS_CHANGED, (payload) => {
-        this.$emit(EVENTS.FLOWCHART_OPTIONS_CHANGED, payload);
+      fc.on(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, (payload) => {
+        this.$emit(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, payload);
       });
     },
 

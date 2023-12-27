@@ -51,14 +51,14 @@ import {
   DEFAULT_SORT_ATTR_VALUE,
   DEFAULT_STEP_INDEX_ATTR_VALUE,
   EVENT_NAMESPACE,
-  EVENTS,
+  DOM_EVENTS,
   FC_CONNECTION_TYPE,
   FC_CSS_CLASS_NAMES, GET_DEFAULT_OPTIONS,
   JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
   SORT_ATTR_NAME,
-  STEP_INDEX_ATTR_NAME,
+  STEP_INDEX_ATTR_NAME, CUSTOM_EVENTS,
 } from '@/commons/configs/constants';
 import clonedeep from 'lodash.clonedeep';
 
@@ -73,14 +73,14 @@ export class FlowChart {
   private jsPlumbInstance: BrowserJsPlumbInstance;
 
   private eventHandlers = {
-    [EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
-    [EVENTS.UNSELECT_NODE]: [] as Array<() => void>,
-    [EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
-    [EVENTS.UNSELECT_CONNECTION]: [] as Array<() => void>,
-    [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
-    [EVENTS.WHEEL]: [] as Array<(scale: number) => void>,
-    [EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
-    [EVENTS.FLOWCHART_OPTIONS_CHANGED]: [] as Array<(options: IFcOptions) => void>,
+    [CUSTOM_EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
+    [CUSTOM_EVENTS.UNSELECT_NODE]: [] as Array<() => void>,
+    [CUSTOM_EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
+    [CUSTOM_EVENTS.UNSELECT_CONNECTION]: [] as Array<() => void>,
+    [CUSTOM_EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
+    [CUSTOM_EVENTS.STAGE_SCALE_CHANGED]: [] as Array<(scale: number) => void>,
+    [CUSTOM_EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
+    [CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED]: [] as Array<(options: IFcOptions) => void>,
   };
 
   private options: Required<IFcOptions>;
@@ -264,8 +264,8 @@ export class FlowChart {
 
       if ($fcNode) {
         this.onClickNode($fcNode);
-        this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqueryObject($fcNode)));
-        this.emit(EVENTS.UNSELECT_CONNECTION);
+        this.emit(CUSTOM_EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqueryObject($fcNode)));
+        this.emit(CUSTOM_EVENTS.UNSELECT_CONNECTION);
         return;
       }
 
@@ -277,19 +277,19 @@ export class FlowChart {
         const jsPlumbConnection = this.getSelectedJsPlumbConnection();
         const fcConnection = jsPlumbConnection ? this.getFcConnectionConfig(jsPlumbConnection) : null;
 
-        this.emit(EVENTS.SELECT_CONNECTION, fcConnection);
-        this.emit(EVENTS.UNSELECT_NODE);
+        this.emit(CUSTOM_EVENTS.SELECT_CONNECTION, fcConnection);
+        this.emit(CUSTOM_EVENTS.UNSELECT_NODE);
 
         return;
       }
 
-      this.emit(EVENTS.UNSELECT_ALL);
-      this.emit(EVENTS.UNSELECT_CONNECTION);
-      this.emit(EVENTS.UNSELECT_NODE);
+      this.emit(CUSTOM_EVENTS.UNSELECT_ALL);
+      this.emit(CUSTOM_EVENTS.UNSELECT_CONNECTION);
+      this.emit(CUSTOM_EVENTS.UNSELECT_NODE);
     }, 200, { trailing: false });
 
     this.$stage
-      .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler);
+      .on(DOM_EVENTS.MOUSEDOWN, debouncedMousedownHandler);
   }
 
   private isContainTarget(target: HTMLElement, cssClassName: string) {
@@ -354,7 +354,7 @@ export class FlowChart {
     };
 
     this.$stage
-      .on(EVENTS.DBLCLICK, dblclickHandler);
+      .on(DOM_EVENTS.DBLCLICK, dblclickHandler);
   }
 
   private onDoubleClickNode($fcNode: IJQuery) {
@@ -362,9 +362,9 @@ export class FlowChart {
 
     $nodeText
       .prop(CONTENT_EDITABLE_ATTR_NAME, 'true')
-      .trigger(EVENTS.FOCUS)
-      .one(EVENTS.BLUR, () => {
-        console.log(EVENTS.BLUR);
+      .trigger(DOM_EVENTS.FOCUS)
+      .one(DOM_EVENTS.BLUR, () => {
+        console.log(DOM_EVENTS.BLUR);
         $nodeText.removeAttr(CONTENT_EDITABLE_ATTR_NAME);
       });
   }
@@ -388,11 +388,11 @@ export class FlowChart {
         this.increaseScale();
       }
 
-      this.emit(EVENTS.WHEEL, this.options.stage.scale.value);
+      this.emit(CUSTOM_EVENTS.STAGE_SCALE_CHANGED, this.options.stage.scale.value);
     };
 
     jQuery(this.el.parentElement as HTMLElement)
-      .on(EVENTS.WHEEL, mousewheelHandler);
+      .on(DOM_EVENTS.WHEEL, mousewheelHandler);
   }
 
   decreaseScale() {
@@ -450,7 +450,7 @@ export class FlowChart {
     };
 
     jQuery(stageContainerElement)
-      .on(EVENTS.MOUSEOVER, (event: JQuery.TriggeredEvent) => {
+      .on(DOM_EVENTS.MOUSEOVER, (event: JQuery.TriggeredEvent) => {
         if (event.target === stageElement) {
           status.mouseoverStage = true;
           status.mouseoverContainer = false;
@@ -462,7 +462,7 @@ export class FlowChart {
           status.mouseoverContainer = false;
         }
       })
-      .on(EVENTS.MOUSELEAVE, (event: JQuery.TriggeredEvent) => {
+      .on(DOM_EVENTS.MOUSELEAVE, (event: JQuery.TriggeredEvent) => {
         if (event.target === stageElement) {
           status.mouseoverStage = false;
         } else if (event.target === stageContainerElement) {
@@ -488,7 +488,7 @@ export class FlowChart {
             this.options.stage.offset.x += dx;
             this.options.stage.offset.y += dy;
 
-            this.emit(EVENTS.STAGE_MOVE, this.options.stage.offset);
+            this.emit(CUSTOM_EVENTS.STAGE_MOVE, this.options.stage.offset);
 
             this.updateStageScaleAndOffset();
           },
@@ -573,7 +573,7 @@ export class FlowChart {
   updateOptions(options: Partial<IFcOptions>) {
     lodashMerge(this.options, options);
 
-    this.emit(EVENTS.FLOWCHART_OPTIONS_CHANGED, clonedeep(this.options));
+    this.emit(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, clonedeep(this.options));
   }
 
   getStageElement() {

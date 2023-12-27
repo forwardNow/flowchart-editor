@@ -15,11 +15,9 @@
 </template>
 <script>
 import lodashDebounce from 'lodash.debounce';
-import { EVENTS } from '@/commons/configs/constants';
+import { CUSTOM_EVENTS } from '@/commons/configs/constants';
 
-const CUSTOM_EVENTS = {
-  UPDATE_VISIBLE: 'update:visible',
-};
+const UPDATE_VISIBLE = 'update:visible';
 
 export default {
   inject: ['toolboxRef', 'flowChartRef'],
@@ -44,7 +42,7 @@ export default {
   },
 
   created() {
-    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+    this.flowChartRef.$on(CUSTOM_EVENTS.FLOWCHART_READY, this.onFlowchartReady);
   },
 
   beforeDestroy() {
@@ -57,12 +55,12 @@ export default {
     },
 
     bindEvents() {
-      this.flowChartRef.fc.on(EVENTS.SELECT_CONNECTION, this.onSelectConnection);
-      this.flowChartRef.fc.on(EVENTS.UNSELECT_CONNECTION, this.onUnselectConnection);
+      this.flowChartRef.fc.on(CUSTOM_EVENTS.SELECT_CONNECTION, this.onSelectConnection);
+      this.flowChartRef.fc.on(CUSTOM_EVENTS.UNSELECT_CONNECTION, this.onUnselectConnection);
     },
     unbindEvents() {
-      this.flowChartRef.fc.off(EVENTS.SELECT_CONNECTION, this.onSelectConnection);
-      this.flowChartRef.fc.off(EVENTS.UNSELECT_CONNECTION, this.onUnselectConnection);
+      this.flowChartRef.fc.off(CUSTOM_EVENTS.SELECT_CONNECTION, this.onSelectConnection);
+      this.flowChartRef.fc.off(CUSTOM_EVENTS.UNSELECT_CONNECTION, this.onUnselectConnection);
     },
 
     onSelectConnection(fcConnection) {
@@ -72,11 +70,11 @@ export default {
 
       this.connectionInfo = { ...fcConnection };
 
-      this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, true);
+      this.$emit(UPDATE_VISIBLE, true);
     },
 
     onUnselectConnection() {
-      this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, false);
+      this.$emit(UPDATE_VISIBLE, false);
     },
 
     changeConnectionLabel: lodashDebounce(function f() {

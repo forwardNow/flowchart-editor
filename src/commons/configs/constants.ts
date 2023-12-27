@@ -107,7 +107,7 @@ export const NODE_SKELETON_HTML_RENDER = lodashTemplate(`
   <div class="fc-node-skeleton marching-ants marching"></div>
 `);
 
-export const EVENTS = {
+export const DOM_EVENTS = {
   MOUSEDOWN: `mousedown.${EVENT_NAMESPACE}`,
   DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
   BLUR: `blur.${EVENT_NAMESPACE}`,
@@ -115,7 +115,9 @@ export const EVENTS = {
   WHEEL: `wheel.${EVENT_NAMESPACE}`,
   MOUSEOVER: `mouseover.${EVENT_NAMESPACE}`,
   MOUSELEAVE: `mouseleave.${EVENT_NAMESPACE}`,
+};
 
+export const CUSTOM_EVENTS = {
   SELECT_NODE: 'select-node',
   UNSELECT_NODE: 'unselect-node',
   SELECT_CONNECTION: 'select-connection',
@@ -123,6 +125,7 @@ export const EVENTS = {
   UNSELECT_ALL: 'unselect-all',
 
   STAGE_MOVE: 'stage-move',
+  STAGE_SCALE_CHANGED: 'stage-scale-changed',
 
   FLOWCHART_READY: 'flowchart-ready',
 
