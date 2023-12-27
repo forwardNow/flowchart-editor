@@ -90,6 +90,10 @@ export default Vue.extend({
       fc.on(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, (payload) => {
         this.$emit(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, payload);
       });
+
+      if (process.env.NODE_ENV === 'development') {
+        window.fc = fc;
+      }
     },
 
     destroy() {

@@ -115,6 +115,8 @@ export class FlowChart {
     this.updateHighlights();
 
     this.updateStageScaleAndOffset();
+
+    this.updateNodeDraggable();
   }
 
   private importDefaults() {
@@ -436,6 +438,15 @@ export class FlowChart {
     this.el.style.transform = `scale(${scale}) translateX(${x}px) translateY(${y}px)`;
 
     this.jsPlumbInstance.setZoom(scale);
+  }
+
+  setNodeDraggable(draggable: boolean) {
+    this.options.node.draggable = draggable;
+    this.updateNodeDraggable();
+  }
+
+  updateNodeDraggable() {
+    this.jsPlumbInstance.elementsDraggable = this.options.node.draggable;
   }
 
   private bindDragStage() {

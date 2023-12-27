@@ -41,6 +41,7 @@ export const DEFAULT_OPTIONS: Required<IFcOptions> = {
     endpoint: {
       show: true,
     },
+    draggable: true,
   },
 
   highlight: {

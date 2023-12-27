@@ -2,13 +2,25 @@
   <div class="fc-stage-settings fc-toolbox-list fc-info-list">
     <div class="fc-info-item">
       <span class="fc-info-item-label" title="node.endpoint.show">
-        是否显示节点的端点:
+        显示端点:
       </span>
       <input
         v-model="options.node.endpoint.show"
         class="fc-info-item-cont"
         type="checkbox"
         @change="changeVisibleOfEndpoints"
+      >
+    </div>
+
+    <div class="fc-info-item">
+      <span class="fc-info-item-label" title="node.endpoint.show">
+        节点可拖拽:
+      </span>
+      <input
+        v-model="options.node.draggable"
+        class="fc-info-item-cont"
+        type="checkbox"
+        @change="changeDraggableOfNode"
       >
     </div>
 
@@ -69,6 +81,10 @@ export default {
 
     changeVisibleOfEndpoints() {
       this.flowChartRef.fc.setVisibleOfEndpoints(this.options.node.endpoint.show);
+    },
+
+    changeDraggableOfNode() {
+      this.flowChartRef.fc.setNodeDraggable(this.options.node.draggable);
     },
   },
 };
