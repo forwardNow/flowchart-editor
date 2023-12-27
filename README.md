@@ -6,152 +6,86 @@
 
 ## 2. 环境
 
-vue 2.x
+vue 版本：
 
-node.js 16.x
+* vue@^2.6.0 : 版本范围 `[2.6.0, 3.0.0)`
 
-## 3. 使用
+nodejs 版本：
 
-### 3.1. 编译打包
+* 开发：16.x.x
+* 生产：12.x.x
 
-命令：
+## 3. 在其他项目中使用
 
-```shell
-# switch to project root directory
-cd flowchart-editor
+>以 demo 项目要使用该包 为例
 
-npm run build
-```
+### 3.1. 安装
 
-编译后的目录：
+离线安装步骤：
 
-```text
-flowchart-editor/
-  dist/
-    demo/
-      index.html        # 此文件可以直接在浏览器中打开
-    FlowChart.common.js
-    FlowChart.css
-    FlowChart.umd.js
-```
+1. 在项目根目录执行 pack 脚本命令，生成 tgz 文件
 
+    ```shell
+    npm run pack
+    ```
 
-### 3.2. 在浏览器中使用
+2. 将 `dist-zip/fe-flowchart-editor-1.0.3.tgz` 拷贝到 `demo/libs/` 下
+3. 在 demo 项目目录，执行离线安装命令
 
-参考: [public/demo/index.html](./public/demo/index.html) 
+    ```shell
+    npm i ./libs/fe-flowchart-editor-1.0.3.tgz
+    ```
 
-示例：
+从私仓下载安装步骤：
 
-```html
-<script src="//unpkg.com/vue@2"></script>
-<script src="./dist/FlowChart.umd.js"></script>
-<link rel="stylesheet" href="./dist/FlowChart.css">
+1. 配置 demo 项目的私仓镜像源，`.npmrc`
 
-<style>
-  body { padding: 0;margin: 0; }
-  #app { width: 100vw;height: 100vh; }
-</style>
+    ```text
+    @fe:registry=http://39.100.38.119:10000/repository/primeton-npm-product-repository/
+    ```
+   
+2. 执行安装命令
 
-<div id="app">
-  <flow-chart 
-    ref="flowchart"
-    :options="options" 
-    toolbox 
-  ></flow-chart>
-</div>
+    ```shell
+    npm i @fe/flowchart-editor@1.0.3
+    ```
+
+### 3.2. 使用
+
+```vue
+<template>
+  <div id="app">
+    <FlowChart :options="options" toolbox></FlowChart>
+  </div>
+</template>
+
 <script>
-  new Vue({
-    components: { FlowChart },
+  import FlowChart from '@fe/flowchart-editor';
+  import '@fe/flowchart-editor/dist/index.css';
+
+  export default {
+    components: {
+      FlowChart,
+    },
 
     mounted() {
-      this.init();
+      this.options = {};
     },
 
     data() {
       return {
         options: null,
-      }
+      };
     },
-
-    methods: {
-      init() {
-        // options 不为 null 时，才会触发流程图的渲染
-        this.options = this.$refs.flowchart.getOptionsInLocalStorage();
-      }
-    }
-  }).$mount('#app');
-</script>
-```
-
-### 3.3. 在 webpack 中使用
-
-目录：
-
-```text
-src/
-  components/
-    dist/
-      demo/
-        flowchart.config.10.json
-      FlowChart.common.js
-      FlowChart.css
-  App.vue
-```
-
-示例：
-
-```vue
-<template>
-  <div id="app">
-    <FlowChart :options="options"></FlowChart>
-  </div>
-</template>
-
-<script>
-import FlowChart from './components/dist/FlowChart.common';
-import './components/dist/FlowChart.css';
-import config from './components/dist/demo/flowchart.config.10.json';
-
-export default {
-  components: {
-    FlowChart,
-  },
-
-  mounted() {
-    this.init(config);
-  },
-
-  data() {
-    return {
-      options: null,
-    };
-  },
-
-  methods: {
-    init(options) {
-      // options.highlight.value = -1;
-      // options.highlight.value = 0;
-      // options.highlight.value = 1;
-      // options.highlight.value = 2;
-      options.highlight.value = 3;
-      // options.highlight.value = 4;
-      // options.highlight.value = 5;
-      // options.highlight.value = 6;
-      // options.highlight.value = 7;
-      // options.highlight.value = 8;
-
-      this.options = options;
-    },
-  },
-};
+  };
 </script>
 <style lang="scss">
-#app {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-}
+  #app {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+  }
 </style>
 ```

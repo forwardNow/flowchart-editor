@@ -18,10 +18,8 @@ import throttle from 'lodash.throttle';
 
 import {
   AnchorLocations,
-  BlankEndpoint,
   BrowserJsPlumbInstance,
   Connection as JsPlumbConnection,
-  DotEndpoint,
   LabelOverlay,
   newInstance,
 } from '@jsplumb/browser-ui';
@@ -48,21 +46,21 @@ import {
 import { toFixedNumber } from '@/commons/utils/number';
 
 import {
-  BIZ_ID_ATTR_NAME,
+  BIZ_ID_ATTR_NAME, CONTENT_EDITABLE_ATTR_NAME,
   DEFAULT_BIZ_ID_ATTR_VALUE,
-  DEFAULT_OPTIONS,
   DEFAULT_SORT_ATTR_VALUE,
   DEFAULT_STEP_INDEX_ATTR_VALUE,
   EVENT_NAMESPACE,
-  EVENTS,
+  DOM_EVENTS,
   FC_CONNECTION_TYPE,
-  FC_CSS_CLASS_NAMES,
+  FC_CSS_CLASS_NAMES, GET_DEFAULT_OPTIONS,
   JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
   SORT_ATTR_NAME,
-  STEP_INDEX_ATTR_NAME,
+  STEP_INDEX_ATTR_NAME, CUSTOM_EVENTS,
 } from '@/commons/configs/constants';
+import clonedeep from 'lodash.clonedeep';
 
 export type IJQuery = JQuery<HTMLElement>;
 
@@ -75,11 +73,14 @@ export class FlowChart {
   private jsPlumbInstance: BrowserJsPlumbInstance;
 
   private eventHandlers = {
-    [EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
-    [EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
-    [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
-    [EVENTS.WHEEL]: [] as Array<(scale: number) => void>,
-    [EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
+    [CUSTOM_EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
+    [CUSTOM_EVENTS.UNSELECT_NODE]: [] as Array<() => void>,
+    [CUSTOM_EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
+    [CUSTOM_EVENTS.UNSELECT_CONNECTION]: [] as Array<() => void>,
+    [CUSTOM_EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
+    [CUSTOM_EVENTS.STAGE_SCALE_CHANGED]: [] as Array<(scale: number) => void>,
+    [CUSTOM_EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
+    [CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED]: [] as Array<(options: IFcOptions) => void>,
   };
 
   private options: Required<IFcOptions>;
@@ -89,7 +90,7 @@ export class FlowChart {
 
     this.$stage = jQuery(el);
 
-    this.options = lodashMerge({}, DEFAULT_OPTIONS, options);
+    this.options = lodashMerge(GET_DEFAULT_OPTIONS(), options);
 
     this.jsPlumbInstance = this.createJsPlumbInstance();
 
@@ -118,8 +119,6 @@ export class FlowChart {
 
   private importDefaults() {
     const options = JS_PLUMB_DEFAULTS();
-
-    options.endpoint.type = this.options.node.endpoint.show ? DotEndpoint.type : BlankEndpoint.type;
 
     this.jsPlumbInstance.importDefaults(options);
   }
@@ -234,9 +233,12 @@ export class FlowChart {
   updateVisibleOfEndpoints() {
     const { show } = this.options.node.endpoint;
 
-    this.jsPlumbInstance.selectEndpoints().each((endpoint) => {
-      this.jsPlumbInstance.setEndpointVisible(endpoint, show);
-    });
+    if (!show) {
+      this.$stage.removeClass(FC_CSS_CLASS_NAMES.EndpointVisible);
+      return;
+    }
+
+    this.$stage.addClass(FC_CSS_CLASS_NAMES.EndpointVisible);
   }
 
   private bindListeners() {
@@ -262,7 +264,8 @@ export class FlowChart {
 
       if ($fcNode) {
         this.onClickNode($fcNode);
-        this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqueryObject($fcNode)));
+        this.emit(CUSTOM_EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqueryObject($fcNode)));
+        this.emit(CUSTOM_EVENTS.UNSELECT_CONNECTION);
         return;
       }
 
@@ -273,16 +276,20 @@ export class FlowChart {
 
         const jsPlumbConnection = this.getSelectedJsPlumbConnection();
         const fcConnection = jsPlumbConnection ? this.getFcConnectionConfig(jsPlumbConnection) : null;
-        this.emit(EVENTS.SELECT_CONNECTION, fcConnection);
+
+        this.emit(CUSTOM_EVENTS.SELECT_CONNECTION, fcConnection);
+        this.emit(CUSTOM_EVENTS.UNSELECT_NODE);
 
         return;
       }
 
-      this.emit(EVENTS.UNSELECT_ALL);
+      this.emit(CUSTOM_EVENTS.UNSELECT_ALL);
+      this.emit(CUSTOM_EVENTS.UNSELECT_CONNECTION);
+      this.emit(CUSTOM_EVENTS.UNSELECT_NODE);
     }, 200, { trailing: false });
 
     this.$stage
-      .on(EVENTS.MOUSEDOWN, debouncedMousedownHandler);
+      .on(DOM_EVENTS.MOUSEDOWN, debouncedMousedownHandler);
   }
 
   private isContainTarget(target: HTMLElement, cssClassName: string) {
@@ -325,8 +332,6 @@ export class FlowChart {
   private onClickNode($fcNode: IJQuery) {
     this.addSelectedCssClass($fcNode);
 
-    // this.showLineBalls($fcNode);
-
     // add skeleton element
     const hasSkeleton = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeSkeleton}`).length > 0;
 
@@ -349,24 +354,30 @@ export class FlowChart {
     };
 
     this.$stage
-      .on(EVENTS.DBLCLICK, dblclickHandler);
+      .on(DOM_EVENTS.DBLCLICK, dblclickHandler);
   }
 
   private onDoubleClickNode($fcNode: IJQuery) {
     const $nodeText = $fcNode.find(`.${FC_CSS_CLASS_NAMES.NodeContent}`);
 
     $nodeText
-      .prop('contenteditable', 'true')
-      .trigger('focus')
-      .one(EVENTS.BLUR, () => {
-        console.log(EVENTS.BLUR);
-        $nodeText.removeAttr('contenteditable');
+      .prop(CONTENT_EDITABLE_ATTR_NAME, 'true')
+      .trigger(DOM_EVENTS.FOCUS)
+      .one(DOM_EVENTS.BLUR, () => {
+        console.log(DOM_EVENTS.BLUR);
+        $nodeText.removeAttr(CONTENT_EDITABLE_ATTR_NAME);
       });
   }
 
   private bindMouseWheelListener() {
     const mousewheelHandler = (event: JQuery.TriggeredEvent) => {
       event.stopPropagation();
+
+      if (this.options.stage.scale.wheelWithAlt && !event.altKey) {
+        return;
+      }
+
+      event.preventDefault();
 
       const wheelEvent = event.originalEvent as WheelEvent;
       const { deltaY } = wheelEvent;
@@ -377,11 +388,11 @@ export class FlowChart {
         this.increaseScale();
       }
 
-      this.emit(EVENTS.WHEEL, this.options.stage.scale.value);
+      this.emit(CUSTOM_EVENTS.STAGE_SCALE_CHANGED, this.options.stage.scale.value);
     };
 
     jQuery(this.el.parentElement as HTMLElement)
-      .on(EVENTS.WHEEL, mousewheelHandler);
+      .on(DOM_EVENTS.WHEEL, mousewheelHandler);
   }
 
   decreaseScale() {
@@ -439,7 +450,7 @@ export class FlowChart {
     };
 
     jQuery(stageContainerElement)
-      .on(EVENTS.MOUSEOVER, (event: JQuery.TriggeredEvent) => {
+      .on(DOM_EVENTS.MOUSEOVER, (event: JQuery.TriggeredEvent) => {
         if (event.target === stageElement) {
           status.mouseoverStage = true;
           status.mouseoverContainer = false;
@@ -451,7 +462,7 @@ export class FlowChart {
           status.mouseoverContainer = false;
         }
       })
-      .on(EVENTS.MOUSELEAVE, (event: JQuery.TriggeredEvent) => {
+      .on(DOM_EVENTS.MOUSELEAVE, (event: JQuery.TriggeredEvent) => {
         if (event.target === stageElement) {
           status.mouseoverStage = false;
         } else if (event.target === stageContainerElement) {
@@ -477,7 +488,7 @@ export class FlowChart {
             this.options.stage.offset.x += dx;
             this.options.stage.offset.y += dy;
 
-            this.emit(EVENTS.STAGE_MOVE, this.options.stage.offset);
+            this.emit(CUSTOM_EVENTS.STAGE_MOVE, this.options.stage.offset);
 
             this.updateStageScaleAndOffset();
           },
@@ -543,31 +554,6 @@ export class FlowChart {
     $el.addClass(FC_CSS_CLASS_NAMES.Disabled);
   }
 
-  showLineBalls($fcNode: IJQuery) {
-    const el = $fcNode.get(0) as HTMLElement;
-
-    const jsplumbConnections = this.jsPlumbInstance.getConnections({ source: el }) as IJsPlumbConnection[];
-
-    for (let i = 0, len = jsplumbConnections.length; i < len; i += 1) {
-      const jsplumbConnection = jsplumbConnections[i];
-
-      const { connector } = jsplumbConnection;
-      const svgElement = (connector as any).canvas as SVGElement;
-
-      const path = this.jsPlumbInstance.getPathData(connector);
-      const position: JQuery.Coordinates = jQuery(svgElement).position();
-
-      this.$stage
-        .find('.fc-line-ball')
-        .show()
-        .css({
-          left: position.left,
-          top: position.top,
-          'offset-path': `path('${path}')`,
-        });
-    }
-  }
-
   private addSelectedCssClass($el: IJQuery) {
     $el.addClass(FC_CSS_CLASS_NAMES.Selected);
   }
@@ -582,6 +568,12 @@ export class FlowChart {
 
   getOptions() {
     return this.options;
+  }
+
+  updateOptions(options: Partial<IFcOptions>) {
+    lodashMerge(this.options, options);
+
+    this.emit(CUSTOM_EVENTS.FLOWCHART_OPTIONS_CHANGED, clonedeep(this.options));
   }
 
   getStageElement() {
@@ -824,6 +816,22 @@ export class FlowChart {
     }
 
     eventHandler.push(callback);
+  }
+
+  off(eventName: string, callback: (payload: any) => void) {
+    const handlers = this.eventHandlers[eventName];
+
+    if (!handlers) {
+      throw new Error(`FlowChart.eventHandlers.${eventName} is None`);
+    }
+
+    const targetIndex = handlers.findIndex((item) => item === callback);
+
+    if (targetIndex === -1) {
+      throw new Error(`unbind ${eventName} fail`);
+    }
+
+    handlers.splice(targetIndex, 1);
   }
 
   setStepIndexOfFcElement(el: HTMLElement, stepIndex: number) {

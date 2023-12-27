@@ -1,3 +1,4 @@
+import clonedeep from 'lodash.clonedeep';
 import lodashTemplate from 'lodash.template';
 
 import {
@@ -31,6 +32,10 @@ export const FC_CONNECTION_TYPE = FlowchartConnector.type;
 
 export const EVENT_NAMESPACE = 'fc';
 
+export const CONTENT_EDITABLE_ATTR_NAME = 'contenteditable';
+
+export const EXPORTED_FILE_NAME = 'flowchart.config.json';
+
 export const DEFAULT_OPTIONS: Required<IFcOptions> = {
   node: {
     endpoint: {
@@ -49,6 +54,7 @@ export const DEFAULT_OPTIONS: Required<IFcOptions> = {
       step: 0.1,
       min: 0.5,
       max: 2,
+      wheelWithAlt: true,
     },
     offset: {
       x: 0,
@@ -62,6 +68,8 @@ export const DEFAULT_OPTIONS: Required<IFcOptions> = {
   },
 };
 
+export const GET_DEFAULT_OPTIONS = () => clonedeep(DEFAULT_OPTIONS);
+
 export const FC_CSS_CLASS_NAMES = {
   Stage: 'flow-chart',
   Node: 'fc-node',
@@ -72,6 +80,9 @@ export const FC_CSS_CLASS_NAMES = {
   Disabled: 'fc-disabled',
 
   Connection: 'jtk-connector',
+  Endpoint: 'jtk-endpoint',
+
+  EndpointVisible: 'fc-endpoint-visible',
 
   [CIRCLE_NODE_TYPE]: 'fc-node-circle',
   [RECTANGLE_NODE_TYPE]: 'fc-node-rectangle',
@@ -96,19 +107,29 @@ export const NODE_SKELETON_HTML_RENDER = lodashTemplate(`
   <div class="fc-node-skeleton marching-ants marching"></div>
 `);
 
-export const EVENTS = {
+export const DOM_EVENTS = {
   MOUSEDOWN: `mousedown.${EVENT_NAMESPACE}`,
   DBLCLICK: `dblclick.${EVENT_NAMESPACE}`,
   BLUR: `blur.${EVENT_NAMESPACE}`,
+  FOCUS: `focus.${EVENT_NAMESPACE}`,
   WHEEL: `wheel.${EVENT_NAMESPACE}`,
   MOUSEOVER: `mouseover.${EVENT_NAMESPACE}`,
   MOUSELEAVE: `mouseleave.${EVENT_NAMESPACE}`,
+};
 
-  SELECT_NODE: `select-node.${EVENT_NAMESPACE}`,
-  SELECT_CONNECTION: `select-connection.${EVENT_NAMESPACE}`,
-  UNSELECT_ALL: `unselect-all.${EVENT_NAMESPACE}`,
+export const CUSTOM_EVENTS = {
+  SELECT_NODE: 'select-node',
+  UNSELECT_NODE: 'unselect-node',
+  SELECT_CONNECTION: 'select-connection',
+  UNSELECT_CONNECTION: 'unselect-connection',
+  UNSELECT_ALL: 'unselect-all',
 
-  STAGE_MOVE: `stage-move.${EVENT_NAMESPACE}`,
+  STAGE_MOVE: 'stage-move',
+  STAGE_SCALE_CHANGED: 'stage-scale-changed',
+
+  FLOWCHART_READY: 'flowchart-ready',
+
+  FLOWCHART_OPTIONS_CHANGED: 'flowchart-options-changed',
 };
 
 export const JS_PLUMB_DEFAULTS = () => ({

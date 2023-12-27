@@ -1,25 +1,29 @@
 <template>
   <div class="page-editor">
-    <FlowChart :options="options" toolbox ref="flowchart"/>
+    <FlowChart
+      ref="flowchart"
+      :options="options"
+      :toolbox="true"
+      :controls="false"
+    />
   </div>
 </template>
 <script>
-/* eslint-disable object-curly-newline */
-import FlowChart from '@/components/FlowChart.vue';
+import FlowChart from '@/flow-chart/FlowChart.vue';
 
 export default {
   components: {
     FlowChart,
   },
 
-  mounted() {
-    this.options = this.getOptions();
-  },
-
   data() {
     return {
       options: null,
     };
+  },
+
+  mounted() {
+    this.options = this.getOptions();
   },
 
   methods: {
@@ -30,11 +34,14 @@ export default {
 };
 </script>
 <style lang="scss">
+body {
+  padding: 0;
+  margin: 0;
+}
 .page-editor {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  .flow-chart-box {
+    width: 100vw;
+    height: 100vh;
+  }
 }
 </style>
