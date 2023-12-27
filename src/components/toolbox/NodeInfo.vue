@@ -80,19 +80,26 @@ export default {
     },
 
     bindEvents() {
-      this.flowChartRef.fc.on(EVENTS.SELECT_NODE, this.handleClickNode);
-    },
-    unbindEvents() {
-      this.flowChartRef.fc.off(EVENTS.SELECT_NODE, this.handleClickNode);
+      this.flowChartRef.fc.on(EVENTS.SELECT_NODE, this.onSelectNode);
+      this.flowChartRef.fc.on(EVENTS.UNSELECT_NODE, this.onUnselectNode);
     },
 
-    handleClickNode(fcNode) {
+    unbindEvents() {
+      this.flowChartRef.fc.off(EVENTS.SELECT_NODE, this.onSelectNode);
+      this.flowChartRef.fc.off(EVENTS.UNSELECT_NODE, this.onUnselectNode);
+    },
+
+    onSelectNode(fcNode) {
       if (!fcNode) {
         return;
       }
 
       this.nodeInfo = { ...fcNode };
       this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, true);
+    },
+
+    onUnselectNode() {
+      this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, false);
     },
 
     changeNodeStepIndex() {

@@ -32,16 +32,33 @@
   </div>
 </template>
 <script>
+import lodashMerge from 'lodash.merge';
+import clonedeep from 'lodash.clonedeep';
+import { EVENTS, GET_DEFAULT_OPTIONS } from '@/commons/configs/constants';
+
 export default {
   inject: ['toolboxRef', 'flowChartRef'],
 
-  computed: {
-    options() {
-      return this.toolboxRef.options;
-    },
+  data() {
+    return {
+      options: GET_DEFAULT_OPTIONS(),
+    };
+  },
+
+  created() {
+    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+    this.flowChartRef.$on(EVENTS.FLOWCHART_OPTIONS_CHANGED, this.onFlowchartOptionsChange);
   },
 
   methods: {
+    onFlowchartReady() {
+      this.options = clonedeep(this.flowChartRef.fc.getOptions());
+    },
+
+    onFlowchartOptionsChange(options) {
+      lodashMerge(this.options, options);
+    },
+
     changeVisibleOfEndpoints() {
       this.flowChartRef.fc.setVisibleOfEndpoints(this.options.node.endpoint.show);
     },

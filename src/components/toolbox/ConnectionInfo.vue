@@ -57,13 +57,15 @@ export default {
     },
 
     bindEvents() {
-      this.flowChartRef.fc.on(EVENTS.SELECT_CONNECTION, this.handleClickConnection);
+      this.flowChartRef.fc.on(EVENTS.SELECT_CONNECTION, this.onSelectConnection);
+      this.flowChartRef.fc.on(EVENTS.UNSELECT_CONNECTION, this.onUnselectConnection);
     },
     unbindEvents() {
-      this.flowChartRef.fc.off(EVENTS.SELECT_CONNECTION, this.handleClickConnection);
+      this.flowChartRef.fc.off(EVENTS.SELECT_CONNECTION, this.onSelectConnection);
+      this.flowChartRef.fc.off(EVENTS.UNSELECT_CONNECTION, this.onUnselectConnection);
     },
 
-    handleClickConnection(fcConnection) {
+    onSelectConnection(fcConnection) {
       if (!fcConnection) {
         return;
       }
@@ -71,6 +73,10 @@ export default {
       this.connectionInfo = { ...fcConnection };
 
       this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, true);
+    },
+
+    onUnselectConnection() {
+      this.$emit(CUSTOM_EVENTS.UPDATE_VISIBLE, false);
     },
 
     changeConnectionLabel: lodashDebounce(function f() {

@@ -16,15 +16,14 @@
       <StageSettings />
     </div>
 
-    <div v-show="visibleOfBottom" class="fc-toolbox-bottom">
+    <div v-show="visibleOfToolboxBottom" class="fc-toolbox-bottom">
       <NodeInfo :visible.sync="visibleOfNodeInfo" />
       <ConnectionInfo :visible.sync="visibleOfConnectionInfo" />
     </div>
   </div>
 </template>
 <script>
-import lodashMerge from 'lodash.merge';
-import { DEFAULT_OPTIONS, EVENTS } from '@/commons/configs/constants';
+import { EVENTS } from '@/commons/configs/constants';
 import ToolButtons from '@/components/toolbox/ToolButtons.vue';
 import FcDivider from '@/components/toolbox/FcDivider.vue';
 import ShapeList from '@/components/toolbox/ShapeList.vue';
@@ -55,16 +54,13 @@ export default {
 
   data() {
     return {
-      /** @type {IFcOptions}  */
-      options: lodashMerge({}, DEFAULT_OPTIONS),
-
       visibleOfNodeInfo: false,
       visibleOfConnectionInfo: false,
     };
   },
 
   computed: {
-    visibleOfBottom() {
+    visibleOfToolboxBottom() {
       return this.visibleOfNodeInfo || this.visibleOfConnectionInfo;
     },
   },
@@ -75,30 +71,8 @@ export default {
 
   methods: {
     onFlowchartReady() {
-      const options = this.flowChartRef.fc.getOptions();
-
-      this.options = lodashMerge({}, options);
-
-      this.bindListeners();
+      /* do nothing */
     },
-
-    bindListeners() {
-      const { fc } = this.flowChartRef;
-
-      fc.on(EVENTS.UNSELECT_ALL, () => {
-        this.visibleOfNodeInfo = false;
-        this.visibleOfConnectionInfo = false;
-      });
-
-      fc.on(EVENTS.WHEEL, (scale) => {
-        this.options.stage.scale.value = scale;
-      });
-
-      fc.on(EVENTS.STAGE_MOVE, (offset) => {
-        this.options.stage.offset = offset;
-      });
-    },
-
   },
 };
 </script>

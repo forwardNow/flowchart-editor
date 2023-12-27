@@ -48,19 +48,19 @@ import { toFixedNumber } from '@/commons/utils/number';
 import {
   BIZ_ID_ATTR_NAME, CONTENT_EDITABLE_ATTR_NAME,
   DEFAULT_BIZ_ID_ATTR_VALUE,
-  DEFAULT_OPTIONS,
   DEFAULT_SORT_ATTR_VALUE,
   DEFAULT_STEP_INDEX_ATTR_VALUE,
   EVENT_NAMESPACE,
   EVENTS,
   FC_CONNECTION_TYPE,
-  FC_CSS_CLASS_NAMES,
+  FC_CSS_CLASS_NAMES, GET_DEFAULT_OPTIONS,
   JS_PLUMB_DEFAULTS,
   NODE_HTML_RENDER,
   NODE_SKELETON_HTML_RENDER,
   SORT_ATTR_NAME,
   STEP_INDEX_ATTR_NAME,
 } from '@/commons/configs/constants';
+import clonedeep from 'lodash.clonedeep';
 
 export type IJQuery = JQuery<HTMLElement>;
 
@@ -74,10 +74,13 @@ export class FlowChart {
 
   private eventHandlers = {
     [EVENTS.SELECT_NODE]: [] as Array<(payload: IFcNode) => void>,
+    [EVENTS.UNSELECT_NODE]: [] as Array<() => void>,
     [EVENTS.SELECT_CONNECTION]: [] as Array<(payload: IFcConnection) => void>,
+    [EVENTS.UNSELECT_CONNECTION]: [] as Array<() => void>,
     [EVENTS.UNSELECT_ALL]: [] as Array<() => void>,
     [EVENTS.WHEEL]: [] as Array<(scale: number) => void>,
     [EVENTS.STAGE_MOVE]: [] as Array<(offset: { x: number, y: number }) => void>,
+    [EVENTS.FLOWCHART_OPTIONS_CHANGED]: [] as Array<(options: IFcOptions) => void>,
   };
 
   private options: Required<IFcOptions>;
@@ -87,7 +90,7 @@ export class FlowChart {
 
     this.$stage = jQuery(el);
 
-    this.options = lodashMerge({}, DEFAULT_OPTIONS, options);
+    this.options = lodashMerge(GET_DEFAULT_OPTIONS(), options);
 
     this.jsPlumbInstance = this.createJsPlumbInstance();
 
@@ -262,6 +265,7 @@ export class FlowChart {
       if ($fcNode) {
         this.onClickNode($fcNode);
         this.emit(EVENTS.SELECT_NODE, this.getFcNodeConfig(this.getElementFromJqueryObject($fcNode)));
+        this.emit(EVENTS.UNSELECT_CONNECTION);
         return;
       }
 
@@ -272,12 +276,16 @@ export class FlowChart {
 
         const jsPlumbConnection = this.getSelectedJsPlumbConnection();
         const fcConnection = jsPlumbConnection ? this.getFcConnectionConfig(jsPlumbConnection) : null;
+
         this.emit(EVENTS.SELECT_CONNECTION, fcConnection);
+        this.emit(EVENTS.UNSELECT_NODE);
 
         return;
       }
 
       this.emit(EVENTS.UNSELECT_ALL);
+      this.emit(EVENTS.UNSELECT_CONNECTION);
+      this.emit(EVENTS.UNSELECT_NODE);
     }, 200, { trailing: false });
 
     this.$stage
@@ -560,6 +568,12 @@ export class FlowChart {
 
   getOptions() {
     return this.options;
+  }
+
+  updateOptions(options: Partial<IFcOptions>) {
+    lodashMerge(this.options, options);
+
+    this.emit(EVENTS.FLOWCHART_OPTIONS_CHANGED, clonedeep(this.options));
   }
 
   getStageElement() {

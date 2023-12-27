@@ -42,7 +42,11 @@
   </div>
 </template>
 <script>
-import { EXPORTED_FILE_NAME, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
+import {
+  EXPORTED_FILE_NAME,
+  GET_DEFAULT_OPTIONS,
+  STORE_KEY_OPTIONS,
+} from '@/commons/configs/constants';
 import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
 import { downloadPlainFile } from '@/commons/utils/download';
 
@@ -93,12 +97,17 @@ export default {
 
     resetSetting() {
       const { fc } = this.flowChartRef;
-      const options = fc.getOptions();
 
-      options.stage.scale.value = 1;
-      options.stage.offset = { x: 0, y: 0 };
+      const defaultOptions = GET_DEFAULT_OPTIONS();
 
-      this.toolboxRef.options = options;
+      fc.updateOptions({
+        stage: {
+          scale: {
+            value: defaultOptions.stage.scale.value,
+          },
+          offset: defaultOptions.stage.offset,
+        },
+      });
 
       fc.updateStageScaleAndOffset();
     },

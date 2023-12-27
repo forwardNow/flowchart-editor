@@ -1,3 +1,4 @@
+import clonedeep from 'lodash.clonedeep';
 import lodashTemplate from 'lodash.template';
 
 import {
@@ -67,6 +68,8 @@ export const DEFAULT_OPTIONS: Required<IFcOptions> = {
   },
 };
 
+export const GET_DEFAULT_OPTIONS = () => clonedeep(DEFAULT_OPTIONS);
+
 export const FC_CSS_CLASS_NAMES = {
   Stage: 'flow-chart',
   Node: 'fc-node',
@@ -113,13 +116,17 @@ export const EVENTS = {
   MOUSEOVER: `mouseover.${EVENT_NAMESPACE}`,
   MOUSELEAVE: `mouseleave.${EVENT_NAMESPACE}`,
 
-  SELECT_NODE: `select-node.${EVENT_NAMESPACE}`,
-  SELECT_CONNECTION: `select-connection.${EVENT_NAMESPACE}`,
-  UNSELECT_ALL: `unselect-all.${EVENT_NAMESPACE}`,
+  SELECT_NODE: 'select-node',
+  UNSELECT_NODE: 'unselect-node',
+  SELECT_CONNECTION: 'select-connection',
+  UNSELECT_CONNECTION: 'unselect-connection',
+  UNSELECT_ALL: 'unselect-all',
 
-  STAGE_MOVE: `stage-move.${EVENT_NAMESPACE}`,
+  STAGE_MOVE: 'stage-move',
 
   FLOWCHART_READY: 'flowchart-ready',
+
+  FLOWCHART_OPTIONS_CHANGED: 'flowchart-options-changed',
 };
 
 export const JS_PLUMB_DEFAULTS = () => ({

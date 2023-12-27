@@ -72,6 +72,9 @@
 <script>
 import jQuery from 'jquery';
 import { BIZ_IDS_HIGHLIGHT, STEP_INDEX_HIGHLIGHT } from '@/commons/configs/commons';
+import { EVENTS, GET_DEFAULT_OPTIONS } from '@/commons/configs/constants';
+import lodashMerge from 'lodash.merge';
+import clonedeep from 'lodash.clonedeep';
 
 const CLICK_EVENT = 'click.highlight-settings';
 
@@ -83,6 +86,8 @@ export default {
       STEP_INDEX_HIGHLIGHT,
       BIZ_IDS_HIGHLIGHT,
 
+      options: GET_DEFAULT_OPTIONS(),
+
       dropdownMenu: {
         visible: false,
         fcNodes: [],
@@ -91,10 +96,6 @@ export default {
   },
 
   computed: {
-    options() {
-      return this.toolboxRef.options;
-    },
-
     serializedBizIds() {
       const bizIds = this.options.highlight.value;
 
@@ -106,6 +107,11 @@ export default {
     },
   },
 
+  created() {
+    this.flowChartRef.$on(EVENTS.FLOWCHART_READY, this.onFlowchartReady);
+    this.flowChartRef.$on(EVENTS.FLOWCHART_OPTIONS_CHANGED, this.onFlowchartOptionsChange);
+  },
+
   mounted() {
     this.bindEvents();
   },
@@ -115,6 +121,14 @@ export default {
   },
 
   methods: {
+    onFlowchartReady() {
+      this.options = clonedeep(this.flowChartRef.fc.getOptions());
+    },
+
+    onFlowchartOptionsChange(options) {
+      lodashMerge(this.options, options);
+    },
+
     bindEvents() {
       const bizIdsBoxSelector = '.fc-biz-ids-box';
 

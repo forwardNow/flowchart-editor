@@ -21,7 +21,7 @@ import Vue from 'vue';
 import clonedeep from 'lodash.clonedeep';
 import lodashMerge from 'lodash.merge';
 import FcToolbox from '@/components/toolbox/FcToolbox.vue';
-import { DEFAULT_OPTIONS, EVENTS, STORE_KEY_OPTIONS } from '@/commons/configs/constants';
+import { EVENTS, GET_DEFAULT_OPTIONS, STORE_KEY_OPTIONS, } from '@/commons/configs/constants';
 import { FlowChart } from '@/flow-chart/FlowChart';
 import FcControls from '@/components/FcControls.vue';
 
@@ -58,12 +58,6 @@ export default Vue.extend({
     },
   },
 
-  data() {
-    return {
-      fcOptions: {},
-    };
-  },
-
   watch: {
     options: {
       immediate: true,
@@ -71,8 +65,6 @@ export default Vue.extend({
         if (options == null) {
           return;
         }
-
-        this.fcOptions = clonedeep(this.options);
 
         this.destroy();
 
@@ -86,10 +78,18 @@ export default Vue.extend({
   },
 
   methods: {
-    init() {
-      this.fc = new FlowChart(this.$refs.stage, this.fcOptions);
+    init(options) {
+      const fcOptions = options ?? clonedeep(this.options);
+
+      const fc = new FlowChart(this.$refs.stage, fcOptions);
+
+      this.fc = fc;
 
       this.$emit(EVENTS.FLOWCHART_READY);
+
+      fc.on(EVENTS.FLOWCHART_OPTIONS_CHANGED, (payload) => {
+        this.$emit(EVENTS.FLOWCHART_OPTIONS_CHANGED, payload);
+      });
     },
 
     destroy() {
@@ -103,23 +103,13 @@ export default Vue.extend({
     reset(options) {
       this.destroy();
 
-      this.fcOptions = options;
-
-      this.init();
+      this.init(options);
     },
 
     getOptionsInLocalStorage() {
-      const optionsStr = localStorage.getItem(STORE_KEY_OPTIONS);
+      const serializedOptions = localStorage.getItem(STORE_KEY_OPTIONS) ?? '{}';
 
-      if (!optionsStr) {
-        return DEFAULT_OPTIONS;
-      }
-
-      let options = JSON.parse(optionsStr);
-
-      options = lodashMerge({}, DEFAULT_OPTIONS, options);
-
-      return options;
+      return lodashMerge(GET_DEFAULT_OPTIONS(), JSON.parse(serializedOptions));
     },
   },
 });
