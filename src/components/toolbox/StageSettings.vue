@@ -38,7 +38,7 @@
         画布偏移量:
       </span>
       <span class="fc-info-item-cont" title="stage.offset">
-        ({{ options.stage.offset.x }}, {{ options.stage.offset.y }})
+        {{ formatOffsetText() }}
       </span>
     </div>
   </div>
@@ -85,6 +85,17 @@ export default {
 
     changeDraggableOfNode() {
       this.flowChartRef.fc.setNodeDraggable(this.options.node.draggable);
+    },
+
+    // --
+
+    formatOffsetText() {
+      let { x, y } = this.options.stage.offset;
+
+      x = Math.floor(x);
+      y = Math.floor(y);
+
+      return `(${x}, ${y})`;
     },
   },
 };
