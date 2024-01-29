@@ -160,7 +160,7 @@ export default {
 
       fc.updateHighlightType(type);
 
-      this.toolboxRef.options = fc.getOptions();
+      this.options = fc.getOptions();
     },
 
     changeCurrentStepIndex($event) {
