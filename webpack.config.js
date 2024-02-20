@@ -25,7 +25,7 @@ module.exports = {
     historyApiFallback: true,
   },
 
-  entry: IS_PROD ? './src/flow-chart/FlowChart.vue' : './src/main.ts',
+  entry: IS_PROD ? './src/flow-chart/FlowChart.vue' : './src/test/test.ts',
 
   externals: IS_PROD ? config.externals : {},
 
