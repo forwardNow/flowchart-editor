@@ -45,7 +45,8 @@ export interface IFcOptions {
   node: {
     endpoint: {
       show: boolean,
-    }
+    },
+    draggable: boolean,
   },
 
   stage: {

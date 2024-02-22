@@ -1,44 +1,50 @@
 <template>
+  <!-- eslint-disable vue/singleline-html-element-content-newline  -->
   <div class="fc-tool-buttons fc-toolbox-list">
-    <div
-      class="fc-toolbox-item"
-      title="保存到 localStorage"
-      @click="save"
-    >
-      保存
-    </div>
-    <label
-      class="fc-toolbox-item"
-      title="导入流程图配置文件"
-    >
-      <input
-        v-show="false"
-        type="file"
-        @change="importConfigFile($event)"
-      >
-      导入
-    </label>
-    <div
-      class="fc-toolbox-item"
-      title="导出流程图配置文件"
-      @click="downloadConfigFile"
-    >
-      导出
-    </div>
-    <div
-      class="fc-toolbox-item"
-      title="删除节点或连线"
-      @click="remove"
-    >
-      删除
-    </div>
-    <div
-      class="fc-toolbox-item"
-      title="重置画布缩放和偏移"
-      @click="resetSetting"
-    >
-      重置
-    </div>
+    <FcDropdown class="fc-toolbox-item">
+      <span>文件</span>
+      <template #dropdown>
+        <FcDropdownMenu>
+          <FcDropdownMenuItem
+            icon="fc-icon-save" label="保存" hotkey="Ctrl + S"
+            title="保存到 localStorage" @click="save"
+          />
+
+          <FcDropdownMenuItem divided />
+
+          <FcDropdownMenuItem
+            icon="fc-icon-import" label="导入流程图配置文件"
+            title="导入流程图配置文件" @click="$refs.fileInput.click()"
+          >
+            <template #label>
+              <input v-show="false" ref="fileInput" type="file" @change="importConfigFile($event)">
+              导入
+            </template>
+          </FcDropdownMenuItem>
+
+          <FcDropdownMenuItem
+            icon="fc-icon-download" label="导出"
+            title="导出流程图配置文件" @click="downloadConfigFile"
+          />
+        </FcDropdownMenu>
+      </template>
+    </FcDropdown>
+
+    <FcDropdown class="fc-toolbox-item">
+      <span>编辑</span>
+      <template #dropdown>
+        <FcDropdownMenu>
+          <FcDropdownMenuItem
+            icon="fc-icon-delete" label="删除" hotkey="Delete"
+            title="删除节点或连线" @click="remove"
+          />
+          <FcDropdownMenuItem
+            icon="fc-icon-reset" label="重置"
+            title="重置画布缩放和偏移" @click="resetSetting"
+          />
+        </FcDropdownMenu>
+      </template>
+    </FcDropdown>
   </div>
 </template>
 <script>
@@ -49,8 +55,17 @@ import {
 } from '@/commons/configs/constants';
 import { showAlert, showConfirm, showSuccessToast } from '@/commons/utils/popup';
 import { downloadPlainFile } from '@/commons/utils/download';
+import FcDropdownMenu from '@/components/toolbox/components/FcDropdownMenu.vue';
+import FcDropdownMenuItem from '@/components/toolbox/components/FcDropdownMenuItem.vue';
+import FcDropdown from '@/components/toolbox/components/FcDropdown.vue';
 
 export default {
+  components: {
+    FcDropdown,
+    FcDropdownMenu,
+    FcDropdownMenuItem,
+  },
+
   inject: ['toolboxRef', 'flowChartRef'],
 
   methods: {
@@ -142,3 +157,27 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+.fc-tool-buttons {
+
+  .fc-icon-save {
+    background-image: url(@/commons/styles/images/icon_save.svg);
+  }
+
+  .fc-icon-download {
+    background-image: url(@/commons/styles/images/icon_download.svg);
+  }
+
+  .fc-icon-import {
+    background-image: url(@/commons/styles/images/icon_import.svg);
+  }
+
+  .fc-icon-delete {
+    background-image: url(@/commons/styles/images/icon_delete.svg);
+  }
+
+  .fc-icon-reset {
+    background-image: url(@/commons/styles/images/icon_reset_settings.svg);
+  }
+}
+</style>

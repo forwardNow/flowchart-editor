@@ -11,11 +11,13 @@ const config = require('./build/config');
 
 const IS_PROD = process.env.NODE_ENV === 'production';
 
-const IS_DEV = !IS_PROD;
+const IS_DEV = process.env.NODE_ENV === 'development';
+
+const IS_TEST = process.env.NODE_ENV === 'test';
 
 module.exports = {
-  mode: IS_PROD ? 'production' : 'development',
-  devtool: IS_PROD ? false : 'cheap-module-source-map',
+  mode: (IS_PROD || IS_TEST) ? 'production' : 'development',
+  devtool: (IS_PROD || IS_TEST) ? false : 'cheap-module-source-map',
 
   devServer: {
     host: 'localhost',
@@ -25,7 +27,7 @@ module.exports = {
     historyApiFallback: true,
   },
 
-  entry: IS_PROD ? './src/flow-chart/FlowChart.vue' : './src/main.ts',
+  entry: IS_PROD ? './src/flow-chart/FlowChart.vue' : './src/test/test.ts',
 
   externals: IS_PROD ? config.externals : {},
 
@@ -43,6 +45,7 @@ module.exports = {
     filename: 'js/[name].js',
     chunkFilename: 'js/[name].chunk.js',
     assetModuleFilename: 'media/[name].[ext][query]',
+    clean: IS_TEST,
   },
 
   resolve: {
@@ -107,11 +110,11 @@ module.exports = {
       context: path.resolve(__dirname, './src'),
     }),
 
-    IS_DEV && new HtmlWebpackPlugin({
+    (IS_DEV || IS_TEST) && new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './public/index.html'),
     }),
 
-    IS_PROD && new MiniCssExtractPlugin({
+    (IS_PROD || IS_TEST) && new MiniCssExtractPlugin({
       filename: config.cssFile,
     }),
 
@@ -119,7 +122,7 @@ module.exports = {
   ].filter(Boolean),
 
   optimization: {
-    minimize: IS_PROD,
+    minimize: IS_PROD || IS_TEST,
     minimizer: [
       new CssMinimizerPlugin(),
       new TerserPlugin({
@@ -137,7 +140,7 @@ module.exports = {
 
 function getStyleLoaders(preProcessor) {
   return [
-    IS_PROD ? MiniCssExtractPlugin.loader : 'vue-style-loader',
+    (IS_PROD || IS_TEST) ? MiniCssExtractPlugin.loader : 'vue-style-loader',
     'css-loader',
     {
       loader: 'postcss-loader',

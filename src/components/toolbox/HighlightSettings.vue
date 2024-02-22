@@ -51,15 +51,15 @@
             @click="handleClickBizIdsInput"
           >
 
-          <div v-show="dropdownMenu.visible" class="fc-dropdown-menu">
+          <div v-show="dropdownMenu.visible" class="hl-dropdown-menu">
             <div
               v-for="(item, i) in dropdownMenu.fcNodes" :key="i"
-              class="fc-menu-item"
+              class="hl-menu-item"
               @click="handleClickMenuItem(item)"
             >
               <input type="checkbox" :checked="isIncludeBizId(item.bizId)">
-              <div class="fc-menu-item-icon" :class="getFcNodeClasses(item.type)" />
-              <div class="fc-menu-item-text">
+              <div class="hl-menu-item-icon" :class="getFcNodeClasses(item.type)" />
+              <div class="hl-menu-item-text">
                 {{ item.text }}
               </div>
             </div>
@@ -160,7 +160,7 @@ export default {
 
       fc.updateHighlightType(type);
 
-      this.toolboxRef.options = fc.getOptions();
+      this.options = fc.getOptions();
     },
 
     changeCurrentStepIndex($event) {
@@ -212,41 +212,42 @@ export default {
     position: relative;
     display: inline-block;
   }
-}
 
-.fc-dropdown-menu {
-  position: absolute;
-  left: 0;
-  top: 100%;
+  .hl-dropdown-menu {
+    position: absolute;
+    left: 0;
+    top: 100%;
 
-  padding-top: 4px;
-  padding-bottom: 2px;
-  min-width: 320px;
-  max-height: 80vh;
+    padding-top: 4px;
+    padding-bottom: 2px;
+    min-width: 320px;
+    max-height: 80vh;
 
-  color: #212930;
-  font-size: 13px;
+    color: #212930;
+    font-size: 13px;
 
-  overflow-y: auto;
+    overflow-y: auto;
 
-  border-radius: 4px;
-  border: #e9edf2;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 4px 10px 0 rgba(0,0,0,.1);
+    border-radius: 4px;
+    border: #e9edf2;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,.1);
 
-  .fc-menu-item {
-    display: flex;
-    align-items: center;
+    .hl-menu-item {
+      display: flex;
+      align-items: center;
 
-    padding: 8px 8px;
+      padding: 8px 8px;
 
-    &:hover {
-      background: #f3f5f9;
+      &:hover {
+        background: #f3f5f9;
+      }
+    }
+    .hl-menu-item-icon {
+      margin-left: 4px;
+      color: #c4d0dc;
     }
   }
-  .fc-menu-item-icon {
-    margin-left: 4px;
-    color: #c4d0dc;
-  }
 }
+
 </style>
