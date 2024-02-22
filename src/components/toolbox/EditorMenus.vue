@@ -83,7 +83,31 @@ export default {
     };
   },
 
+  mounted() {
+    this.bindHotkey();
+  },
+
+  beforeDestroy() {
+    this.unbindHotkey();
+  },
+
   methods: {
+    bindHotkey() {
+      this.listener = (e) => {
+        if (e.key.toLowerCase() === 's' && e.ctrlKey) {
+          e.preventDefault();
+          this.save();
+        } else if (e.key.toLowerCase() === 'delete') {
+          this.remove();
+        }
+      };
+      document.addEventListener('keydown', this.listener);
+    },
+
+    unbindHotkey() {
+      document.removeEventListener('keydown', this.listener);
+    },
+
     save() {
       const { fc } = this.flowChartRef;
       const options = fc.getOptions();
