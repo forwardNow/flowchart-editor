@@ -35,6 +35,8 @@
 export default {
   name: 'FcMenuItem',
 
+  inject: ['dropdown'],
+
   props: {
     icon: { type: String, default: '' },
     divided: { type: Boolean, default: false },
@@ -44,6 +46,8 @@ export default {
 
   methods: {
     emitClickEvent() {
+      this.dropdown.hide();
+
       this.$emit('click');
     },
   },

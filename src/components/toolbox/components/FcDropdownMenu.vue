@@ -1,15 +1,18 @@
 <template>
-  <div class="fc-dropdown-menu">
+  <div
+    v-show="dropdown.visible"
+    class="fc-dropdown-menu"
+  >
     <slot />
   </div>
 </template>
 <script>
 export default {
+  inject: ['dropdown'],
 };
 </script>
 <style lang="scss">
 .fc-dropdown-menu {
-  display: none;
   position: absolute;
   top: 100%;
   left: 0;
