@@ -1,7 +1,7 @@
 <template>
   <div class="fc-toolbox">
     <div class="fc-toolbox-top">
-      <ToolButtons />
+      <EditorMenus />
 
       <FcDivider />
 
@@ -24,7 +24,7 @@
 </template>
 <script>
 import { CUSTOM_EVENTS } from '@/commons/configs/constants';
-import ToolButtons from '@/components/toolbox/ToolButtons.vue';
+import EditorMenus from '@/components/toolbox/EditorMenus.vue';
 import FcDivider from '@/components/toolbox/FcDivider.vue';
 import ShapeList from '@/components/toolbox/ShapeList.vue';
 import HighlightSettings from '@/components/toolbox/HighlightSettings.vue';
@@ -41,7 +41,7 @@ export default {
     HighlightSettings,
     ShapeList,
     FcDivider,
-    ToolButtons,
+    EditorMenus,
   },
 
   inject: ['flowChartRef'],
