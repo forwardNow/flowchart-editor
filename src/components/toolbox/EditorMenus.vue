@@ -93,11 +93,13 @@ export default {
 
   methods: {
     bindHotkey() {
-      this.listener = (e) => {
-        if (e.key.toLowerCase() === 's' && e.ctrlKey) {
-          e.preventDefault();
+      this.listener = (event) => {
+        const key = event.key.toLowerCase();
+
+        if (key === 's' && event.ctrlKey) {
+          event.preventDefault();
           this.save();
-        } else if (e.key.toLowerCase() === 'delete') {
+        } else if (key === 'delete') {
           this.remove();
         }
       };
