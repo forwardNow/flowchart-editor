@@ -462,10 +462,11 @@ export class FlowChart {
 
     jQuery(stageContainerElement)
       .on(DOM_EVENTS.MOUSEOVER, (event: JQuery.TriggeredEvent) => {
-        if (event.target === stageElement) {
+        const { target } = event;
+        if (target === stageElement) {
           status.mouseoverStage = true;
           status.mouseoverContainer = false;
-        } else if (event.target === stageContainerElement) {
+        } else if (target === stageContainerElement) {
           status.mouseoverStage = false;
           status.mouseoverContainer = true;
         } else {
@@ -474,9 +475,10 @@ export class FlowChart {
         }
       })
       .on(DOM_EVENTS.MOUSELEAVE, (event: JQuery.TriggeredEvent) => {
-        if (event.target === stageElement) {
+        const { target } = event;
+        if (target === stageElement) {
           status.mouseoverStage = false;
-        } else if (event.target === stageContainerElement) {
+        } else if (target === stageContainerElement) {
           status.mouseoverContainer = false;
         }
       });
@@ -493,6 +495,10 @@ export class FlowChart {
             const { dx, dy } = event;
 
             if (!isStageMovable) {
+              return;
+            }
+
+            if (this.jsPlumbInstance.currentlyDragging) {
               return;
             }
 
