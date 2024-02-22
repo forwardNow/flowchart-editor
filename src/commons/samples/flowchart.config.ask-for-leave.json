@@ -1,0 +1,183 @@
+{
+  "node": {
+    "endpoint": {
+      "show": true
+    },
+    "draggable": true
+  },
+  "highlight": {
+    "type": "BIZ_IDS",
+    "value": [
+      "0",
+      "1",
+      "3",
+      "4"
+    ]
+  },
+  "stage": {
+    "scale": {
+      "value": 1,
+      "step": 0.1,
+      "min": 0.5,
+      "max": 2,
+      "wheelWithAlt": true
+    },
+    "offset": {
+      "x": 101.60007858276367,
+      "y": -21.599899291992188
+    }
+  },
+  "config": {
+    "nodes": [
+      {
+        "id": "aa5dfb1f-1690-4e3c-bdd6-2f1d42d97a80",
+        "bizId": "0",
+        "type": "Circle",
+        "content": "开始",
+        "text": "开始",
+        "position": {
+          "x": 34,
+          "y": 162
+        },
+        "stepIndex": 0,
+        "sort": 0
+      },
+      {
+        "id": "2a320af2-67dc-4fc1-b7a2-78280a0002ec",
+        "bizId": "1",
+        "type": "Rectangle",
+        "content": "请假申请",
+        "text": "请假申请",
+        "position": {
+          "x": 190,
+          "y": 162
+        },
+        "stepIndex": 1,
+        "sort": 1
+      },
+      {
+        "id": "e4db1134-dd8b-43bd-886a-c8ad8ba76fd6",
+        "bizId": "2",
+        "type": "Rectangle",
+        "content": "部门助理审核",
+        "text": "部门助理审核",
+        "position": {
+          "x": 331,
+          "y": 264
+        },
+        "stepIndex": 2,
+        "sort": 2
+      },
+      {
+        "id": "2261cd5e-7279-4468-ac3a-0d209405d882",
+        "bizId": "3",
+        "type": "Rectangle",
+        "content": "部门审批",
+        "text": "部门审批",
+        "position": {
+          "x": 457,
+          "y": 163
+        },
+        "stepIndex": 3,
+        "sort": 3
+      },
+      {
+        "id": "d5e29574-9e1a-4a7c-820d-a7a9b29bb10c",
+        "bizId": "4",
+        "type": "Rectangle",
+        "content": "通知请假结果",
+        "text": "通知请假结果",
+        "position": {
+          "x": 662,
+          "y": 163
+        },
+        "stepIndex": 4,
+        "sort": 4
+      },
+      {
+        "id": "3faf3caa-1cfc-4303-bdbf-9777598191d9",
+        "bizId": "5",
+        "type": "Rectangle",
+        "content": "HR确认归档",
+        "text": "HR确认归档",
+        "position": {
+          "x": 868,
+          "y": 163
+        },
+        "stepIndex": 5,
+        "sort": 5
+      },
+      {
+        "id": "6f071f43-b6e8-40b9-9c42-86f491f46305",
+        "bizId": "6",
+        "type": "Circle",
+        "content": "结束",
+        "text": "结束",
+        "position": {
+          "x": 1058,
+          "y": 163
+        },
+        "stepIndex": 6,
+        "sort": 6
+      }
+    ],
+    "connections": [
+      {
+        "type": "Flowchart",
+        "sourceId": "aa5dfb1f-1690-4e3c-bdd6-2f1d42d97a80",
+        "sourceAnchor": "Right",
+        "targetId": "2a320af2-67dc-4fc1-b7a2-78280a0002ec",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "2a320af2-67dc-4fc1-b7a2-78280a0002ec",
+        "sourceAnchor": "Right",
+        "targetId": "2261cd5e-7279-4468-ac3a-0d209405d882",
+        "targetAnchor": "Left",
+        "label": "常规请假"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "e4db1134-dd8b-43bd-886a-c8ad8ba76fd6",
+        "sourceAnchor": "Right",
+        "targetId": "2261cd5e-7279-4468-ac3a-0d209405d882",
+        "targetAnchor": "Bottom",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "2a320af2-67dc-4fc1-b7a2-78280a0002ec",
+        "sourceAnchor": "Bottom",
+        "targetId": "e4db1134-dd8b-43bd-886a-c8ad8ba76fd6",
+        "targetAnchor": "Left",
+        "label": "调休"
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "2261cd5e-7279-4468-ac3a-0d209405d882",
+        "sourceAnchor": "Right",
+        "targetId": "d5e29574-9e1a-4a7c-820d-a7a9b29bb10c",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "d5e29574-9e1a-4a7c-820d-a7a9b29bb10c",
+        "sourceAnchor": "Right",
+        "targetId": "3faf3caa-1cfc-4303-bdbf-9777598191d9",
+        "targetAnchor": "Left",
+        "label": ""
+      },
+      {
+        "type": "Flowchart",
+        "sourceId": "3faf3caa-1cfc-4303-bdbf-9777598191d9",
+        "sourceAnchor": "Right",
+        "targetId": "6f071f43-b6e8-40b9-9c42-86f491f46305",
+        "targetAnchor": "Left",
+        "label": ""
+      }
+    ]
+  }
+}

@@ -26,6 +26,13 @@
             icon="fc-icon-download" label="导出"
             title="导出流程图配置文件" @click="downloadConfigFile"
           />
+
+          <FcDropdownMenuItem divided />
+
+          <FcDropdownMenuItem
+            icon="fc-icon-terminal" label="示例：请假流程"
+            @click="loadSample(samples.ASK_FOR_LEAVE)"
+          />
         </FcDropdownMenu>
       </template>
     </FcDropdown>
@@ -67,6 +74,14 @@ export default {
   },
 
   inject: ['toolboxRef', 'flowChartRef'],
+
+  data() {
+    return {
+      samples: {
+        ASK_FOR_LEAVE: 'ASK_FOR_LEAVE',
+      },
+    };
+  },
 
   methods: {
     save() {
@@ -161,6 +176,21 @@ export default {
         reader.readAsText(file);
       }
     },
+
+    async loadSample(sample) {
+      let fileContent;
+
+      if (sample === this.samples.ASK_FOR_LEAVE) {
+        fileContent = await import('@/commons/samples/flowchart.config.ask-for-leave.json');
+      }
+
+      if (!fileContent) {
+        console.error(`unknown sample: ${sample}`);
+        return;
+      }
+
+      this.flowChartRef.reset(fileContent);
+    },
   },
 };
 </script>
@@ -185,6 +215,10 @@ export default {
 
   .fc-icon-reset {
     background-image: url(@/commons/styles/images/icon_reset_settings.svg);
+  }
+
+  .fc-icon-terminal {
+    background-image: url(@/commons/styles/images/icon_terminal.svg);
   }
 }
 </style>
