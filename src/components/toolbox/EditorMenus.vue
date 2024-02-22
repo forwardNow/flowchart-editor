@@ -110,7 +110,14 @@ export default {
         .catch((e) => console.log(e));
     },
 
-    resetSetting() {
+    async resetSetting() {
+      const isConfirm = await showConfirm('确认重置画布缩放和偏移量？')
+        .then(() => true).catch(() => false);
+
+      if (!isConfirm) {
+        return;
+      }
+
       const { fc } = this.flowChartRef;
 
       const defaultOptions = GET_DEFAULT_OPTIONS();
