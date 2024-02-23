@@ -26,6 +26,13 @@
             icon="fc-icon-download" label="导出"
             title="导出流程图配置文件" @click="downloadConfigFile"
           />
+
+          <FcDropdownMenuItem divided />
+
+          <FcDropdownMenuItem
+            icon="fc-icon-terminal" label="示例：请假流程"
+            @click="loadSample(samples.ASK_FOR_LEAVE)"
+          />
         </FcDropdownMenu>
       </template>
     </FcDropdown>
@@ -68,7 +75,41 @@ export default {
 
   inject: ['toolboxRef', 'flowChartRef'],
 
+  data() {
+    return {
+      samples: {
+        ASK_FOR_LEAVE: 'ASK_FOR_LEAVE',
+      },
+    };
+  },
+
+  mounted() {
+    this.bindHotkey();
+  },
+
+  beforeDestroy() {
+    this.unbindHotkey();
+  },
+
   methods: {
+    bindHotkey() {
+      this.listener = (event) => {
+        const key = event.key.toLowerCase();
+
+        if (key === 's' && event.ctrlKey) {
+          event.preventDefault();
+          this.save();
+        } else if (key === 'delete') {
+          this.remove();
+        }
+      };
+      document.addEventListener('keydown', this.listener);
+    },
+
+    unbindHotkey() {
+      document.removeEventListener('keydown', this.listener);
+    },
+
     save() {
       const { fc } = this.flowChartRef;
       const options = fc.getOptions();
@@ -110,7 +151,14 @@ export default {
         .catch((e) => console.log(e));
     },
 
-    resetSetting() {
+    async resetSetting() {
+      const isConfirm = await showConfirm('确认重置画布缩放和偏移量？')
+        .then(() => true).catch(() => false);
+
+      if (!isConfirm) {
+        return;
+      }
+
       const { fc } = this.flowChartRef;
 
       const defaultOptions = GET_DEFAULT_OPTIONS();
@@ -154,6 +202,21 @@ export default {
         reader.readAsText(file);
       }
     },
+
+    async loadSample(sample) {
+      let fileContent;
+
+      if (sample === this.samples.ASK_FOR_LEAVE) {
+        fileContent = await import('@/commons/samples/flowchart.config.ask-for-leave.json');
+      }
+
+      if (!fileContent) {
+        console.error(`unknown sample: ${sample}`);
+        return;
+      }
+
+      this.flowChartRef.reset(fileContent);
+    },
   },
 };
 </script>
@@ -178,6 +241,10 @@ export default {
 
   .fc-icon-reset {
     background-image: url(@/commons/styles/images/icon_reset_settings.svg);
+  }
+
+  .fc-icon-terminal {
+    background-image: url(@/commons/styles/images/icon_terminal.svg);
   }
 }
 </style>

@@ -158,8 +158,13 @@ export default {
   .fc-info-item-cont {
     margin: 0 0 0 4px;
     color: #333;
+
+  }
+
+  input.fc-info-item-cont {
     vertical-align: middle;
   }
+
   .fc-info-item-input {
     display: inline-block;
     padding: 0 0 0 8px;
