@@ -49,6 +49,17 @@
             icon="fc-icon-reset" label="重置"
             title="重置画布缩放和偏移" @click="resetSetting"
           />
+          <FcDropdownMenuItem divided />
+
+          <FcDropdownMenuItem
+            icon="fc-icon-zoom-in" label="放大" hotkey="Alt + 滚下"
+            @click="zoomIn"
+          />
+
+          <FcDropdownMenuItem
+            icon="fc-icon-zoom-out" label="缩小" hotkey="Alt + 滚上"
+            @click="zoomOut"
+          />
         </FcDropdownMenu>
       </template>
     </FcDropdown>
@@ -217,6 +228,14 @@ export default {
 
       this.flowChartRef.reset(fileContent);
     },
+
+    zoomIn() {
+      this.flowChartRef.fc.increaseScale();
+    },
+
+    zoomOut() {
+      this.flowChartRef.fc.decreaseScale();
+    },
   },
 };
 </script>
@@ -245,6 +264,14 @@ export default {
 
   .fc-icon-terminal {
     background-image: url(@/commons/styles/images/icon_terminal.svg);
+  }
+
+  .fc-icon-zoom-in {
+    background-image: url(@/commons/styles/images/icon_zoom_in.svg);
+  }
+
+  .fc-icon-zoom-out {
+    background-image: url(@/commons/styles/images/icon_zoom_out.svg);
   }
 }
 </style>

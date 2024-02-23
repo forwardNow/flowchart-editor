@@ -389,8 +389,6 @@ export class FlowChart {
       } else {
         this.increaseScale();
       }
-
-      this.emit(CUSTOM_EVENTS.STAGE_SCALE_CHANGED, this.options.stage.scale.value);
     };
 
     jQuery(this.el.parentElement as HTMLElement)
@@ -410,6 +408,8 @@ export class FlowChart {
 
     this.options.stage.scale.value = toFixedNumber(scale - scaleStep);
 
+    this.emit(CUSTOM_EVENTS.STAGE_SCALE_CHANGED, this.options.stage.scale.value);
+
     this.updateStageScaleAndOffset();
   }
 
@@ -425,6 +425,8 @@ export class FlowChart {
     }
 
     this.options.stage.scale.value = toFixedNumber(scale + scaleStep);
+
+    this.emit(CUSTOM_EVENTS.STAGE_SCALE_CHANGED, this.options.stage.scale.value);
 
     this.updateStageScaleAndOffset();
   }
