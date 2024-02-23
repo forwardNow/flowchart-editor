@@ -2,7 +2,7 @@
 
 ## 1. 介绍
 
-流程图的编辑及呈现
+流程图的编辑及呈现，[在线示例](https://forwardnow.github.io/flowchart-editor/)。
 
 ## 2. 环境
 
@@ -29,11 +29,11 @@ nodejs 版本：
     npm run pack
     ```
 
-2. 将 `dist-zip/fe-flowchart-editor-1.0.3.tgz` 拷贝到 `demo/libs/` 下
+2. 将 `dist-zip/fe-flowchart-editor-x.y.z.tgz` 拷贝到 `demo/libs/` 下
 3. 在 demo 项目目录，执行离线安装命令
 
     ```shell
-    npm i ./libs/fe-flowchart-editor-1.0.3.tgz
+    npm i ./libs/fe-flowchart-editor-x.y.z.tgz
     ```
 
 从私仓下载安装步骤：
